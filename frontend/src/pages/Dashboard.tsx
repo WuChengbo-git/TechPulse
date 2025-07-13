@@ -123,7 +123,7 @@ const Dashboard: React.FC = () => {
       {cards.length === 0 && !loading && (
         <Alert
           message="暂无数据"
-          description="点击"收集新数据"按钮开始抓取技术情报"
+          description="点击「收集新数据」按钮开始抓取技术情报"
           type="info"
           showIcon
         />

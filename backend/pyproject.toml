@@ -4,7 +4,6 @@ version = "0.1.0"
 description = "TechPulse Backend API - Tech Intelligence Dashboard"
 authors = ["TechPulse Team"]
 readme = "README.md"
-python = "^3.9"
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -13,6 +12,7 @@ uvicorn = {extras = ["standard"], version = "^0.24.0"}
 sqlalchemy = "^2.0.23"
 alembic = "^1.12.1"
 pydantic = "^2.5.0"
+pydantic-settings = "^2.1.0"
 requests = "^2.31.0"
 feedparser = "^6.0.10"
 notion-client = "^2.2.1"
