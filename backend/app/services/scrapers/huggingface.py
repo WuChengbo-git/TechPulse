@@ -54,6 +54,66 @@ class HuggingFaceScraper:
             logger.error(f"Error fetching HuggingFace models: {e}")
             return []
     
+    async def get_daily_trending_models(self, limit: int = 20) -> List[Dict]:
+        """
+        获取每日热门AI模型
+        """
+        try:
+            # 获取不同类型的AI模型
+            ai_tasks = [
+                "text-generation",
+                "image-generation", 
+                "text-to-image",
+                "automatic-speech-recognition",
+                "question-answering",
+                "translation",
+                "summarization",
+                "text-classification",
+                "image-classification",
+                "object-detection"
+            ]
+            
+            all_models = []
+            
+            for task in ai_tasks[:5]:  # 限制请求数量
+                params = {
+                    "sort": "trending",
+                    "direction": -1,
+                    "limit": 10,
+                    "filter": task
+                }
+                
+                response = requests.get(self.models_url, params=params, timeout=30)
+                if response.status_code == 200:
+                    models = response.json()
+                    
+                    for model in models:
+                        # 避免重复
+                        if not any(m["title"] == model.get("modelId", "") for m in all_models):
+                            model_data = {
+                                "title": model.get("modelId", ""),
+                                "author": model.get("author", ""),
+                                "downloads": model.get("downloads", 0),
+                                "likes": model.get("likes", 0),
+                                "url": f"https://huggingface.co/{model.get('modelId', '')}",
+                                "tags": model.get("tags", []),
+                                "pipeline_tag": model.get("pipeline_tag"),
+                                "library_name": model.get("library_name"),
+                                "created_at": model.get("createdAt"),
+                                "last_modified": model.get("lastModified"),
+                                "task_category": task,
+                                "raw_data": model
+                            }
+                            all_models.append(model_data)
+            
+            # 按下载量排序
+            all_models.sort(key=lambda x: x.get("downloads", 0), reverse=True)
+            return all_models[:limit]
+            
+        except Exception as e:
+            logger.error(f"Error fetching daily trending models: {e}")
+            return []
+    
     async def get_trending_datasets(self, task: Optional[str] = None, limit: int = 30) -> List[Dict]:
         """
         获取 HuggingFace 热门数据集

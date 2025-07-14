@@ -4,6 +4,8 @@ from sqlalchemy.orm import Session
 from ..models.card import TechCard, SourceType
 from ..core.database import SessionLocal
 from .scrapers import GitHubScraper, ArxivScraper, HuggingFaceScraper
+from .ai.azure_openai import azure_openai_service
+from ..core.config import settings
 import logging
 
 logger = logging.getLogger(__name__)
@@ -50,23 +52,60 @@ class DataCollector:
         收集 GitHub 数据
         """
         try:
-            repos = await self.github_scraper.get_trending_repos()
-            db = SessionLocal()
+            # 同时收集一般trending和AI Python项目
+            general_repos = await self.github_scraper.get_trending_repos(language="python")
+            ai_repos = await self.github_scraper.get_ai_python_repos()
             
+            # 合并并去重
+            all_repos = general_repos + ai_repos
+            unique_repos = {repo["url"]: repo for repo in all_repos}.values()
+            
+            db = SessionLocal()
             saved_count = 0
-            for repo in repos:
+            
+            for repo in unique_repos:
                 existing = db.query(TechCard).filter(
                     TechCard.original_url == repo["url"]
                 ).first()
                 
                 if not existing:
+                    # 准备内容进行AI处理
+                    content = f"Project: {repo['title']}\nDescription: {repo.get('description', '')}\nTopics: {', '.join(repo.get('topics', []))}"
+                    
+                    # AI处理
+                    summary = None
+                    chinese_tags = []
+                    trial_suggestion = None
+                    
+                    if azure_openai_service.is_available():
+                        try:
+                            # 生成摘要
+                            if settings.enable_summarization:
+                                summary = await azure_openai_service.summarize_content(
+                                    content, "github", settings.default_language
+                                )
+                            
+                            # 提取标签
+                            chinese_tags = await azure_openai_service.extract_tags(
+                                content, settings.default_language
+                            )
+                            
+                            # 生成试用建议
+                            trial_suggestion = await azure_openai_service.generate_trial_suggestion(
+                                content, settings.default_language
+                            )
+                            
+                        except Exception as e:
+                            logger.error(f"AI processing failed for {repo['title']}: {e}")
+                    
                     card = TechCard(
                         title=repo["title"],
                         source=SourceType.GITHUB,
                         original_url=repo["url"],
-                        summary=repo.get("description", ""),
-                        chinese_tags=repo.get("topics", []),
-                        raw_data=repo["raw_data"]
+                        summary=summary or repo.get("description", ""),
+                        chinese_tags=chinese_tags if chinese_tags else repo.get("topics", []),
+                        trial_suggestion=trial_suggestion,
+                        raw_data=repo
                     )
                     db.add(card)
                     saved_count += 1
@@ -122,25 +161,67 @@ class DataCollector:
         收集 HuggingFace 数据
         """
         try:
-            models = await self.hf_scraper.get_trending_models(limit=15)
-            datasets = await self.hf_scraper.get_trending_datasets(limit=15)
+            # 收集热门模型和每日trending模型
+            trending_models = await self.hf_scraper.get_trending_models(limit=15)
+            daily_models = await self.hf_scraper.get_daily_trending_models(limit=15)
+            datasets = await self.hf_scraper.get_trending_datasets(limit=10)
+            
+            # 合并并去重
+            all_items = trending_models + daily_models + datasets
+            unique_items = {item["url"]: item for item in all_items}.values()
             
             db = SessionLocal()
             saved_count = 0
             
-            for item in models + datasets:
+            for item in unique_items:
                 existing = db.query(TechCard).filter(
                     TechCard.original_url == item["url"]
                 ).first()
                 
                 if not existing:
+                    # 准备内容进行AI处理
+                    item_type = "Model" if "models" in item["url"] else "Dataset"
+                    content = f"{item_type}: {item['title']}\nAuthor: {item.get('author', '')}\nTags: {', '.join(item.get('tags', []))}\nTask: {item.get('pipeline_tag', '')}"
+                    
+                    # AI处理
+                    summary = None
+                    chinese_tags = []
+                    trial_suggestion = None
+                    
+                    if azure_openai_service.is_available():
+                        try:
+                            # 生成摘要
+                            if settings.enable_summarization:
+                                summary = await azure_openai_service.summarize_content(
+                                    content, "huggingface", settings.default_language
+                                )
+                            
+                            # 提取标签
+                            chinese_tags = await azure_openai_service.extract_tags(
+                                content, settings.default_language
+                            )
+                            
+                            # 生成试用建议
+                            trial_suggestion = await azure_openai_service.generate_trial_suggestion(
+                                content, settings.default_language
+                            )
+                            
+                        except Exception as e:
+                            logger.error(f"AI processing failed for {item['title']}: {e}")
+                    
+                    # 构建基础摘要
+                    base_summary = f"Downloads: {item.get('downloads', 0)}, Likes: {item.get('likes', 0)}"
+                    if item.get('pipeline_tag'):
+                        base_summary += f", Task: {item['pipeline_tag']}"
+                    
                     card = TechCard(
                         title=item["title"],
                         source=SourceType.HUGGINGFACE,
                         original_url=item["url"],
-                        summary=f"Downloads: {item.get('downloads', 0)}, Likes: {item.get('likes', 0)}",
-                        chinese_tags=item.get("tags", []),
-                        raw_data=item["raw_data"]
+                        summary=summary or base_summary,
+                        chinese_tags=chinese_tags if chinese_tags else item.get("tags", []),
+                        trial_suggestion=trial_suggestion,
+                        raw_data=item
                     )
                     db.add(card)
                     saved_count += 1

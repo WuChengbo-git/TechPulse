@@ -3,7 +3,8 @@ name = "techpulse-backend"
 version = "0.1.0"
 description = "TechPulse Backend API - Tech Intelligence Dashboard"
 authors = ["TechPulse Team"]
-readme = "README.md"
+readme = "../README.md"
+packages = [{include = "app"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"

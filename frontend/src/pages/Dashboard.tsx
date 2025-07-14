@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Card, Row, Col, Typography, Spin, Alert, Button, Tag, Space } from 'antd'
-import { GithubOutlined, FileTextOutlined, RobotOutlined, SyncOutlined } from '@ant-design/icons'
+import { Card, Row, Col, Typography, Spin, Alert, Button, Tag, Space, Select, Modal, message } from 'antd'
+import { GithubOutlined, FileTextOutlined, RobotOutlined, SyncOutlined, TranslationOutlined, SettingOutlined } from '@ant-design/icons'
 
 const { Title, Paragraph } = Typography
 
@@ -16,15 +16,25 @@ interface TechCard {
   created_at: string
 }
 
+interface Language {
+  code: string
+  name: string
+  flag: string
+}
+
 const Dashboard: React.FC = () => {
   const [cards, setCards] = useState<TechCard[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [languages, setLanguages] = useState<Record<string, Language>>({})
+  const [currentLanguage, setCurrentLanguage] = useState('zh')
+  const [translationLoading, setTranslationLoading] = useState(false)
+  const [serviceStatus, setServiceStatus] = useState<any>(null)
 
   const fetchCards = async () => {
     try {
       setLoading(true)
-      const response = await fetch('/api/v1/cards?limit=20')
+      const response = await fetch('/api/v1/cards/?limit=20')
       if (response.ok) {
         const data = await response.json()
         setCards(data)
@@ -50,8 +60,95 @@ const Dashboard: React.FC = () => {
     }
   }
 
+  const fetchLanguages = async () => {
+    try {
+      const response = await fetch('/api/v1/languages')
+      if (response.ok) {
+        const data = await response.json()
+        setLanguages(data.languages)
+        setCurrentLanguage(data.current_language)
+      }
+    } catch (err) {
+      console.error('Failed to fetch languages:', err)
+    }
+  }
+
+  const fetchServiceStatus = async () => {
+    try {
+      const response = await fetch('/api/v1/status')
+      if (response.ok) {
+        const data = await response.json()
+        setServiceStatus(data)
+      }
+    } catch (err) {
+      console.error('Failed to fetch service status:', err)
+    }
+  }
+
+  const handleLanguageChange = async (language: string) => {
+    try {
+      const response = await fetch('/api/v1/language/switch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ language })
+      })
+      if (response.ok) {
+        setCurrentLanguage(language)
+        message.success(`语言已切换到 ${languages[language]?.name}`)
+      }
+    } catch (err) {
+      message.error('语言切换失败')
+    }
+  }
+
+  const translateCard = async (cardId: number) => {
+    if (!serviceStatus?.ai_service_available) {
+      message.warning('AI服务未配置，无法翻译')
+      return
+    }
+
+    try {
+      setTranslationLoading(true)
+      const response = await fetch('/api/v1/translate/card', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ card_id: cardId, target_language: currentLanguage })
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        Modal.info({
+          title: '翻译结果',
+          content: (
+            <div>
+              <p><strong>原文摘要：</strong></p>
+              <p>{data.original_summary}</p>
+              <p><strong>翻译摘要：</strong></p>
+              <p>{data.translated_summary}</p>
+              {data.translated_trial_suggestion && (
+                <>
+                  <p><strong>试用建议：</strong></p>
+                  <p>{data.translated_trial_suggestion}</p>
+                </>
+              )}
+            </div>
+          ),
+          width: 600
+        })
+      } else {
+        message.error('翻译失败')
+      }
+    } catch (err) {
+      message.error('翻译失败: ' + err)
+    } finally {
+      setTranslationLoading(false)
+    }
+  }
+
   useEffect(() => {
     fetchCards()
+    fetchLanguages()
+    fetchServiceStatus()
   }, [])
 
   const getSourceIcon = (source: string) => {
@@ -92,7 +189,28 @@ const Dashboard: React.FC = () => {
   return (
     <div>
       <div style={{ marginBottom: 24 }}>
-        <Title level={2}>📊 技术情报仪表盘</Title>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Title level={2}>📊 技术情报仪表盘</Title>
+          <Space>
+            <Select
+              value={currentLanguage}
+              onChange={handleLanguageChange}
+              style={{ width: 120 }}
+              placeholder="选择语言"
+            >
+              {Object.entries(languages).map(([code, lang]) => (
+                <Select.Option key={code} value={code}>
+                  {lang.flag} {lang.name}
+                </Select.Option>
+              ))}
+            </Select>
+            {serviceStatus && (
+              <Tag color={serviceStatus.ai_service_available ? 'green' : 'red'}>
+                AI服务: {serviceStatus.ai_service_available ? '已连接' : '未配置'}
+              </Tag>
+            )}
+          </Space>
+        </div>
         <Space>
           <Button 
             type="primary" 
@@ -158,7 +276,18 @@ const Dashboard: React.FC = () => {
                   style={{ fontSize: '12px' }}
                 >
                   查看原文
-                </a>
+                </a>,
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<TranslationOutlined />}
+                  onClick={() => translateCard(card.id)}
+                  loading={translationLoading}
+                  disabled={!serviceStatus?.ai_service_available}
+                  style={{ fontSize: '12px' }}
+                >
+                  翻译
+                </Button>
               ]}
             >
               {card.summary && (
@@ -173,15 +302,26 @@ const Dashboard: React.FC = () => {
               {card.chinese_tags && card.chinese_tags.length > 0 && (
                 <div style={{ marginBottom: 8 }}>
                   {card.chinese_tags.slice(0, 3).map((tag, index) => (
-                    <Tag key={index} size="small" style={{ fontSize: '10px' }}>
+                    <Tag key={index} style={{ fontSize: '10px' }}>
                       {tag}
                     </Tag>
                   ))}
                   {card.chinese_tags.length > 3 && (
-                    <Tag size="small" style={{ fontSize: '10px' }}>
+                    <Tag style={{ fontSize: '10px' }}>
                       +{card.chinese_tags.length - 3}
                     </Tag>
                   )}
+                </div>
+              )}
+              
+              {card.trial_suggestion && (
+                <div style={{ marginTop: 8, padding: '8px', backgroundColor: '#f0f0f0', borderRadius: '4px' }}>
+                  <div style={{ fontSize: '10px', color: '#666', marginBottom: '4px' }}>💡 试用建议</div>
+                  <div style={{ fontSize: '11px', color: '#333' }}>
+                    {card.trial_suggestion.length > 100 
+                      ? card.trial_suggestion.substring(0, 100) + '...' 
+                      : card.trial_suggestion}
+                  </div>
                 </div>
               )}
               
