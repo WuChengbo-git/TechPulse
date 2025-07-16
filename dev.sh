@@ -39,7 +39,15 @@ fi
 # 启动后端
 echo -e "${BLUE}🚀 Starting backend in development mode...${NC}"
 cd backend
-poetry run python run.py &
+if [ ! -d "venv" ]; then
+    echo -e "${BLUE}Creating virtual environment...${NC}"
+    python -m venv venv
+    source venv/bin/activate
+    pip install fastapi uvicorn sqlalchemy alembic pydantic pydantic-settings requests feedparser notion-client openai python-multipart python-jose python-dotenv httpx
+else
+    source venv/bin/activate
+fi
+python run.py &
 BACKEND_PID=$!
 echo "Backend PID: $BACKEND_PID"
 
@@ -56,9 +64,12 @@ echo $FRONTEND_PID > ../logs/frontend.pid
 
 echo ""
 echo -e "${GREEN}🎉 Development servers started!${NC}"
-echo -e "Frontend: ${GREEN}http://localhost:5173${NC}"
-echo -e "Backend:  ${GREEN}http://localhost:8000${NC}"
-echo -e "API Docs: ${GREEN}http://localhost:8000/docs${NC}"
+LOCAL_IP=$(hostname -I | awk '{print $1}')
+echo -e "Frontend (Local): ${GREEN}http://localhost:5174${NC}"
+echo -e "Frontend (LAN):   ${GREEN}http://$LOCAL_IP:5174${NC}"
+echo -e "Backend (Local):  ${GREEN}http://localhost:8001${NC}"
+echo -e "Backend (LAN):    ${GREEN}http://$LOCAL_IP:8001${NC}"
+echo -e "API Docs:         ${GREEN}http://localhost:8001/docs${NC}"
 echo ""
 echo -e "${YELLOW}Press Ctrl+C to stop all services${NC}"
 

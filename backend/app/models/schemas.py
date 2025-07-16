@@ -10,6 +10,12 @@ class TechCardBase(BaseModel):
     original_url: str
     summary: Optional[str] = None
     chinese_tags: Optional[List[str]] = None
+    ai_category: Optional[List[str]] = None  # AI分类标签
+    tech_stack: Optional[List[str]] = None   # 技术栈
+    license: Optional[str] = None            # 开源协议
+    stars: Optional[int] = 0                 # GitHub Stars
+    forks: Optional[int] = 0                 # GitHub Forks
+    issues: Optional[int] = 0                # Issue活跃度
     trial_suggestion: Optional[str] = None
     status: TrialStatus = TrialStatus.NOT_TRIED
     trial_notes: Optional[str] = None
@@ -23,6 +29,12 @@ class TechCardUpdate(BaseModel):
     title: Optional[str] = None
     summary: Optional[str] = None
     chinese_tags: Optional[List[str]] = None
+    ai_category: Optional[List[str]] = None
+    tech_stack: Optional[List[str]] = None
+    license: Optional[str] = None
+    stars: Optional[int] = None
+    forks: Optional[int] = None
+    issues: Optional[int] = None
     trial_suggestion: Optional[str] = None
     status: Optional[TrialStatus] = None
     trial_notes: Optional[str] = None

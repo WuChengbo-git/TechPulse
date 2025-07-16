@@ -39,7 +39,9 @@ class GitHubScraper:
                     "description": repo.get("description", ""),
                     "url": repo["html_url"],
                     "stars": repo["stargazers_count"],
+                    "forks": repo["forks_count"],
                     "language": repo.get("language"),
+                    "license": repo.get("license", {}).get("name") if repo.get("license") else None,
                     "created_at": repo["created_at"],
                     "updated_at": repo["updated_at"],
                     "topics": repo.get("topics", []),
@@ -99,7 +101,9 @@ class GitHubScraper:
                                 "description": repo.get("description", ""),
                                 "url": repo["html_url"],
                                 "stars": repo["stargazers_count"],
+                                "forks": repo["forks_count"],
                                 "language": repo.get("language"),
+                                "license": repo.get("license", {}).get("name") if repo.get("license") else None,
                                 "created_at": repo["created_at"],
                                 "updated_at": repo["updated_at"],
                                 "topics": repo.get("topics", []),
@@ -118,21 +122,24 @@ class GitHubScraper:
     
     def _build_trending_query(self, since: str) -> str:
         """
-        构建 GitHub 搜索查询
+        构建 GitHub 搜索查询 - 获取最近一周活跃且高star的项目
         """
         from datetime import datetime, timedelta
         
-        if since == "daily":
-            date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
-            date_filter = f"created:>{date}"
-        elif since == "weekly":
-            date = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
-            date_filter = f"created:>{date}"
-        else:
-            date = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
-            date_filter = f"created:>{date}"
+        # 最近一周的日期
+        week_ago = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
         
-        return f"stars:>5 {date_filter}"
+        if since == "daily":
+            # 最近1天推送且高star数的项目
+            date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+            return f"stars:>500 pushed:>{date}"
+        elif since == "weekly":
+            # 最近一周推送且高star数的项目
+            return f"stars:>100 pushed:>{week_ago}"
+        else:
+            # 最近一月推送且高star数的项目
+            date = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
+            return f"stars:>50 pushed:>{date}"
     
     async def get_repo_details(self, owner: str, repo: str) -> Optional[Dict]:
         """

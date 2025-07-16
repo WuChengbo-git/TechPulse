@@ -63,13 +63,19 @@ if [ ! -f ".env" ]; then
     echo -e "${YELLOW}📝 Please edit backend/.env file with your API keys${NC}"
 fi
 
-# 安装后端依赖
-echo -e "${BLUE}📦 Installing backend dependencies...${NC}"
-poetry install
+# 安装后端依赖（如果虚拟环境不存在则创建）
+if [ ! -d "venv" ]; then
+    echo -e "${BLUE}📦 Creating virtual environment and installing dependencies...${NC}"
+    python -m venv venv
+    source venv/bin/activate
+    pip install fastapi uvicorn sqlalchemy alembic pydantic pydantic-settings requests feedparser notion-client openai python-multipart python-jose python-dotenv httpx
+else
+    echo -e "${BLUE}📦 Virtual environment exists, activating...${NC}"
+fi
 
 # 启动后端服务
 echo -e "${GREEN}🚀 Starting backend server...${NC}"
-poetry run python run.py > ../logs/backend.log 2>&1 &
+source venv/bin/activate && python run.py > ../logs/backend.log 2>&1 &
 BACKEND_PID=$!
 
 # 等待后端启动
@@ -77,8 +83,8 @@ echo -e "${BLUE}⏳ Waiting for backend to start...${NC}"
 sleep 5
 
 # 检查后端是否启动成功
-if curl -s http://localhost:8000/health > /dev/null; then
-    echo -e "${GREEN}✅ Backend started successfully at http://localhost:8000${NC}"
+if curl -s http://localhost:8001/health > /dev/null; then
+    echo -e "${GREEN}✅ Backend started successfully at http://localhost:8001${NC}"
 else
     echo -e "${RED}❌ Backend failed to start. Check logs/backend.log${NC}"
     kill $BACKEND_PID 2>/dev/null
@@ -105,8 +111,8 @@ echo -e "${BLUE}⏳ Waiting for frontend to start...${NC}"
 sleep 8
 
 # 检查前端是否启动成功
-if curl -s http://localhost:5173 > /dev/null; then
-    echo -e "${GREEN}✅ Frontend started successfully at http://localhost:5173${NC}"
+if curl -s http://localhost:5174 > /dev/null; then
+    echo -e "${GREEN}✅ Frontend started successfully at http://localhost:5174${NC}"
 else
     echo -e "${YELLOW}⚠️  Frontend may still be starting. Check logs/frontend.log${NC}"
 fi
@@ -115,10 +121,13 @@ fi
 echo ""
 echo -e "${GREEN}🎉 TechPulse is now running!${NC}"
 echo ""
+LOCAL_IP=$(hostname -I | awk '{print $1}')
 echo -e "${BLUE}📍 Service URLs:${NC}"
-echo -e "   Frontend:    ${GREEN}http://localhost:5173${NC}"
-echo -e "   Backend:     ${GREEN}http://localhost:8000${NC}"
-echo -e "   API Docs:    ${GREEN}http://localhost:8000/docs${NC}"
+echo -e "   Frontend (Local):  ${GREEN}http://localhost:5174${NC}"
+echo -e "   Frontend (LAN):    ${GREEN}http://$LOCAL_IP:5174${NC}"
+echo -e "   Backend (Local):   ${GREEN}http://localhost:8001${NC}"
+echo -e "   Backend (LAN):     ${GREEN}http://$LOCAL_IP:8001${NC}"
+echo -e "   API Docs:          ${GREEN}http://localhost:8001/docs${NC}"
 echo ""
 echo -e "${BLUE}📋 Process IDs:${NC}"
 echo -e "   Backend PID: ${BACKEND_PID}"

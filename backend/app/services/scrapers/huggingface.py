@@ -56,30 +56,29 @@ class HuggingFaceScraper:
     
     async def get_daily_trending_models(self, limit: int = 20) -> List[Dict]:
         """
-        获取每日热门AI模型
+        获取最新AI模型 - 按下载量和最近更新时间
         """
         try:
-            # 获取不同类型的AI模型
+            # 获取不同类型的热门AI模型
             ai_tasks = [
                 "text-generation",
-                "image-generation", 
                 "text-to-image",
+                "image-generation", 
                 "automatic-speech-recognition",
                 "question-answering",
                 "translation",
                 "summarization",
-                "text-classification",
-                "image-classification",
-                "object-detection"
+                "feature-extraction"
             ]
             
             all_models = []
             
-            for task in ai_tasks[:5]:  # 限制请求数量
+            # 首先获取按下载量排序的热门模型
+            for task in ai_tasks[:4]:  # 限制请求数量
                 params = {
-                    "sort": "trending",
+                    "sort": "downloads",
                     "direction": -1,
-                    "limit": 10,
+                    "limit": 8,
                     "filter": task
                 }
                 
@@ -106,8 +105,44 @@ class HuggingFaceScraper:
                             }
                             all_models.append(model_data)
             
-            # 按下载量排序
-            all_models.sort(key=lambda x: x.get("downloads", 0), reverse=True)
+            # 然后获取最近更新的模型
+            recent_params = {
+                "sort": "lastModified",
+                "direction": -1,
+                "limit": 15
+            }
+            
+            response = requests.get(self.models_url, params=recent_params, timeout=30)
+            if response.status_code == 200:
+                models = response.json()
+                
+                for model in models:
+                    # 避免重复
+                    if not any(m["title"] == model.get("modelId", "") for m in all_models):
+                        model_data = {
+                            "title": model.get("modelId", ""),
+                            "author": model.get("author", ""),
+                            "downloads": model.get("downloads", 0),
+                            "likes": model.get("likes", 0),
+                            "url": f"https://huggingface.co/{model.get('modelId', '')}",
+                            "tags": model.get("tags", []),
+                            "pipeline_tag": model.get("pipeline_tag"),
+                            "library_name": model.get("library_name"),
+                            "created_at": model.get("createdAt"),
+                            "last_modified": model.get("lastModified"),
+                            "task_category": "recent",
+                            "raw_data": model
+                        }
+                        all_models.append(model_data)
+            
+            # 按下载量排序，但保持最近更新的模型也有机会被选中
+            # 混合排序：70%按下载量，30%按最近更新
+            popular_models = sorted([m for m in all_models if m.get("downloads", 0) > 1000], 
+                                   key=lambda x: x.get("downloads", 0), reverse=True)[:int(limit*0.7)]
+            recent_models = sorted([m for m in all_models if m not in popular_models], 
+                                  key=lambda x: x.get("last_modified") or "", reverse=True)[:int(limit*0.3)]
+            
+            all_models = popular_models + recent_models
             return all_models[:limit]
             
         except Exception as e:

@@ -65,23 +65,23 @@ fi
 # 检查端口占用
 echo -e "${BLUE}🔍 Checking port usage...${NC}"
 
-if lsof -i :8000 > /dev/null 2>&1; then
-    echo -e "${YELLOW}⚠️  Port 8000 still in use:${NC}"
-    lsof -i :8000
-    PIDS_8000=$(lsof -t -i :8000)
-    if [ -n "$PIDS_8000" ]; then
-        echo -e "${BLUE}🔌 Killing processes on port 8000...${NC}"
-        kill $PIDS_8000 2>/dev/null
+if lsof -i :8001 > /dev/null 2>&1; then
+    echo -e "${YELLOW}⚠️  Port 8001 still in use:${NC}"
+    lsof -i :8001
+    PIDS_8001=$(lsof -t -i :8001)
+    if [ -n "$PIDS_8001" ]; then
+        echo -e "${BLUE}🔌 Killing processes on port 8001...${NC}"
+        kill $PIDS_8001 2>/dev/null
     fi
 fi
 
-if lsof -i :5173 > /dev/null 2>&1; then
-    echo -e "${YELLOW}⚠️  Port 5173 still in use:${NC}"
-    lsof -i :5173
-    PIDS_5173=$(lsof -t -i :5173)
-    if [ -n "$PIDS_5173" ]; then
-        echo -e "${BLUE}🔌 Killing processes on port 5173...${NC}"
-        kill $PIDS_5173 2>/dev/null
+if lsof -i :5174 > /dev/null 2>&1; then
+    echo -e "${YELLOW}⚠️  Port 5174 still in use:${NC}"
+    lsof -i :5174
+    PIDS_5174=$(lsof -t -i :5174)
+    if [ -n "$PIDS_5174" ]; then
+        echo -e "${BLUE}🔌 Killing processes on port 5174...${NC}"
+        kill $PIDS_5174 2>/dev/null
     fi
 fi
 

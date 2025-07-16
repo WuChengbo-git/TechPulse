@@ -52,13 +52,17 @@ class DataCollector:
         收集 GitHub 数据
         """
         try:
-            # 同时收集一般trending和AI Python项目
-            general_repos = await self.github_scraper.get_trending_repos(language="python")
-            ai_repos = await self.github_scraper.get_ai_python_repos()
+            # 同时收集一般trending和AI Python项目（最近一周）
+            general_repos = await self.github_scraper.get_trending_repos(language="python", since="weekly")
+            ai_repos = await self.github_scraper.get_ai_python_repos(since="weekly")
             
             # 合并并去重
             all_repos = general_repos + ai_repos
-            unique_repos = {repo["url"]: repo for repo in all_repos}.values()
+            unique_repos = list({repo["url"]: repo for repo in all_repos}.values())
+            
+            # 按star数排序并限制数量到20个
+            unique_repos.sort(key=lambda x: x.get("stars", 0), reverse=True)
+            unique_repos = unique_repos[:20]
             
             db = SessionLocal()
             saved_count = 0
@@ -105,6 +109,10 @@ class DataCollector:
                         summary=summary or repo.get("description", ""),
                         chinese_tags=chinese_tags if chinese_tags else repo.get("topics", []),
                         trial_suggestion=trial_suggestion,
+                        stars=repo.get("stars", 0),
+                        forks=repo.get("forks", 0),
+                        license=repo.get("license"),
+                        tech_stack=repo.get("topics", [])[:5] if repo.get("topics") else [],
                         raw_data=repo
                     )
                     db.add(card)

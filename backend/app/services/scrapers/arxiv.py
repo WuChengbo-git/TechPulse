@@ -22,13 +22,26 @@ class ArxivScraper:
     
     async def get_recent_papers(self, categories: Optional[List[str]] = None, max_results: int = 30) -> List[Dict]:
         """
-        获取最近的 arXiv 论文
+        获取最近的 arXiv 论文 - 重点关注AI相关领域
         """
         try:
             if not categories:
-                categories = list(self.categories.keys())
+                # 重点关注AI核心领域
+                categories = ["cs.AI", "cs.ML", "cs.LG", "cs.CV", "cs.CL"]
             
-            query = " OR ".join([f"cat:{cat}" for cat in categories])
+            # 构建查询：包含分类和热门关键词
+            cat_query = " OR ".join([f"cat:{cat}" for cat in categories])
+            keyword_query = " OR ".join([
+                "all:\"large language model\"",
+                "all:\"transformer\"", 
+                "all:\"diffusion\"",
+                "all:\"reinforcement learning\"",
+                "all:\"neural network\"",
+                "all:\"deep learning\""
+            ])
+            
+            # 组合查询：(分类 OR 关键词) 
+            query = f"({cat_query}) OR ({keyword_query})"
             
             params = {
                 "search_query": query,
