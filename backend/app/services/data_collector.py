@@ -3,7 +3,7 @@ from typing import List, Dict
 from sqlalchemy.orm import Session
 from ..models.card import TechCard, SourceType
 from ..core.database import SessionLocal
-from .scrapers import GitHubScraper, ArxivScraper, HuggingFaceScraper
+from .scrapers import GitHubScraper, ArxivScraper, HuggingFaceScraper, ZennScraper
 from .ai.azure_openai import azure_openai_service
 from ..core.config import settings
 import logging
@@ -16,6 +16,7 @@ class DataCollector:
         self.github_scraper = GitHubScraper()
         self.arxiv_scraper = ArxivScraper()
         self.hf_scraper = HuggingFaceScraper()
+        self.zenn_scraper = ZennScraper()
     
     async def collect_all_sources(self) -> Dict[str, int]:
         """
@@ -25,6 +26,7 @@ class DataCollector:
             "github": 0,
             "arxiv": 0,
             "huggingface": 0,
+            "zenn": 0,
             "total": 0
         }
         
@@ -32,15 +34,17 @@ class DataCollector:
             tasks = [
                 self.collect_github_data(),
                 self.collect_arxiv_data(),
-                self.collect_huggingface_data()
+                self.collect_huggingface_data(),
+                self.collect_zenn_data()
             ]
             
-            github_count, arxiv_count, hf_count = await asyncio.gather(*tasks)
+            github_count, arxiv_count, hf_count, zenn_count = await asyncio.gather(*tasks)
             
             results["github"] = github_count
             results["arxiv"] = arxiv_count
             results["huggingface"] = hf_count
-            results["total"] = github_count + arxiv_count + hf_count
+            results["zenn"] = zenn_count
+            results["total"] = github_count + arxiv_count + hf_count + zenn_count
             
         except Exception as e:
             logger.error(f"Error in collect_all_sources: {e}")
@@ -49,20 +53,20 @@ class DataCollector:
     
     async def collect_github_data(self) -> int:
         """
-        收集 GitHub 数据
+        收集 GitHub 数据 - 优化为获取每日最新trending项目
         """
         try:
-            # 同时收集一般trending和AI Python项目（最近一周）
-            general_repos = await self.github_scraper.get_trending_repos(language="python", since="weekly")
-            ai_repos = await self.github_scraper.get_ai_python_repos(since="weekly")
+            # 使用新的每日trending算法获取最新项目
+            daily_trending = await self.github_scraper.get_daily_trending_repos(language="python", limit=25)
+            ai_repos = await self.github_scraper.get_ai_python_repos(since="daily")
             
             # 合并并去重
-            all_repos = general_repos + ai_repos
+            all_repos = daily_trending + ai_repos
             unique_repos = list({repo["url"]: repo for repo in all_repos}.values())
             
-            # 按star数排序并限制数量到20个
-            unique_repos.sort(key=lambda x: x.get("stars", 0), reverse=True)
-            unique_repos = unique_repos[:20]
+            # 按trending得分和更新时间排序，确保获取最新内容
+            unique_repos.sort(key=lambda x: (x.get("trending_score", 0), x.get("updated_at", "")), reverse=True)
+            unique_repos = unique_repos[:25]  # 增加到25个项目
             
             db = SessionLocal()
             saved_count = 0
@@ -242,4 +246,102 @@ class DataCollector:
             
         except Exception as e:
             logger.error(f"Error collecting HuggingFace data: {e}")
+            return 0
+    
+    async def collect_zenn_data(self) -> int:
+        """
+        收集 Zenn 数据
+        """
+        try:
+            # 收集热门文章和技术文章
+            trending_articles = await self.zenn_scraper.get_trending_articles(limit=15)
+            tech_articles = await self.zenn_scraper.get_tech_articles(limit=15)
+            
+            # 合并并去重
+            all_articles = trending_articles + tech_articles
+            unique_articles = {article["url"]: article for article in all_articles}.values()
+            
+            db = SessionLocal()
+            saved_count = 0
+            
+            for article in unique_articles:
+                existing = db.query(TechCard).filter(
+                    TechCard.original_url == article["url"]
+                ).first()
+                
+                if not existing:
+                    # 获取文章详细内容
+                    article_details = await self.zenn_scraper.get_article_details(article["url"])
+                    
+                    # 准备内容进行AI处理
+                    content = f"Title: {article['title']}\nAuthor: {article.get('author', '')}\nPlatform: Zenn"
+                    if article_details and article_details.get("content"):
+                        content += f"\nContent: {article_details['content'][:300]}"
+                    
+                    # AI处理
+                    summary = None
+                    chinese_tags = []
+                    trial_suggestion = None
+                    
+                    if azure_openai_service.is_available():
+                        try:
+                            # 生成摘要
+                            if settings.enable_summarization:
+                                summary = await azure_openai_service.summarize_content(
+                                    content, "zenn", settings.default_language
+                                )
+                            
+                            # 提取标签
+                            chinese_tags = await azure_openai_service.extract_tags(
+                                content, settings.default_language
+                            )
+                            
+                            # 生成试用建议
+                            trial_suggestion = await azure_openai_service.generate_trial_suggestion(
+                                content, settings.default_language
+                            )
+                            
+                        except Exception as e:
+                            logger.error(f"AI processing failed for {article['title']}: {e}")
+                    
+                    # 构建基础摘要
+                    base_summary = f"作者: {article.get('author', 'Unknown')}"
+                    if article.get('likes'):
+                        base_summary += f", 点赞: {article['likes']}"
+                    if article.get('keyword'):
+                        base_summary += f", 关键词: {article['keyword']}"
+                    
+                    # 准备标签
+                    tags = chinese_tags if chinese_tags else []
+                    if article_details and article_details.get("tags"):
+                        tags.extend(article_details["tags"][:3])
+                    if article.get('keyword'):
+                        tags.append(article['keyword'])
+                    
+                    # 去重并限制标签数量
+                    unique_tags = list(dict.fromkeys(tags))[:5]
+                    
+                    card = TechCard(
+                        title=article["title"],
+                        source=SourceType.ZENN,
+                        original_url=article["url"],
+                        summary=summary or base_summary,
+                        chinese_tags=unique_tags,
+                        trial_suggestion=trial_suggestion,
+                        raw_data={
+                            **article,
+                            "article_details": article_details
+                        }
+                    )
+                    db.add(card)
+                    saved_count += 1
+            
+            db.commit()
+            db.close()
+            
+            logger.info(f"Collected {saved_count} Zenn articles")
+            return saved_count
+            
+        except Exception as e:
+            logger.error(f"Error collecting Zenn data: {e}")
             return 0

@@ -66,11 +66,13 @@ fi
 # 安装后端依赖（如果虚拟环境不存在则创建）
 if [ ! -d "venv" ]; then
     echo -e "${BLUE}📦 Creating virtual environment and installing dependencies...${NC}"
-    python -m venv venv
+    python3 -m venv venv
     source venv/bin/activate
     pip install fastapi uvicorn sqlalchemy alembic pydantic pydantic-settings requests feedparser notion-client openai python-multipart python-jose python-dotenv httpx
 else
-    echo -e "${BLUE}📦 Virtual environment exists, activating...${NC}"
+    echo -e "${BLUE}📦 Virtual environment exists, activating and installing dependencies...${NC}"
+    source venv/bin/activate
+    pip install fastapi uvicorn sqlalchemy alembic pydantic pydantic-settings requests feedparser notion-client openai python-multipart python-jose python-dotenv httpx
 fi
 
 # 启动后端服务

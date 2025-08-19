@@ -55,6 +55,111 @@ class GitHubScraper:
             logger.error(f"Error fetching GitHub trending: {e}")
             return []
     
+    async def get_daily_trending_repos(self, language: Optional[str] = None, limit: int = 30) -> List[Dict]:
+        """
+        获取每日真正trending的项目 - 结合新建和活跃项目
+        """
+        try:
+            from datetime import datetime, timedelta
+            
+            today = datetime.now().strftime("%Y-%m-%d")
+            yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+            
+            all_repos = []
+            
+            # 策略1: 获取今天新建的项目
+            new_repos = await self._search_repos({
+                "q": f"created:{today}" + (f" language:{language}" if language else ""),
+                "sort": "stars", 
+                "order": "desc",
+                "per_page": 15
+            })
+            
+            # 策略2: 获取昨天活跃且星数增长的项目  
+            active_repos = await self._search_repos({
+                "q": f"pushed:>{yesterday} stars:>10" + (f" language:{language}" if language else ""),
+                "sort": "updated",
+                "order": "desc", 
+                "per_page": 15
+            })
+            
+            # 策略3: 获取最近2天创建的新兴项目
+            recent_repos = await self._search_repos({
+                "q": f"created:>{yesterday} stars:>3" + (f" language:{language}" if language else ""),
+                "sort": "stars",
+                "order": "desc",
+                "per_page": 15
+            })
+            
+            # 合并并去重
+            all_repos.extend(new_repos)
+            all_repos.extend(active_repos) 
+            all_repos.extend(recent_repos)
+            
+            # 去重并按综合得分排序
+            unique_repos = {repo["url"]: repo for repo in all_repos}.values()
+            scored_repos = []
+            
+            for repo in unique_repos:
+                # 计算trending得分：新鲜度 + 星数增长潜力
+                try:
+                    from datetime import timezone
+                    created_at = datetime.fromisoformat(repo["created_at"].replace("Z", "+00:00"))
+                    now_utc = datetime.now(timezone.utc)
+                    created_days = (now_utc - created_at).days
+                    freshness_score = max(0, 30 - created_days)  # 越新得分越高
+                    popularity_score = min(repo["stars"], 1000) / 10  # 星数得分，上限100
+                    
+                    repo["trending_score"] = freshness_score + popularity_score
+                    scored_repos.append(repo)
+                except Exception as e:
+                    logger.error(f"Error calculating score for repo {repo.get('title', '')}: {e}")
+                    # 如果时间处理出错，仍然添加但设置默认得分
+                    repo["trending_score"] = repo["stars"] / 10
+                    scored_repos.append(repo)
+            
+            # 按得分排序
+            scored_repos.sort(key=lambda x: x["trending_score"], reverse=True)
+            return scored_repos[:limit]
+            
+        except Exception as e:
+            logger.error(f"Error fetching daily trending repos: {e}")
+            return []
+    
+    async def _search_repos(self, params: Dict) -> List[Dict]:
+        """
+        搜索GitHub仓库的通用方法
+        """
+        try:
+            url = "https://api.github.com/search/repositories"
+            response = requests.get(url, params=params, timeout=30)
+            response.raise_for_status()
+            
+            data = response.json()
+            repos = []
+            
+            for repo in data.get("items", []):
+                repo_data = {
+                    "title": repo["full_name"],
+                    "description": repo.get("description", ""),
+                    "url": repo["html_url"],
+                    "stars": repo["stargazers_count"],
+                    "forks": repo["forks_count"],
+                    "language": repo.get("language"),
+                    "license": repo.get("license", {}).get("name") if repo.get("license") else None,
+                    "created_at": repo["created_at"],
+                    "updated_at": repo["updated_at"],
+                    "topics": repo.get("topics", []),
+                    "raw_data": repo
+                }
+                repos.append(repo_data)
+                
+            return repos
+            
+        except Exception as e:
+            logger.error(f"Error in _search_repos: {e}")
+            return []
+
     async def get_ai_python_repos(self, since: str = "daily") -> List[Dict]:
         """
         获取 AI 相关的 Python 项目
@@ -79,41 +184,25 @@ class GitHubScraper:
             
             all_repos = []
             
-            # 搜索不同的AI关键词组合
+            # 搜索不同的AI关键词组合，降低星数要求以获取更多新项目
             for keyword in ai_keywords[:5]:  # 限制搜索次数避免API限制
-                url = f"https://api.github.com/search/repositories"
                 params = {
-                    "q": f'"{keyword}" language:python created:>{date} stars:>10',
-                    "sort": "stars",
+                    "q": f'"{keyword}" language:python (created:>{date} OR pushed:>{date}) stars:>1',
+                    "sort": "updated",
                     "order": "desc",
                     "per_page": 10
                 }
                 
-                response = requests.get(url, params=params, timeout=30)
-                if response.status_code == 200:
-                    data = response.json()
-                    
-                    for repo in data.get("items", []):
-                        # 避免重复
-                        if not any(r["url"] == repo["html_url"] for r in all_repos):
-                            repo_data = {
-                                "title": repo["full_name"],
-                                "description": repo.get("description", ""),
-                                "url": repo["html_url"],
-                                "stars": repo["stargazers_count"],
-                                "forks": repo["forks_count"],
-                                "language": repo.get("language"),
-                                "license": repo.get("license", {}).get("name") if repo.get("license") else None,
-                                "created_at": repo["created_at"],
-                                "updated_at": repo["updated_at"],
-                                "topics": repo.get("topics", []),
-                                "ai_category": keyword,
-                                "raw_data": repo
-                            }
-                            all_repos.append(repo_data)
+                repos = await self._search_repos(params)
+                
+                for repo in repos:
+                    # 避免重复
+                    if not any(r["url"] == repo["url"] for r in all_repos):
+                        repo["ai_category"] = keyword
+                        all_repos.append(repo)
             
-            # 按星数排序
-            all_repos.sort(key=lambda x: x["stars"], reverse=True)
+            # 按更新时间和星数综合排序
+            all_repos.sort(key=lambda x: (x["stars"], x["updated_at"]), reverse=True)
             return all_repos[:20]  # 返回前20个
             
         except Exception as e:
@@ -122,24 +211,22 @@ class GitHubScraper:
     
     def _build_trending_query(self, since: str) -> str:
         """
-        构建 GitHub 搜索查询 - 获取最近一周活跃且高star的项目
+        构建 GitHub 搜索查询 - 获取真正trending的项目
         """
         from datetime import datetime, timedelta
         
-        # 最近一周的日期
-        week_ago = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
-        
         if since == "daily":
-            # 最近1天推送且高star数的项目
+            # 最近1天创建或有重大更新的项目，降低星数要求
             date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
-            return f"stars:>500 pushed:>{date}"
+            return f"created:>{date} OR (stars:>20 pushed:>{date})"
         elif since == "weekly":
-            # 最近一周推送且高star数的项目
-            return f"stars:>100 pushed:>{week_ago}"
+            # 最近一周的活跃项目
+            date = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
+            return f"created:>{date} OR (stars:>10 pushed:>{date})"
         else:
-            # 最近一月推送且高star数的项目
+            # 最近一月的项目，包括新创建和活跃项目
             date = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
-            return f"stars:>50 pushed:>{date}"
+            return f"created:>{date} OR (stars:>5 pushed:>{date})"
     
     async def get_repo_details(self, owner: str, repo: str) -> Optional[Dict]:
         """

@@ -18,6 +18,7 @@ class NotionTestResponse(BaseModel):
     database_title: Optional[str] = None
     database_id: Optional[str] = None
     user: Optional[str] = None
+    properties: Optional[dict] = None
 
 
 class NotionSyncResponse(BaseModel):
@@ -34,6 +35,28 @@ async def test_notion_connection():
     result = await notion_service.test_connection()
     
     return NotionTestResponse(**result)
+
+
+@router.post("/save-card")
+async def save_card_to_notion(
+    request_data: dict,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
+):
+    """
+    保存指定卡片到Notion（前端兼容接口）
+    """
+    card_id = request_data.get("card_id")
+    if not card_id:
+        raise HTTPException(status_code=400, detail="card_id is required")
+    
+    card = db.query(TechCard).filter(TechCard.id == card_id).first()
+    if not card:
+        raise HTTPException(status_code=404, detail="Card not found")
+    
+    background_tasks.add_task(sync_single_card_task, card_id)
+    
+    return {"message": f"Card {card_id} save to Notion started in background", "success": True}
 
 
 @router.post("/sync-card/{card_id}")

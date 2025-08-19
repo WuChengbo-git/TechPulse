@@ -36,6 +36,85 @@ async def sync_data_collection():
     }
 
 
+@router.get("/github/daily-trending")
+async def get_daily_trending_preview():
+    """
+    预览每日trending GitHub项目（不保存到数据库）
+    """
+    try:
+        from ..services.scrapers import GitHubScraper
+        
+        scraper = GitHubScraper()
+        
+        # 获取Python项目的每日trending
+        python_trending = await scraper.get_daily_trending_repos(language="python", limit=15)
+        # 获取所有语言的trending
+        general_trending = await scraper.get_daily_trending_repos(limit=10)
+        
+        return {
+            "message": "Daily trending repos fetched successfully",
+            "python_trending": python_trending,
+            "general_trending": general_trending,
+            "total_count": len(python_trending) + len(general_trending)
+        }
+    except Exception as e:
+        logger.error(f"Error fetching daily trending: {e}")
+        return {"error": str(e)}
+
+
+@router.post("/collect/github")
+async def collect_github_only(background_tasks: BackgroundTasks):
+    """
+    只收集GitHub数据
+    """
+    collector = DataCollector()
+    background_tasks.add_task(single_source_collection_task, collector.collect_github_data)
+    return {"message": "GitHub data collection started", "source": "github"}
+
+
+@router.post("/collect/arxiv")
+async def collect_arxiv_only(background_tasks: BackgroundTasks):
+    """
+    只收集arXiv数据
+    """
+    collector = DataCollector()
+    background_tasks.add_task(single_source_collection_task, collector.collect_arxiv_data)
+    return {"message": "arXiv data collection started", "source": "arxiv"}
+
+
+@router.post("/collect/huggingface")
+async def collect_huggingface_only(background_tasks: BackgroundTasks):
+    """
+    只收集HuggingFace数据
+    """
+    collector = DataCollector()
+    background_tasks.add_task(single_source_collection_task, collector.collect_huggingface_data)
+    return {"message": "HuggingFace data collection started", "source": "huggingface"}
+
+
+@router.post("/collect/zenn")
+async def collect_zenn_only(background_tasks: BackgroundTasks):
+    """
+    只收集Zenn数据
+    """
+    collector = DataCollector()
+    background_tasks.add_task(single_source_collection_task, collector.collect_zenn_data)
+    return {"message": "Zenn data collection started", "source": "zenn"}
+
+
+async def single_source_collection_task(collection_func):
+    """
+    单个数据源收集任务
+    """
+    try:
+        count = await collection_func()
+        logger.info(f"Single source collection completed: {count} items")
+        return {"count": count}
+    except Exception as e:
+        logger.error(f"Error in single source collection: {e}")
+        return {"error": str(e)}
+
+
 @router.get("/")
 async def get_data_sources(db: Session = Depends(get_db)):
     """

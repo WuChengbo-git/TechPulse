@@ -8,6 +8,7 @@ class SourceType(enum.Enum):
     GITHUB = "github"
     ARXIV = "arxiv"
     HUGGINGFACE = "huggingface"
+    ZENN = "zenn"
 
 
 class TrialStatus(enum.Enum):

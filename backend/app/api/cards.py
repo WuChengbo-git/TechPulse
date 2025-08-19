@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from typing import List, Optional
+from sqlalchemy import func, desc
+from typing import List, Optional, Dict, Any
+from datetime import datetime, timedelta
 from ..core.database import get_db
 from ..models.card import TechCard, SourceType, TrialStatus
 from ..models.schemas import TechCard as TechCardSchema, TechCardCreate, TechCardUpdate
@@ -28,6 +30,95 @@ def get_cards(
     
     cards = query.order_by(TechCard.created_at.desc()).offset(skip).limit(limit).all()
     return cards
+
+
+@router.get("/stats")
+def get_cards_stats(db: Session = Depends(get_db)) -> Dict[str, Any]:
+    """
+    获取卡片统计信息（用于数据源管理页面）
+    """
+    today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    
+    # 基础统计
+    total_cards = db.query(TechCard).count()
+    today_cards = db.query(TechCard).filter(TechCard.created_at >= today).count()
+    
+    # 按数据源统计
+    sources_stats = {}
+    for source in SourceType:
+        total_count = db.query(TechCard).filter(TechCard.source == source).count()
+        today_count = db.query(TechCard).filter(
+            TechCard.source == source, 
+            TechCard.created_at >= today
+        ).count()
+        
+        # 获取最后更新时间
+        last_updated = db.query(TechCard).filter(TechCard.source == source).order_by(
+            desc(TechCard.created_at)
+        ).first()
+        
+        sources_stats[source.value] = {
+            "total": total_count,
+            "today": today_count,
+            "last_update": last_updated.created_at.isoformat() if last_updated else None
+        }
+    
+    return {
+        "total_cards": total_cards,
+        "today_cards": today_cards,
+        "sources_stats": sources_stats
+    }
+
+
+@router.get("/overview-stats")
+def get_overview_stats(db: Session = Depends(get_db)) -> Dict[str, Any]:
+    """
+    获取概览页面统计信息
+    """
+    today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    
+    # 基础统计
+    total_cards = db.query(TechCard).count()
+    today_cards = db.query(TechCard).filter(TechCard.created_at >= today).count()
+    
+    # 按数据源统计
+    sources_stats = {}
+    for source in SourceType:
+        count = db.query(TechCard).filter(TechCard.source == source).count()
+        sources_stats[source.value] = count
+    
+    # 热门标签统计 (从chinese_tags字段提取)
+    trending_tags = []
+    try:
+        # 获取所有包含标签的卡片
+        cards_with_tags = db.query(TechCard).filter(
+            TechCard.chinese_tags.isnot(None)
+        ).all()
+        
+        # 统计标签频次
+        tag_counts = {}
+        for card in cards_with_tags:
+            if card.chinese_tags:
+                for tag in card.chinese_tags:
+                    if isinstance(tag, str) and len(tag.strip()) > 0:
+                        clean_tag = tag.strip()
+                        tag_counts[clean_tag] = tag_counts.get(clean_tag, 0) + 1
+        
+        # 按频次排序，取前20个
+        trending_tags = [
+            {"tag": tag, "count": count} 
+            for tag, count in sorted(tag_counts.items(), key=lambda x: x[1], reverse=True)[:20]
+        ]
+    except Exception as e:
+        print(f"Error processing tags: {e}")
+        trending_tags = []
+    
+    return {
+        "total_cards": total_cards,
+        "today_cards": today_cards, 
+        "sources_stats": sources_stats,
+        "trending_tags": trending_tags
+    }
 
 
 @router.get("/{card_id}", response_model=TechCardSchema)

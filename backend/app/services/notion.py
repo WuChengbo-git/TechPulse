@@ -113,7 +113,7 @@ class NotionService:
         构建Notion页面属性
         """
         properties = {
-            "标题": {
+            "名称": {
                 "title": [
                     {
                         "text": {
@@ -121,44 +121,8 @@ class NotionService:
                         }
                     }
                 ]
-            },
-            "来源": {
-                "select": {
-                    "name": self._get_source_name(card.source)
-                }
-            },
-            "状态": {
-                "select": {
-                    "name": self._get_status_name(card.status)
-                }
-            },
-            "链接": {
-                "url": card.original_url
-            },
-            "创建时间": {
-                "date": {
-                    "start": card.created_at.isoformat()
-                }
             }
         }
-        
-        if card.chinese_tags:
-            properties["标签"] = {
-                "multi_select": [
-                    {"name": tag} for tag in card.chinese_tags[:10]
-                ]
-            }
-        
-        if card.summary:
-            properties["摘要"] = {
-                "rich_text": [
-                    {
-                        "text": {
-                            "content": card.summary[:2000]
-                        }
-                    }
-                ]
-            }
         
         return properties
     
@@ -281,7 +245,8 @@ class NotionService:
         source_map = {
             SourceType.GITHUB: "GitHub",
             SourceType.ARXIV: "arXiv",
-            SourceType.HUGGINGFACE: "HuggingFace"
+            SourceType.HUGGINGFACE: "HuggingFace",
+            SourceType.ZENN: "Zenn"
         }
         return source_map.get(source, str(source))
     
@@ -307,10 +272,15 @@ class NotionService:
         try:
             if self.database_id:
                 response = await self.client.databases.retrieve(self.database_id)
+                properties_info = {}
+                for prop_name, prop_data in response.get("properties", {}).items():
+                    properties_info[prop_name] = prop_data.get("type")
+                
                 return {
                     "connected": True,
                     "database_title": response.get("title", [{}])[0].get("plain_text", "Unknown"),
-                    "database_id": self.database_id
+                    "database_id": self.database_id,
+                    "properties": properties_info
                 }
             else:
                 user = await self.client.users.me()
