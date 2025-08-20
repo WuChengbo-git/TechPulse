@@ -68,11 +68,11 @@ if [ ! -d "venv" ]; then
     echo -e "${BLUE}📦 Creating virtual environment and installing dependencies...${NC}"
     python3 -m venv venv
     source venv/bin/activate
-    pip install fastapi uvicorn sqlalchemy alembic pydantic pydantic-settings requests feedparser notion-client openai python-multipart python-jose python-dotenv httpx
+    pip install fastapi uvicorn sqlalchemy alembic pydantic pydantic-settings requests feedparser notion-client openai python-multipart python-jose python-dotenv httpx schedule beautifulsoup4
 else
     echo -e "${BLUE}📦 Virtual environment exists, activating and installing dependencies...${NC}"
     source venv/bin/activate
-    pip install fastapi uvicorn sqlalchemy alembic pydantic pydantic-settings requests feedparser notion-client openai python-multipart python-jose python-dotenv httpx
+    pip install fastapi uvicorn sqlalchemy alembic pydantic pydantic-settings requests feedparser notion-client openai python-multipart python-jose python-dotenv httpx schedule beautifulsoup4
 fi
 
 # 启动后端服务
@@ -101,6 +101,11 @@ echo -e "${BLUE}🔧 Setting up frontend...${NC}"
 if [ ! -d "node_modules" ]; then
     echo -e "${BLUE}📦 Installing frontend dependencies...${NC}"
     npm install
+    echo -e "${BLUE}📦 Installing chart dependencies...${NC}"
+    npm install @ant-design/charts echarts echarts-for-react dayjs
+else
+    echo -e "${BLUE}📦 Checking and updating frontend dependencies...${NC}"
+    npm install @ant-design/charts echarts echarts-for-react dayjs
 fi
 
 # 启动前端服务

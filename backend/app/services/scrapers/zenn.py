@@ -231,17 +231,123 @@ class ZennScraper:
             logger.error(f"Error fetching article details from {article_url}: {e}")
             return None
     
-    async def get_recent_articles(self, days: int = 7) -> List[Dict]:
+    async def get_recent_articles(self, days: int = 30) -> List[Dict]:
         """
-        获取最近几天的文章
+        获取最近几天的文章 - 改进版，获取一个月内的活跃文章
         """
         try:
-            # 由于Zenn没有直接的日期过滤API，我们获取最新文章并手动过滤
-            articles = await self.get_trending_articles(limit=50)
+            all_articles = []
             
-            # 这里可以根据实际需要添加日期过滤逻辑
-            # 目前返回最新的文章
-            return articles[:20]
+            # 策略1: 获取热门文章页面
+            trending_articles = await self.get_trending_articles(limit=30)
+            all_articles.extend(trending_articles)
+            
+            # 策略2: 通过最新文章API获取
+            try:
+                latest_url = f"{self.base_url}/articles?order=latest"
+                response = requests.get(latest_url, headers=self.headers, timeout=30)
+                if response.status_code == 200:
+                    soup = BeautifulSoup(response.text, 'html.parser')
+                    article_items = soup.find_all('article')[:30]
+                    
+                    for item in article_items:
+                        try:
+                            link_elem = item.find('a', href=True)
+                            if not link_elem:
+                                continue
+                            
+                            article_url = link_elem['href']
+                            if not article_url.startswith('http'):
+                                article_url = f"{self.base_url}{article_url}"
+                            
+                            # 避免重复
+                            if any(art["url"] == article_url for art in all_articles):
+                                continue
+                            
+                            title_elem = item.find(['h1', 'h2', 'h3']) or link_elem
+                            title = title_elem.get_text(strip=True) if title_elem else "No Title"
+                            
+                            # 提取时间信息（如果可用）
+                            time_elem = item.find('time')
+                            published_at = ""
+                            if time_elem:
+                                published_at = time_elem.get('datetime') or time_elem.get_text(strip=True)
+                            
+                            article_data = {
+                                "title": title,
+                                "url": article_url,
+                                "published_at": published_at,
+                                "platform": "Zenn",
+                                "language": "ja",
+                                "type": "latest",
+                                "raw_data": {
+                                    "scraped_at": datetime.now().isoformat(),
+                                    "source": "latest_page"
+                                }
+                            }
+                            
+                            all_articles.append(article_data)
+                            
+                        except Exception as e:
+                            logger.warning(f"Error parsing latest article: {e}")
+                            continue
+                            
+            except Exception as e:
+                logger.warning(f"Error fetching latest articles: {e}")
+            
+            # 策略3: 获取AI/技术相关的热门文章
+            tech_articles = await self.get_tech_articles(limit=20)
+            for article in tech_articles:
+                if not any(art["url"] == article["url"] for art in all_articles):
+                    all_articles.append(article)
+            
+            # 去重并按标题排序
+            unique_articles = list({art["title"]: art for art in all_articles}.values())
+            
+            # 如果可能的话，按时间过滤（Zenn的时间信息有限）
+            filtered_articles = []
+            cutoff_date = datetime.now() - timedelta(days=days)
+            
+            for article in unique_articles:
+                include_article = True
+                
+                # 如果有时间信息，尝试解析并过滤
+                if article.get("published_at"):
+                    try:
+                        # 尝试多种时间格式
+                        time_str = article["published_at"]
+                        article_date = None
+                        
+                        # ISO格式
+                        try:
+                            article_date = datetime.fromisoformat(time_str.replace('Z', '+00:00').replace('+00:00', ''))
+                        except:
+                            pass
+                        
+                        # 相对时间格式（如"2日前"）
+                        if not article_date and "日前" in time_str:
+                            import re
+                            match = re.search(r'(\d+)日前', time_str)
+                            if match:
+                                days_ago = int(match.group(1))
+                                article_date = datetime.now() - timedelta(days=days_ago)
+                        
+                        # 如果成功解析时间且超出范围，跳过
+                        if article_date and article_date < cutoff_date:
+                            include_article = False
+                            
+                    except Exception as e:
+                        logger.debug(f"Error parsing date {article.get('published_at')}: {e}")
+                        # 解析失败时仍然包含文章
+                        pass
+                
+                if include_article:
+                    filtered_articles.append(article)
+            
+            # 限制返回数量
+            result = filtered_articles[:30]
+            logger.info(f"Fetched {len(result)} recent Zenn articles from last {days} days")
+            return result
             
         except Exception as e:
             logger.error(f"Error fetching recent Zenn articles: {e}")

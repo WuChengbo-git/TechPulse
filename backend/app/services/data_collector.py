@@ -134,10 +134,11 @@ class DataCollector:
     
     async def collect_arxiv_data(self) -> int:
         """
-        收集 arXiv 数据
+        收集 arXiv 数据 - 改进版，只获取一个月内的论文并进行AI分析
         """
         try:
-            papers = await self.arxiv_scraper.get_recent_papers()
+            # 获取最近30天内的论文
+            papers = await self.arxiv_scraper.get_recent_papers(max_results=25, days_back=30)
             db = SessionLocal()
             
             saved_count = 0
@@ -147,13 +148,46 @@ class DataCollector:
                 ).first()
                 
                 if not existing:
+                    # 准备内容进行AI处理
+                    content = f"Title: {paper['title']}\nAuthors: {', '.join(paper.get('authors', []))}\nAbstract: {paper['summary']}\nCategories: {', '.join(paper.get('categories', []))}"
+                    
+                    # AI处理
+                    summary = None
+                    chinese_tags = []
+                    trial_suggestion = None
+                    
+                    if azure_openai_service.is_available():
+                        try:
+                            # 生成摘要
+                            if settings.enable_summarization:
+                                summary = await azure_openai_service.summarize_content(
+                                    content, "arxiv", settings.default_language
+                                )
+                            
+                            # 提取标签
+                            chinese_tags = await azure_openai_service.extract_tags(
+                                content, settings.default_language
+                            )
+                            
+                            # 生成试用建议（对于论文，主要是阅读和研究建议）
+                            trial_suggestion = await azure_openai_service.generate_trial_suggestion(
+                                content, settings.default_language
+                            )
+                            
+                        except Exception as e:
+                            logger.error(f"AI processing failed for {paper['title']}: {e}")
+                    
+                    # 构建基础摘要
+                    base_summary = paper["summary"][:400] + "..." if len(paper["summary"]) > 400 else paper["summary"]
+                    
                     card = TechCard(
                         title=paper["title"],
                         source=SourceType.ARXIV,
                         original_url=paper["url"],
-                        summary=paper["summary"][:500] + "..." if len(paper["summary"]) > 500 else paper["summary"],
-                        chinese_tags=paper.get("categories", []),
-                        raw_data=paper["raw_data"]
+                        summary=summary or base_summary,
+                        chinese_tags=chinese_tags if chinese_tags else paper.get("categories", []),
+                        trial_suggestion=trial_suggestion,
+                        raw_data=paper
                     )
                     db.add(card)
                     saved_count += 1
@@ -161,7 +195,7 @@ class DataCollector:
             db.commit()
             db.close()
             
-            logger.info(f"Collected {saved_count} arXiv papers")
+            logger.info(f"Collected {saved_count} arXiv papers from last 30 days")
             return saved_count
             
         except Exception as e:
@@ -250,15 +284,15 @@ class DataCollector:
     
     async def collect_zenn_data(self) -> int:
         """
-        收集 Zenn 数据
+        收集 Zenn 数据 - 改进版，获取最近30天的活跃文章
         """
         try:
-            # 收集热门文章和技术文章
-            trending_articles = await self.zenn_scraper.get_trending_articles(limit=15)
-            tech_articles = await self.zenn_scraper.get_tech_articles(limit=15)
+            # 使用新的最近文章方法获取一个月内的文章
+            recent_articles = await self.zenn_scraper.get_recent_articles(days=30)
+            tech_articles = await self.zenn_scraper.get_tech_articles(limit=10)
             
             # 合并并去重
-            all_articles = trending_articles + tech_articles
+            all_articles = recent_articles + tech_articles
             unique_articles = {article["url"]: article for article in all_articles}.values()
             
             db = SessionLocal()

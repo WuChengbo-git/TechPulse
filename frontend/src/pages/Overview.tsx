@@ -31,21 +31,43 @@ const Overview: React.FC = () => {
     try {
       setLoading(true)
       
-      // 获取统计数据
-      const [statsRes, recentRes, trendingRes] = await Promise.all([
-        fetch('/api/v1/cards/overview-stats'),
-        fetch('/api/v1/cards/?limit=10&sort=created_at&order=desc'),
-        fetch('/api/v1/cards/?limit=8&source=github&sort=stars&order=desc')
-      ])
+      // 获取卡片数据
+      const recentRes = await fetch('/api/v1/cards/?limit=20')
       
-      if (statsRes.ok && recentRes.ok && trendingRes.ok) {
-        const statsData = await statsRes.json()
+      if (recentRes.ok) {
         const recentData = await recentRes.json()
-        const trendingData = await trendingRes.json()
-        
-        setStats(statsData)
         setRecentCards(recentData)
-        setTrendingCards(trendingData)
+        setTrendingCards(recentData.filter((card: TechCard) => card.stars && card.stars > 10).slice(0, 8))
+        
+        // 计算统计数据
+        const sourceStats = recentData.reduce((acc: Record<string, number>, card: TechCard) => {
+          acc[card.source] = (acc[card.source] || 0) + 1
+          return acc
+        }, {})
+        
+        const tagCounts: Record<string, number> = {}
+        recentData.forEach((card: TechCard) => {
+          card.chinese_tags?.forEach(tag => {
+            tagCounts[tag] = (tagCounts[tag] || 0) + 1
+          })
+        })
+        
+        const trending_tags = Object.entries(tagCounts)
+          .sort(([,a], [,b]) => b - a)
+          .slice(0, 20)
+          .map(([tag, count]) => ({ tag, count }))
+        
+        const today = new Date().toDateString()
+        const todayCards = recentData.filter((card: TechCard) => 
+          new Date(card.created_at).toDateString() === today
+        )
+        
+        setStats({
+          total_cards: recentData.length,
+          today_cards: todayCards.length,
+          sources_stats: sourceStats,
+          trending_tags
+        })
       }
     } catch (err) {
       console.error('Failed to fetch overview data:', err)

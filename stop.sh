@@ -48,11 +48,18 @@ fi
 # 额外检查并停止可能运行的进程
 echo -e "${BLUE}🔍 Checking for remaining processes...${NC}"
 
-# 停止可能的Python/uvicorn进程
-PYTHON_PIDS=$(pgrep -f "python.*run.py\|uvicorn.*app.main")
+# 停止可能的Python/uvicorn进程（包括任务调度器）
+PYTHON_PIDS=$(pgrep -f "python.*run.py\|uvicorn.*app.main\|python.*scheduler")
 if [ -n "$PYTHON_PIDS" ]; then
     echo -e "${BLUE}🐍 Stopping Python processes: $PYTHON_PIDS${NC}"
     kill $PYTHON_PIDS 2>/dev/null
+fi
+
+# 停止可能的后台任务调度器
+SCHEDULER_PIDS=$(pgrep -f "python.*scheduler\|schedule")
+if [ -n "$SCHEDULER_PIDS" ]; then
+    echo -e "${BLUE}⏰ Stopping scheduler processes: $SCHEDULER_PIDS${NC}"
+    kill $SCHEDULER_PIDS 2>/dev/null
 fi
 
 # 停止可能的Node.js/Vite进程

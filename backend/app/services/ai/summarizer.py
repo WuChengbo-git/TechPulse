@@ -1,40 +1,35 @@
-from openai import AsyncOpenAI
 from typing import Optional, Dict, List
 from ...core.config import settings
+from .azure_openai import azure_openai_service
 import logging
+import json
 
 logger = logging.getLogger(__name__)
 
 
 class AISummarizer:
     def __init__(self):
-        if settings.openai_api_key and settings.openai_api_base:
-            self.client = AsyncOpenAI(
-                api_key=settings.openai_api_key,
-                base_url=settings.openai_api_base,
-                default_headers={"api-version": settings.openai_api_version}
-            )
-        else:
-            self.client = None
-            logger.warning("OpenAI API not configured")
+        self.azure_service = azure_openai_service
+        if not self.azure_service.is_available():
+            logger.warning("Azure OpenAI service not available")
     
     async def generate_summary(self, title: str, description: str, source_type: str = "github") -> Optional[str]:
         """
-        生成中文摘要
+        生成详细的智能摘要，包含分类和可用性判断
         """
-        if not self.client:
+        if not self.azure_service.is_available():
             return None
         
         try:
-            prompt = self._build_summary_prompt(title, description, source_type)
+            prompt = self._build_enhanced_summary_prompt(title, description, source_type)
             
-            response = await self.client.chat.completions.create(
-                model="gpt-3.5-turbo",
+            response = self.azure_service.client.chat.completions.create(
+                model=settings.azure_openai_deployment_name,
                 messages=[
-                    {"role": "system", "content": "你是一个技术内容摘要专家，专门为技术人员生成简洁、准确的中文摘要。"},
+                    {"role": "system", "content": "你是一个技术项目评估专家，专门为技术人员提供项目的详细分析、分类和可用性评估。"},
                     {"role": "user", "content": prompt}
                 ],
-                max_tokens=200,
+                max_tokens=400,
                 temperature=0.3
             )
             
@@ -48,14 +43,14 @@ class AISummarizer:
         """
         生成试用建议
         """
-        if not self.client:
+        if not self.azure_service.is_available():
             return None
         
         try:
             prompt = self._build_trial_prompt(title, description, tags or [])
             
-            response = await self.client.chat.completions.create(
-                model="gpt-3.5-turbo",
+            response = self.azure_service.client.chat.completions.create(
+                model=settings.azure_openai_deployment_name,
                 messages=[
                     {"role": "system", "content": "你是一个技术项目试用专家，专门为开发者提供项目试用和学习建议。"},
                     {"role": "user", "content": prompt}
@@ -74,14 +69,14 @@ class AISummarizer:
         """
         提取中文标签
         """
-        if not self.client:
+        if not self.azure_service.is_available():
             return []
         
         try:
             prompt = self._build_tags_prompt(title, description, source_type)
             
-            response = await self.client.chat.completions.create(
-                model="gpt-3.5-turbo",
+            response = self.azure_service.client.chat.completions.create(
+                model=settings.azure_openai_deployment_name,
                 messages=[
                     {"role": "system", "content": "你是一个技术内容标签提取专家，专门提取技术项目的关键标签。"},
                     {"role": "user", "content": prompt}
@@ -99,9 +94,47 @@ class AISummarizer:
             logger.error(f"Error extracting tags: {e}")
             return []
     
+    def _build_enhanced_summary_prompt(self, title: str, description: str, source_type: str) -> str:
+        """
+        构建增强版摘要生成提示词，包含分类和可用性判断
+        """
+        source_context = {
+            "github": "GitHub开源项目",
+            "arxiv": "arXiv学术论文", 
+            "huggingface": "HuggingFace模型或数据集",
+            "zenn": "Zenn技术文章"
+        }.get(source_type, "技术项目")
+        
+        return f"""
+请为以下{source_context}提供详细分析，帮助技术人员快速判断其价值和可用性：
+
+标题：{title}
+描述：{description}
+
+请按以下格式分析：
+
+📋 **项目分类**：[确定项目类型，如：机器学习框架/Web开发工具/数据分析库/移动应用/学术研究等]
+
+🎯 **核心功能**：[简洁描述项目的主要功能和价值，50字以内]
+
+⚙️ **技术成熟度**：[评估：生产就绪/开发中/概念验证/学术研究]
+
+📦 **代码完整性**：[判断：完整可用/部分实现/仅示例代码/理论描述]
+
+🚀 **上手难度**：[评级：简单/中等/复杂，并说明原因]
+
+💡 **学习价值**：[高/中/低，适合什么水平的开发者学习]
+
+🔧 **实用性评分**：[1-5星，5星为最实用]
+
+⭐ **推荐理由**：[为什么值得关注，或者需要注意什么]
+
+请确保分析准确、实用，帮助开发者快速做出学习或使用决策。
+"""
+    
     def _build_summary_prompt(self, title: str, description: str, source_type: str) -> str:
         """
-        构建摘要生成提示词
+        构建简版摘要生成提示词（保持向后兼容）
         """
         source_context = {
             "github": "这是一个GitHub开源项目",

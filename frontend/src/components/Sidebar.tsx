@@ -16,7 +16,9 @@ import {
   UnorderedListOutlined,
   MonitorOutlined,
   FireOutlined,
-  BarChartOutlined
+  BarChartOutlined,
+  MessageOutlined,
+  DashboardOutlined as AnalyticsOutlined
 } from '@ant-design/icons'
 
 const { Sider } = Layout
@@ -55,6 +57,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, selectedKey, onMenuSelect 
       icon: <SearchOutlined />,
       label: '智能分析',
       children: [
+        { key: 'analytics', icon: <AnalyticsOutlined />, label: '数据分析' },
+        { key: 'chat', icon: <MessageOutlined />, label: 'AI 智能助手' },
         { key: 'search', icon: <SearchOutlined />, label: '智能搜索' },
         { key: 'trends', icon: <LineChartOutlined />, label: '趋势分析' },
         { key: 'tags', icon: <TagsOutlined />, label: '标签云' }
