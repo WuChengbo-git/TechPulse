@@ -31,7 +31,7 @@ const DataSources: React.FC = () => {
       name: 'GitHub',
       icon: <GithubOutlined />,
       color: '#24292e',
-      description: '获取最新的开源项目和trending仓库',
+      description: '最新のオープンソースプロジェクトとトレンドリポジトリを取得',
       status: 'idle'
     },
     {
@@ -39,7 +39,7 @@ const DataSources: React.FC = () => {
       name: 'arXiv',
       icon: <FileTextOutlined />,
       color: '#b31b1b', 
-      description: '获取最新的学术论文和研究成果',
+      description: '最新の学術論文と研究成果を取得',
       status: 'idle'
     },
     {
@@ -47,7 +47,7 @@ const DataSources: React.FC = () => {
       name: 'Hugging Face',
       icon: <RobotOutlined />,
       color: '#ff6f00',
-      description: '获取最新的AI模型和数据集',
+      description: '最新のAIモデルとデータセットを取得',
       status: 'idle'
     },
     {
@@ -55,7 +55,7 @@ const DataSources: React.FC = () => {
       name: 'Zenn',
       icon: <EditOutlined />,
       color: '#3ea8ff',
-      description: '获取日本技术社区的优质文章',
+      description: '日本の技術コミュニティの高品質な記事を取得',
       status: 'idle'
     }
   ])
@@ -121,7 +121,7 @@ const DataSources: React.FC = () => {
           } : s
         ))
         
-        message.success(`${sources.find(s => s.id === sourceId)?.name} 数据更新完成！获取了 ${result.count || 0} 条新数据`)
+        message.success(`${sources.find(s => s.id === sourceId)?.name} データ更新完了！${result.count || 0} 件の新しいデータを取得しました`)
         
         // 添加更新历史
         setUpdateHistory(prev => [{
@@ -139,7 +139,7 @@ const DataSources: React.FC = () => {
       setSources(prev => prev.map(s => 
         s.id === sourceId ? { ...s, status: 'error', progress: 0 } : s
       ))
-      message.error(`${sources.find(s => s.id === sourceId)?.name} 更新失败: ${err}`)
+      message.error(`${sources.find(s => s.id === sourceId)?.name} 更新失敗: ${err}`)
       
       setUpdateHistory(prev => [{
         source: sources.find(s => s.id === sourceId)?.name,
@@ -159,10 +159,10 @@ const DataSources: React.FC = () => {
         setPreviewData(data)
         setPreviewModalVisible(true)
       } else {
-        message.error('预览失败')
+        message.error('プレビュー失敗')
       }
     } catch (err) {
-      message.error('预览失败: ' + err)
+      message.error('プレビュー失敗: ' + err)
     }
   }
 
@@ -183,11 +183,11 @@ const DataSources: React.FC = () => {
       case 'loading':
         return <Badge status="processing" text="更新中" />
       case 'success':
-        return <Badge status="success" text="已更新" />
+        return <Badge status="success" text="更新済み" />
       case 'error':
-        return <Badge status="error" text="更新失败" />
+        return <Badge status="error" text="更新失敗" />
       default:
-        return <Badge status="default" text="待更新" />
+        return <Badge status="default" text="更新待ち" />
     }
   }
 
@@ -195,7 +195,7 @@ const DataSources: React.FC = () => {
     <div>
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Title level={2}>📊 数据源管理</Title>
+          <Title level={2}>📊 データソース管理</Title>
           <Space>
             <Button 
               type="primary" 
@@ -203,21 +203,21 @@ const DataSources: React.FC = () => {
               onClick={updateAllSources}
               loading={sources.some(s => s.status === 'loading')}
             >
-              全部更新
+              全て更新
             </Button>
             <Button 
               icon={<EyeOutlined />}
               onClick={previewGitHubTrending}
             >
-              预览GitHub Trending
+              GitHub Trendingプレビュー
             </Button>
           </Space>
         </div>
       </div>
 
       <Alert
-        message="按需更新说明"
-        description="现在可以单独更新每个数据源，避免不必要的资源浪费。建议根据需求选择性更新特定数据源。"
+        message="必要に応じた更新の説明"
+        description="各データソースを個別に更新できるようになり、不要なリソースの無駄を避けられます。ニーズに応じて特定のデータソースを選択的に更新することを推奨します。"
         type="info"
         showIcon
         style={{ marginBottom: 24 }}
@@ -264,14 +264,14 @@ const DataSources: React.FC = () => {
               <Row gutter={16}>
                 <Col span={12}>
                   <Statistic 
-                    title="总数据" 
+                    title="総データ" 
                     value={source.count || 0} 
                     valueStyle={{ fontSize: '16px' }}
                   />
                 </Col>
                 <Col span={12}>
                   <Statistic 
-                    title="今日新增" 
+                    title="本日新規" 
                     value={source.todayCount || 0} 
                     valueStyle={{ fontSize: '16px', color: '#52c41a' }}
                   />
@@ -280,7 +280,7 @@ const DataSources: React.FC = () => {
 
               {source.lastUpdate && (
                 <div style={{ marginTop: 12, fontSize: '12px', color: '#999' }}>
-                  上次更新: {new Date(source.lastUpdate).toLocaleString()}
+                  前回更新: {new Date(source.lastUpdate).toLocaleString()}
                 </div>
               )}
             </Card>
@@ -291,25 +291,25 @@ const DataSources: React.FC = () => {
       {/* 更新历史 */}
       <Row gutter={16}>
         <Col xs={24} lg={16}>
-          <Card title="📈 数据统计总览" style={{ height: '400px' }}>
+          <Card title="📈 データ統計概要" style={{ height: '400px' }}>
             <Row gutter={16}>
               <Col span={8}>
                 <Statistic
-                  title="总数据量"
+                  title="総データ量"
                   value={sources.reduce((sum, s) => sum + (s.count || 0), 0)}
                   valueStyle={{ color: '#1890ff' }}
                 />
               </Col>
               <Col span={8}>
                 <Statistic
-                  title="今日新增"
+                  title="本日新規"
                   value={sources.reduce((sum, s) => sum + (s.todayCount || 0), 0)}
                   valueStyle={{ color: '#52c41a' }}
                 />
               </Col>
               <Col span={8}>
                 <Statistic
-                  title="活跃数据源"
+                  title="アクティブデータソース"
                   value={sources.filter(s => (s.todayCount || 0) > 0).length}
                   valueStyle={{ color: '#fa8c16' }}
                 />
@@ -319,7 +319,7 @@ const DataSources: React.FC = () => {
         </Col>
         
         <Col xs={24} lg={8}>
-          <Card title="⏱️ 更新历史" style={{ height: '400px', overflow: 'auto' }}>
+          <Card title="⏱️ 更新履歴" style={{ height: '400px', overflow: 'auto' }}>
             {updateHistory.length > 0 ? (
               <Timeline size="small">
                 {updateHistory.map((item, index) => (
@@ -344,7 +344,7 @@ const DataSources: React.FC = () => {
               </Timeline>
             ) : (
               <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
-                暂无更新记录
+                更新記録がありません
               </div>
             )}
           </Card>
@@ -353,13 +353,13 @@ const DataSources: React.FC = () => {
 
       {/* GitHub Trending 预览模态框 */}
       <Modal
-        title="🔥 GitHub Trending 预览"
+        title="🔥 GitHub Trending プレビュー"
         open={previewModalVisible}
         onCancel={() => setPreviewModalVisible(false)}
         width={800}
         footer={[
           <Button key="close" onClick={() => setPreviewModalVisible(false)}>
-            关闭
+            閉じる
           </Button>,
           <Button 
             key="update" 
@@ -369,29 +369,29 @@ const DataSources: React.FC = () => {
               updateSingleSource('github')
             }}
           >
-            保存这些数据
+            これらのデータを保存
           </Button>
         ]}
       >
         {previewData && (
           <div>
             <Alert
-              message={`发现 ${previewData.total_count} 个trending项目`}
-              description="以下是今日最新的trending项目预览，确认后将保存到数据库"
+              message={`${previewData.total_count} 個のtrendingプロジェクトを発見`}
+              description="以下は本日最新のtrendingプロジェクトのプレビューです。確認後データベースに保存されます"
               type="info"
               style={{ marginBottom: 16 }}
             />
             
             {previewData.python_trending && previewData.python_trending.length > 0 && (
               <div style={{ marginBottom: 16 }}>
-                <Title level={4}>Python 项目 ({previewData.python_trending.length})</Title>
+                <Title level={4}>Python プロジェクト ({previewData.python_trending.length})</Title>
                 {previewData.python_trending.slice(0, 5).map((repo, index) => (
                   <div key={index} style={{ padding: '8px 0', borderBottom: '1px solid #f0f0f0' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <Text strong>{repo.title}</Text>
                       <Space>
                         <Text>⭐ {repo.stars}</Text>
-                        <Text type="secondary">得分: {repo.trending_score?.toFixed(1)}</Text>
+                        <Text type="secondary">スコア: {repo.trending_score?.toFixed(1)}</Text>
                       </Space>
                     </div>
                     <Text type="secondary" style={{ fontSize: '12px' }}>
@@ -404,14 +404,14 @@ const DataSources: React.FC = () => {
             
             {previewData.general_trending && previewData.general_trending.length > 0 && (
               <div>
-                <Title level={4}>全语言项目 ({previewData.general_trending.length})</Title>
+                <Title level={4}>全言語プロジェクト ({previewData.general_trending.length})</Title>
                 {previewData.general_trending.slice(0, 3).map((repo, index) => (
                   <div key={index} style={{ padding: '8px 0', borderBottom: '1px solid #f0f0f0' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <Text strong>{repo.title}</Text>
                       <Space>
                         <Text>⭐ {repo.stars}</Text>
-                        <Text type="secondary">得分: {repo.trending_score?.toFixed(1)}</Text>
+                        <Text type="secondary">スコア: {repo.trending_score?.toFixed(1)}</Text>
                       </Space>
                     </div>
                     <Text type="secondary" style={{ fontSize: '12px' }}>

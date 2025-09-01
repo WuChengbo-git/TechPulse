@@ -1,7 +1,7 @@
 {
-  "version": "1.0.2",
-  "build": "20250820",
-  "codename": "TechPulse Core",
-  "releaseDate": "2025-08-20",
-  "description": "Major feature update with AI-driven analysis and multi-platform data collection"
+  "version": "0.1.3",
+  "build": "20250901",
+  "codename": "TechPulse Enhanced",
+  "releaseDate": "2025-09-01",
+  "description": "Enhanced UI improvements with multi-language support and API configuration management"
 }

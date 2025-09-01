@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Card, Row, Col, Statistic, Typography, Space, Tag, Timeline, Avatar, Button, Progress, Divider } from 'antd'
 import { LineChartOutlined, StarOutlined, ForkOutlined, FireOutlined, ClockCircleOutlined, GithubOutlined, FileTextOutlined, RobotOutlined, EditOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons'
+import { useLanguage } from '../contexts/LanguageContext'
 
 const { Title, Text, Paragraph } = Typography
 
@@ -22,6 +23,7 @@ interface Stats {
 }
 
 const Overview: React.FC = () => {
+  const { t } = useLanguage()
   const [stats, setStats] = useState<Stats | null>(null)
   const [recentCards, setRecentCards] = useState<TechCard[]>([])
   const [trendingCards, setTrendingCards] = useState<TechCard[]>([])
@@ -101,14 +103,14 @@ const Overview: React.FC = () => {
   }
 
   if (loading) {
-    return <div style={{ textAlign: 'center', padding: '50px' }}>加载中...</div>
+    return <div style={{ textAlign: 'center', padding: '50px' }}>{t('overview.loading')}</div>
   }
 
   return (
     <div>
       <div style={{ marginBottom: 24 }}>
-        <Title level={2}>🏠 技术情报概览</Title>
-        <Text type="secondary">实时掌握最新的技术动态和趋势</Text>
+        <Title level={2}>{t('overview.title')}</Title>
+        <Text type="secondary">{t('overview.subtitle')}</Text>
       </div>
 
       {/* 核心统计 */}
@@ -116,44 +118,44 @@ const Overview: React.FC = () => {
         <Col xs={24} sm={6}>
           <Card>
             <Statistic
-              title="总数据量"
+              title="総データ量"
               value={stats?.total_cards || 0}
               valueStyle={{ color: '#1890ff' }}
               prefix={<LineChartOutlined />}
-              suffix="条"
+              suffix="件"
             />
           </Card>
         </Col>
         <Col xs={24} sm={6}>
           <Card>
             <Statistic
-              title="今日新增"
+              title="本日の新規"
               value={stats?.today_cards || 0}
               valueStyle={{ color: '#52c41a' }}
               prefix={<ArrowUpOutlined />}
-              suffix="条"
+              suffix="件"
             />
           </Card>
         </Col>
         <Col xs={24} sm={6}>
           <Card>
             <Statistic
-              title="热门项目"
+              title="人気プロジェクト"
               value={trendingCards.filter(c => (c.stars || 0) > 1000).length}
               valueStyle={{ color: '#fa8c16' }}
               prefix={<FireOutlined />}
-              suffix="个"
+              suffix="個"
             />
           </Card>
         </Col>
         <Col xs={24} sm={6}>
           <Card>
             <Statistic
-              title="数据源"
+              title="データソース"
               value={Object.keys(stats?.sources_stats || {}).length}
               valueStyle={{ color: '#722ed1' }}
               prefix={<ClockCircleOutlined />}
-              suffix="个"
+              suffix="個"
             />
           </Card>
         </Col>
@@ -162,7 +164,7 @@ const Overview: React.FC = () => {
       {/* 数据源分布 */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col xs={24} lg={12}>
-          <Card title="📊 数据源分布" extra={<Button size="small">查看详情</Button>}>
+          <Card title="📊 データソース分散" extra={<Button size="small">詳細を表示</Button>}>
             <Row gutter={[8, 8]}>
               {Object.entries(stats?.sources_stats || {}).map(([source, count]) => (
                 <Col span={12} key={source}>
@@ -195,7 +197,7 @@ const Overview: React.FC = () => {
         </Col>
         
         <Col xs={24} lg={12}>
-          <Card title="🔥 热门标签" extra={<Button size="small">标签云</Button>}>
+          <Card title="🔥 人気タグ" extra={<Button size="small">タグクラウド</Button>}>
             <div style={{ minHeight: '200px' }}>
               {stats?.trending_tags ? (
                 <Space wrap size="small">
@@ -218,7 +220,7 @@ const Overview: React.FC = () => {
                 </Space>
               ) : (
                 <div style={{ textAlign: 'center', color: '#999', padding: '60px 0' }}>
-                  暂无标签数据
+                  タグデータがありません
                 </div>
               )}
             </div>
@@ -230,8 +232,8 @@ const Overview: React.FC = () => {
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={12}>
           <Card 
-            title="⏰ 最新内容" 
-            extra={<Button size="small">查看全部</Button>}
+            title="⏰ 最新コンテンツ" 
+            extra={<Button size="small">全て表示</Button>}
             style={{ height: '500px' }}
           >
             <Timeline style={{ maxHeight: '400px', overflow: 'auto' }}>
@@ -278,8 +280,8 @@ const Overview: React.FC = () => {
         
         <Col xs={24} lg={12}>
           <Card 
-            title="🌟 热门项目" 
-            extra={<Button size="small">查看全部</Button>}
+            title="🌟 人気プロジェクト" 
+            extra={<Button size="small">全て表示</Button>}
             style={{ height: '500px' }}
           >
             <div style={{ maxHeight: '400px', overflow: 'auto' }}>

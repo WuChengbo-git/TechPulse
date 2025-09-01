@@ -20,6 +20,7 @@ import {
   MessageOutlined,
   DashboardOutlined as AnalyticsOutlined
 } from '@ant-design/icons'
+import { useLanguage } from '../contexts/LanguageContext'
 
 const { Sider } = Layout
 const { Text } = Typography
@@ -31,48 +32,50 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ collapsed, selectedKey, onMenuSelect }) => {
+  const { t } = useLanguage()
+  
   const menuItems: MenuProps['items'] = [
     {
       key: 'overview',
       icon: <DashboardOutlined />,
-      label: '首页仪表盘',
+      label: t('sidebar.homeDashboard'),
       children: [
-        { key: 'dashboard', icon: <BarChartOutlined />, label: '数据概览' },
-        { key: 'trending', icon: <FireOutlined />, label: '今日热门' }
+        { key: 'dashboard', icon: <BarChartOutlined />, label: t('nav.dashboard') },
+        { key: 'trending', icon: <FireOutlined />, label: t('nav.trending') }
       ]
     },
     {
       key: 'sources',
       icon: <ApiOutlined />,
-      label: '数据源管理',
+      label: t('sidebar.dataSourceManagement'),
       children: [
-        { key: 'github', icon: <GithubOutlined />, label: 'GitHub' },
-        { key: 'arxiv', icon: <FileTextOutlined />, label: 'arXiv' },
-        { key: 'huggingface', icon: <RobotOutlined />, label: 'Hugging Face' },
-        { key: 'zenn', icon: <EditOutlined />, label: 'Zenn' }
+        { key: 'github', icon: <GithubOutlined />, label: t('nav.github') },
+        { key: 'arxiv', icon: <FileTextOutlined />, label: t('nav.arxiv') },
+        { key: 'huggingface', icon: <RobotOutlined />, label: t('nav.huggingface') },
+        { key: 'zenn', icon: <EditOutlined />, label: t('nav.zenn') }
       ]
     },
     {
       key: 'analysis',
       icon: <SearchOutlined />,
-      label: '智能分析',
+      label: t('sidebar.intelligentAnalysis'),
       children: [
-        { key: 'analytics', icon: <AnalyticsOutlined />, label: '数据分析' },
-        { key: 'chat', icon: <MessageOutlined />, label: 'AI 智能助手' },
-        { key: 'search', icon: <SearchOutlined />, label: '智能搜索' },
-        { key: 'trends', icon: <LineChartOutlined />, label: '趋势分析' },
-        { key: 'tags', icon: <TagsOutlined />, label: '标签云' }
+        { key: 'analytics', icon: <AnalyticsOutlined />, label: t('nav.dataAnalysis') },
+        { key: 'chat', icon: <MessageOutlined />, label: t('nav.aiAssistant') },
+        { key: 'search', icon: <SearchOutlined />, label: t('nav.smartSearch') },
+        { key: 'trends', icon: <LineChartOutlined />, label: t('nav.trendAnalysis') },
+        { key: 'tags', icon: <TagsOutlined />, label: t('nav.tagCloud') }
       ]
     },
     {
       key: 'system',
       icon: <SettingOutlined />,
-      label: '系统管理',
+      label: t('sidebar.systemManagement'),
       children: [
-        { key: 'notion', icon: <CloudOutlined />, label: 'Notion 集成' },
-        { key: 'api-config', icon: <ApiOutlined />, label: 'API 配置' },
-        { key: 'tasks', icon: <UnorderedListOutlined />, label: '任务管理' },
-        { key: 'status', icon: <MonitorOutlined />, label: '系统状态' }
+        { key: 'notion', icon: <CloudOutlined />, label: t('nav.notionIntegration') },
+        { key: 'api-config', icon: <ApiOutlined />, label: t('nav.apiConfig') },
+        { key: 'tasks', icon: <UnorderedListOutlined />, label: t('nav.taskManagement') },
+        { key: 'status', icon: <MonitorOutlined />, label: t('nav.systemStatus') }
       ]
     }
   ]
@@ -88,7 +91,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, selectedKey, onMenuSelect 
         borderRight: '1px solid #f0f0f0'
       }}
     >
-      {/* Logo区域 */}
+      {/* ロゴエリア */}
       <div
         style={{
           height: 64,
@@ -115,7 +118,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, selectedKey, onMenuSelect 
         )}
       </div>
 
-      {/* 菜单 */}
+      {/* メニュー */}
       <Menu
         mode="inline"
         selectedKeys={[selectedKey]}

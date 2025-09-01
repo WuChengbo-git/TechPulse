@@ -65,7 +65,7 @@ const Chat: React.FC = () => {
     const welcomeMessage: ChatMessage = {
       id: 'welcome',
       type: 'system',
-      content: '👋 欢迎使用 TechPulse AI 助手！\n\n我可以帮你：\n• 📎 分析任何网页链接的内容\n• 💬 基于网页内容进行问答\n• 🔍 解答技术问题\n\n请输入网页链接开始分析，或直接提问！',
+      content: '👋 TechPulse AI アシスタントへようこそ！\n\n私にできること：\n• 📎 任意のウェブページリンクのコンテンツを分析\n• 💬 ウェブページの内容をベースにしたQ&A\n• 🔍 技術的な質問の解答\n\nウェブページリンクを入力して分析を開始するか、直接質問してください！',
       timestamp: new Date()
     }
     setMessages([welcomeMessage])
@@ -98,7 +98,7 @@ const Chat: React.FC = () => {
       })
       
       if (!response.ok) {
-        throw new Error('网页分析失败')
+        throw new Error('ウェブページの分析に失敗しました')
       }
       
       const analysis: URLAnalysis = await response.json()
@@ -107,7 +107,7 @@ const Chat: React.FC = () => {
       const analysisMessage: ChatMessage = {
         id: Date.now().toString(),
         type: 'ai',
-        content: '🔍 网页分析完成！点击查看详细分析结果。',
+        content: '🔍 ウェブページ分析完了！クリックして詳細な分析結果を表示。',
         timestamp: new Date(),
         isUrl: true,
         urlAnalysis: analysis
@@ -119,24 +119,24 @@ const Chat: React.FC = () => {
       
       // 更新建议
       setSuggestions([
-        '这个内容的主要技术栈是什么？',
-        '如何快速上手这个项目？',
-        '这个内容的实用价值如何？',
-        '有什么需要注意的地方？'
+        'このコンテンツの主要な技術スタックは何ですか？',
+        'このプロジェクトを素早く始めるにはどうすればいいですか？',
+        'このコンテンツの実用的な価値はどうですか？',
+        '注意すべき点はありますか？'
       ])
       
-      message.success('网页分析完成！')
+      message.success('ウェブページ分析完了！')
       
     } catch (error) {
       console.error('URL analysis failed:', error)
       const errorMessage: ChatMessage = {
         id: Date.now().toString(),
         type: 'ai',
-        content: `❌ 分析失败：${error instanceof Error ? error.message : '未知错误'}`,
+        content: `❌ 分析失敗：${error instanceof Error ? error.message : '未知のエラー'}`,
         timestamp: new Date()
       }
       setMessages(prev => [...prev, errorMessage])
-      message.error('网页分析失败')
+      message.error('ウェブページ分析失敗')
     } finally {
       setIsLoading(false)
     }
@@ -160,7 +160,7 @@ const Chat: React.FC = () => {
       })
       
       if (!response.ok) {
-        throw new Error('聊天失败')
+        throw new Error('チャット失敗')
       }
       
       const chatResponse = await response.json()
@@ -192,11 +192,11 @@ const Chat: React.FC = () => {
       const errorMessage: ChatMessage = {
         id: Date.now().toString(),
         type: 'ai',
-        content: `❌ 回复失败：${error instanceof Error ? error.message : '未知错误'}`,
+        content: `❌ 返答失敗：${error instanceof Error ? error.message : '未知のエラー'}`,
         timestamp: new Date()
       }
       setMessages(prev => [...prev, errorMessage])
-      message.error('发送消息失败')
+      message.error('メッセージ送信失敗')
     } finally {
       setIsLoading(false)
     }
@@ -243,7 +243,7 @@ const Chat: React.FC = () => {
     const welcomeMessage: ChatMessage = {
       id: 'welcome-new',
       type: 'system',
-      content: '🔄 聊天已清空，可以开始新的对话！',
+      content: '🔄 チャットがクリアされました。新しい会話を始められます！',
       timestamp: new Date()
     }
     setMessages([welcomeMessage])
@@ -252,7 +252,7 @@ const Chat: React.FC = () => {
   // 复制内容
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
-    message.success('已复制到剪贴板')
+    message.success('クリップボードにコピーしました')
   }
   
   // 获取内容类型图标
@@ -276,15 +276,15 @@ const Chat: React.FC = () => {
   // 获取内容类型名称
   const getContentTypeName = (contentType: string) => {
     const types: Record<string, string> = {
-      'github_repository': 'GitHub仓库',
-      'tech_blog': '技术博客',
-      'documentation': '技术文档',
-      'academic_paper': '学术论文',
-      'news': '技术新闻',
-      'technical_content': '技术内容',
-      'general_web_page': '普通网页'
+      'github_repository': 'GitHubリポジトリ',
+      'tech_blog': '技術ブログ',
+      'documentation': '技術ドキュメント',
+      'academic_paper': '学術論文',
+      'news': '技術ニュース',
+      'technical_content': '技術コンテンツ',
+      'general_web_page': '一般ウェブページ'
     }
-    return types[contentType] || '网页内容'
+    return types[contentType] || 'ウェブページコンテンツ'
   }
   
   // 渲染消息
@@ -357,14 +357,14 @@ const Chat: React.FC = () => {
                         setAnalysisModalVisible(true)
                       }}
                     >
-                      查看详细分析
+                      詳細分析を表示
                     </Button>
                     <Button 
                       size="small" 
                       icon={<CopyOutlined />}
                       onClick={() => copyToClipboard(msg.urlAnalysis!.content_summary)}
                     >
-                      复制摘要
+                      概要をコピー
                     </Button>
                   </Space>
                 </Space>
@@ -400,14 +400,14 @@ const Chat: React.FC = () => {
           <div>
             <Title level={3} style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
               <RobotOutlined style={{ color: '#1890ff' }} />
-              TechPulse AI 助手
+              TechPulse AI アシスタント
             </Title>
-            <Text type="secondary">智能网页分析和技术问答</Text>
+            <Text type="secondary">インテリジェントウェブページ分析と技術Q&A</Text>
           </div>
           
           <Space>
             {currentUrl && (
-              <Tooltip title="当前分析的网页">
+              <Tooltip title="現在分析中のウェブページ">
                 <Tag color="blue" icon={<LinkOutlined />}>
                   {currentUrl.length > 30 ? currentUrl.substring(0, 30) + '...' : currentUrl}
                 </Tag>
@@ -418,7 +418,7 @@ const Chat: React.FC = () => {
               onClick={clearChat}
               type="text"
             >
-              清空聊天
+              チャットをクリア
             </Button>
           </Space>
         </div>
@@ -452,7 +452,7 @@ const Chat: React.FC = () => {
           {isLoading && (
             <div style={{ textAlign: 'center', padding: 20 }}>
               <Spin>
-                <div style={{ marginTop: 8 }}>AI 正在思考...</div>
+                <div style={{ marginTop: 8 }}>AI が考えています...</div>
               </Spin>
             </div>
           )}
@@ -462,7 +462,7 @@ const Chat: React.FC = () => {
         {/* 建议区域 */}
         {suggestions.length > 0 && (
           <div style={{ marginBottom: 16 }}>
-            <Text type="secondary" style={{ fontSize: '12px' }}>💡 建议问题：</Text>
+            <Text type="secondary" style={{ fontSize: '12px' }}>💡 推奨質問：</Text>
             <div style={{ marginTop: 8 }}>
               {suggestions.map((suggestion, index) => (
                 <Tag 
@@ -486,7 +486,7 @@ const Chat: React.FC = () => {
           <TextArea
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder="输入网页链接进行分析，或提出技术问题..."
+            placeholder="ウェブページリンクを入力して分析するか、技術的な質問をしてください..."
             autoSize={{ minRows: 1, maxRows: 4 }}
             onPressEnter={(e) => {
               if (!e.shiftKey) {
@@ -503,18 +503,18 @@ const Chat: React.FC = () => {
             loading={isLoading}
             style={{ height: 'auto' }}
           >
-            发送
+            送信
           </Button>
         </div>
         
         <Text type="secondary" style={{ fontSize: '11px', marginTop: 4 }}>
-          💡 提示：输入URL自动分析，Shift+Enter换行，Enter发送
+          💡 ヒント：URLを入力して自動分析、Shift+Enterで改行、Enterで送信
         </Text>
       </Card>
       
       {/* 详细分析模态框 */}
       <Modal
-        title="详细网页分析"
+        title="詳細ウェブページ分析"
         open={analysisModalVisible}
         onCancel={() => setAnalysisModalVisible(false)}
         footer={[
@@ -523,10 +523,10 @@ const Chat: React.FC = () => {
               copyToClipboard(currentAnalysis.analysis)
             }
           }}>
-            复制分析
+            分析をコピー
           </Button>,
           <Button key="close" type="primary" onClick={() => setAnalysisModalVisible(false)}>
-            关闭
+            閉じる
           </Button>
         ]}
         width={800}
@@ -534,14 +534,14 @@ const Chat: React.FC = () => {
         {currentAnalysis && (
           <Space direction="vertical" style={{ width: '100%' }}>
             <div>
-              <Text strong>📄 标题：</Text>
+              <Text strong>📄 タイトル：</Text>
               <Paragraph copyable={{ text: currentAnalysis.title }}>
                 {currentAnalysis.title}
               </Paragraph>
             </div>
             
             <div>
-              <Text strong>🔗 链接：</Text>
+              <Text strong>🔗 リンク：</Text>
               <Paragraph copyable={{ text: currentAnalysis.url }}>
                 <a href={currentAnalysis.url} target="_blank" rel="noopener noreferrer">
                   {currentAnalysis.url}
@@ -550,14 +550,14 @@ const Chat: React.FC = () => {
             </div>
             
             <div>
-              <Text strong>🏷️ 内容类型：</Text>
+              <Text strong>🏷️ コンテンツタイプ：</Text>
               <Tag color="blue" style={{ marginLeft: 8 }}>
                 {getContentTypeName(currentAnalysis.content_type)}
               </Tag>
             </div>
             
             <div>
-              <Text strong>🔍 关键要点：</Text>
+              <Text strong>🔍 キーポイント：</Text>
               <ul style={{ marginTop: 8 }}>
                 {currentAnalysis.key_points.map((point, index) => (
                   <li key={index}>{point}</li>
@@ -566,7 +566,7 @@ const Chat: React.FC = () => {
             </div>
             
             <div>
-              <Text strong>📊 详细分析：</Text>
+              <Text strong>📊 詳細分析：</Text>
               <Paragraph style={{ 
                 whiteSpace: 'pre-wrap', 
                 backgroundColor: '#fafafa', 
@@ -579,7 +579,7 @@ const Chat: React.FC = () => {
             </div>
             
             <div>
-              <Text strong>🏷️ 相关标签：</Text>
+              <Text strong>🏷️ 関連タグ：</Text>
               <div style={{ marginTop: 8 }}>
                 {currentAnalysis.tags.map((tag, index) => (
                   <Tag key={index} style={{ marginBottom: 4 }}>
