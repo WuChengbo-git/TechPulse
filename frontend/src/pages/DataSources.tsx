@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Card, Row, Col, Button, Progress, message, Typography, Space, Badge, Statistic, Timeline, Alert, Modal } from 'antd'
 import { GithubOutlined, FileTextOutlined, RobotOutlined, EditOutlined, SyncOutlined, CheckCircleOutlined, ClockCircleOutlined, ExclamationCircleOutlined, EyeOutlined } from '@ant-design/icons'
+import { useLanguage } from '../contexts/LanguageContext'
 
 const { Title, Text } = Typography
 
@@ -25,13 +26,14 @@ interface PreviewData {
 }
 
 const DataSources: React.FC = () => {
+  const { t } = useLanguage()
   const [sources, setSources] = useState<DataSource[]>([
     {
       id: 'github',
       name: 'GitHub',
       icon: <GithubOutlined />,
       color: '#24292e',
-      description: '最新のオープンソースプロジェクトとトレンドリポジトリを取得',
+      description: t('dataSources.github.description'),
       status: 'idle'
     },
     {
@@ -47,7 +49,7 @@ const DataSources: React.FC = () => {
       name: 'Hugging Face',
       icon: <RobotOutlined />,
       color: '#ff6f00',
-      description: '最新のAIモデルとデータセットを取得',
+      description: t('dataSources.huggingface.description'),
       status: 'idle'
     },
     {
@@ -55,7 +57,7 @@ const DataSources: React.FC = () => {
       name: 'Zenn',
       icon: <EditOutlined />,
       color: '#3ea8ff',
-      description: '日本の技術コミュニティの高品質な記事を取得',
+      description: t('dataSources.zenn.description'),
       status: 'idle'
     }
   ])
@@ -121,7 +123,7 @@ const DataSources: React.FC = () => {
           } : s
         ))
         
-        message.success(`${sources.find(s => s.id === sourceId)?.name} データ更新完了！${result.count || 0} 件の新しいデータを取得しました`)
+        message.success(`${sources.find(s => s.id === sourceId)?.name} data update completed! Retrieved ${result.count || 0} new items`)
         
         // 添加更新历史
         setUpdateHistory(prev => [{
@@ -139,7 +141,7 @@ const DataSources: React.FC = () => {
       setSources(prev => prev.map(s => 
         s.id === sourceId ? { ...s, status: 'error', progress: 0 } : s
       ))
-      message.error(`${sources.find(s => s.id === sourceId)?.name} 更新失敗: ${err}`)
+      message.error(`${sources.find(s => s.id === sourceId)?.name} update failed: ${err}`)
       
       setUpdateHistory(prev => [{
         source: sources.find(s => s.id === sourceId)?.name,
@@ -159,10 +161,10 @@ const DataSources: React.FC = () => {
         setPreviewData(data)
         setPreviewModalVisible(true)
       } else {
-        message.error('プレビュー失敗')
+        message.error('Preview failed')
       }
     } catch (err) {
-      message.error('プレビュー失敗: ' + err)
+      message.error('Preview failed: ' + err)
     }
   }
 
@@ -181,13 +183,13 @@ const DataSources: React.FC = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'loading':
-        return <Badge status="processing" text="更新中" />
+        return <Badge status="processing" text={t('dataSources.updating')} />
       case 'success':
-        return <Badge status="success" text="更新済み" />
+        return <Badge status="success" text={t('dataSources.updated')} />
       case 'error':
-        return <Badge status="error" text="更新失敗" />
+        return <Badge status="error" text={t('dataSources.updateFailed')} />
       default:
-        return <Badge status="default" text="更新待ち" />
+        return <Badge status="default" text={t('dataSources.pendingUpdate')} />
     }
   }
 
@@ -195,7 +197,7 @@ const DataSources: React.FC = () => {
     <div>
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Title level={2}>📊 データソース管理</Title>
+          <Title level={2}>{t('dataSources.title')}</Title>
           <Space>
             <Button 
               type="primary" 
@@ -203,21 +205,21 @@ const DataSources: React.FC = () => {
               onClick={updateAllSources}
               loading={sources.some(s => s.status === 'loading')}
             >
-              全て更新
+              {t('dataSources.updateAll')}
             </Button>
             <Button 
               icon={<EyeOutlined />}
               onClick={previewGitHubTrending}
             >
-              GitHub Trendingプレビュー
+              {t('dataSources.previewGithubTrending')}
             </Button>
           </Space>
         </div>
       </div>
 
       <Alert
-        message="必要に応じた更新の説明"
-        description="各データソースを個別に更新できるようになり、不要なリソースの無駄を避けられます。ニーズに応じて特定のデータソースを選択的に更新することを推奨します。"
+        message={t('dataSources.updateByNeed')}
+        description={t('dataSources.updateDescription')}
         type="info"
         showIcon
         style={{ marginBottom: 24 }}
@@ -247,7 +249,7 @@ const DataSources: React.FC = () => {
                   loading={source.status === 'loading'}
                   disabled={source.status === 'loading'}
                 >
-                  {source.status === 'loading' ? '更新中' : '更新'}
+                  {source.status === 'loading' ? t('dataSources.updating') : t('dataSources.update')}
                 </Button>
               ]}
             >
@@ -264,7 +266,7 @@ const DataSources: React.FC = () => {
               <Row gutter={16}>
                 <Col span={12}>
                   <Statistic 
-                    title="総データ" 
+                    title={t('dataSources.totalData')} 
                     value={source.count || 0} 
                     valueStyle={{ fontSize: '16px' }}
                   />
@@ -280,7 +282,7 @@ const DataSources: React.FC = () => {
 
               {source.lastUpdate && (
                 <div style={{ marginTop: 12, fontSize: '12px', color: '#999' }}>
-                  前回更新: {new Date(source.lastUpdate).toLocaleString()}
+                  {t('dataSources.lastUpdate')}: {new Date(source.lastUpdate).toLocaleString()}
                 </div>
               )}
             </Card>
@@ -291,11 +293,11 @@ const DataSources: React.FC = () => {
       {/* 更新历史 */}
       <Row gutter={16}>
         <Col xs={24} lg={16}>
-          <Card title="📈 データ統計概要" style={{ height: '400px' }}>
+          <Card title={t('dataSources.dataStatistics')} style={{ height: '400px' }}>
             <Row gutter={16}>
               <Col span={8}>
                 <Statistic
-                  title="総データ量"
+                  title={t('dataSources.totalAmount')}
                   value={sources.reduce((sum, s) => sum + (s.count || 0), 0)}
                   valueStyle={{ color: '#1890ff' }}
                 />
@@ -309,7 +311,7 @@ const DataSources: React.FC = () => {
               </Col>
               <Col span={8}>
                 <Statistic
-                  title="アクティブデータソース"
+                  title={t('dataSources.activeSources')}
                   value={sources.filter(s => (s.todayCount || 0) > 0).length}
                   valueStyle={{ color: '#fa8c16' }}
                 />
@@ -319,7 +321,7 @@ const DataSources: React.FC = () => {
         </Col>
         
         <Col xs={24} lg={8}>
-          <Card title="⏱️ 更新履歴" style={{ height: '400px', overflow: 'auto' }}>
+          <Card title={t('dataSources.updateHistory')} style={{ height: '400px', overflow: 'auto' }}>
             {updateHistory.length > 0 ? (
               <Timeline size="small">
                 {updateHistory.map((item, index) => (
@@ -344,7 +346,7 @@ const DataSources: React.FC = () => {
               </Timeline>
             ) : (
               <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
-                更新記録がありません
+                {t('dataSources.noUpdateRecords')}
               </div>
             )}
           </Card>
@@ -353,7 +355,7 @@ const DataSources: React.FC = () => {
 
       {/* GitHub Trending 预览模态框 */}
       <Modal
-        title="🔥 GitHub Trending プレビュー"
+        title={t('dataSources.previewTitle')}
         open={previewModalVisible}
         onCancel={() => setPreviewModalVisible(false)}
         width={800}
@@ -369,29 +371,29 @@ const DataSources: React.FC = () => {
               updateSingleSource('github')
             }}
           >
-            これらのデータを保存
+            {t('dataSources.saveData')}
           </Button>
         ]}
       >
         {previewData && (
           <div>
             <Alert
-              message={`${previewData.total_count} 個のtrendingプロジェクトを発見`}
-              description="以下は本日最新のtrendingプロジェクトのプレビューです。確認後データベースに保存されます"
+              message={`Found ${previewData.total_count} trending projects`}
+              description="Below is a preview of today's latest trending projects. They will be saved to the database after confirmation"
               type="info"
               style={{ marginBottom: 16 }}
             />
             
             {previewData.python_trending && previewData.python_trending.length > 0 && (
               <div style={{ marginBottom: 16 }}>
-                <Title level={4}>Python プロジェクト ({previewData.python_trending.length})</Title>
+                <Title level={4}>{t('dataSources.pythonProjects')} ({previewData.python_trending.length})</Title>
                 {previewData.python_trending.slice(0, 5).map((repo, index) => (
                   <div key={index} style={{ padding: '8px 0', borderBottom: '1px solid #f0f0f0' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <Text strong>{repo.title}</Text>
                       <Space>
                         <Text>⭐ {repo.stars}</Text>
-                        <Text type="secondary">スコア: {repo.trending_score?.toFixed(1)}</Text>
+                        <Text type="secondary">{t('dataSources.score')}: {repo.trending_score?.toFixed(1)}</Text>
                       </Space>
                     </div>
                     <Text type="secondary" style={{ fontSize: '12px' }}>
@@ -404,14 +406,14 @@ const DataSources: React.FC = () => {
             
             {previewData.general_trending && previewData.general_trending.length > 0 && (
               <div>
-                <Title level={4}>全言語プロジェクト ({previewData.general_trending.length})</Title>
+                <Title level={4}>{t('dataSources.allLanguageProjects')} ({previewData.general_trending.length})</Title>
                 {previewData.general_trending.slice(0, 3).map((repo, index) => (
                   <div key={index} style={{ padding: '8px 0', borderBottom: '1px solid #f0f0f0' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <Text strong>{repo.title}</Text>
                       <Space>
                         <Text>⭐ {repo.stars}</Text>
-                        <Text type="secondary">スコア: {repo.trending_score?.toFixed(1)}</Text>
+                        <Text type="secondary">{t('dataSources.score')}: {repo.trending_score?.toFixed(1)}</Text>
                       </Space>
                     </div>
                     <Text type="secondary" style={{ fontSize: '12px' }}>

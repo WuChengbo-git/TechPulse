@@ -17,7 +17,7 @@ const LanguageSwitch: React.FC = () => {
       onChange={handleLanguageChange}
       size="small"
       style={{ width: 100 }}
-      bordered={false}
+      variant="borderless"
     >
       {Object.entries(languages).map(([code, config]) => (
         <Option key={code} value={code}>

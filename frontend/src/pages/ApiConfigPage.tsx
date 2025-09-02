@@ -172,12 +172,12 @@ const ApiConfigPage: React.FC = () => {
       })
 
       if (response.ok) {
-        message.success('設定を保存しました')
+        message.success('Settings saved successfully')
       } else {
         throw new Error('Save failed')
       }
     } catch (error) {
-      message.error('設定の保存に失敗しました')
+      message.error('Failed to save settings')
     } finally {
       setLoading(false)
     }
@@ -207,15 +207,15 @@ const ApiConfigPage: React.FC = () => {
   // GitHub配置面板
   const renderGitHubConfig = () => (
     <Space direction="vertical" style={{ width: '100%' }}>
-      <Card title="🔍 検索条件" size="small">
+      <Card title="🔍 Search Criteria" size="small">
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item label="プログラミング言語">
+            <Form.Item label="Programming Languages">
               <Select
                 mode="multiple"
                 value={githubConfig.languages}
                 onChange={(value) => setGithubConfig({...githubConfig, languages: value})}
-                placeholder="言語を選択"
+                placeholder="Select languages"
               >
                 {githubLanguages.map(lang => (
                   <Option key={lang} value={lang}>{lang}</Option>
@@ -224,12 +224,12 @@ const ApiConfigPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label="トピック">
+            <Form.Item label="Topics">
               <Select
                 mode="multiple"
                 value={githubConfig.topics}
                 onChange={(value) => setGithubConfig({...githubConfig, topics: value})}
-                placeholder="トピックを選択"
+                placeholder="Select topics"
               >
                 {githubTopics.map(topic => (
                   <Option key={topic} value={topic}>{topic}</Option>
@@ -240,10 +240,10 @@ const ApiConfigPage: React.FC = () => {
         </Row>
       </Card>
 
-      <Card title="⭐ フィルタ条件" size="small">
+      <Card title="⭐ Filter Conditions" size="small">
         <Row gutter={16}>
           <Col span={8}>
-            <Form.Item label="最小スター数">
+            <Form.Item label="Minimum Stars">
               <InputNumber
                 min={0}
                 value={githubConfig.min_stars}
@@ -253,20 +253,20 @@ const ApiConfigPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="期間（日）">
+            <Form.Item label="Period (Days)">
               <Select
                 value={githubConfig.max_age_days}
                 onChange={(value) => setGithubConfig({...githubConfig, max_age_days: value})}
               >
-                <Option value={1}>1日</Option>
-                <Option value={7}>1週間</Option>
-                <Option value={30}>1ヶ月</Option>
-                <Option value={90}>3ヶ月</Option>
+                <Option value={1}>1 day</Option>
+                <Option value={7}>1 week</Option>
+                <Option value={30}>1 month</Option>
+                <Option value={90}>3 months</Option>
               </Select>
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="取得数">
+            <Form.Item label="Fetch Count">
               <InputNumber
                 min={10}
                 max={100}
@@ -280,19 +280,19 @@ const ApiConfigPage: React.FC = () => {
 
         <Row gutter={16}>
           <Col span={8}>
-            <Form.Item label="ソート順">
+            <Form.Item label="Sort By">
               <Select
                 value={githubConfig.sort_by}
                 onChange={(value) => setGithubConfig({...githubConfig, sort_by: value})}
               >
-                <Option value="stars">スター数</Option>
-                <Option value="updated">更新日時</Option>
-                <Option value="created">作成日時</Option>
+                <Option value="stars">Stars</Option>
+                <Option value="updated">Updated</Option>
+                <Option value="created">Created</Option>
               </Select>
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="フォークを除外">
+            <Form.Item label="Exclude Forks">
               <Switch
                 checked={githubConfig.exclude_forks}
                 onChange={(checked) => setGithubConfig({...githubConfig, exclude_forks: checked})}
@@ -300,7 +300,7 @@ const ApiConfigPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="アーカイブを含む">
+            <Form.Item label="Include Archived">
               <Switch
                 checked={githubConfig.include_archived}
                 onChange={(checked) => setGithubConfig({...githubConfig, include_archived: checked})}
@@ -315,8 +315,8 @@ const ApiConfigPage: React.FC = () => {
   // arXiv配置面板
   const renderArxivConfig = () => (
     <Space direction="vertical" style={{ width: '100%' }}>
-      <Card title="📚 研究分野" size="small">
-        <Form.Item label="カテゴリ">
+      <Card title="📚 Research Fields" size="small">
+        <Form.Item label="Categories">
           <Checkbox.Group
             value={arxivConfig.categories}
             onChange={(value) => setArxivConfig({...arxivConfig, categories: value as string[]})}
@@ -332,21 +332,21 @@ const ApiConfigPage: React.FC = () => {
         </Form.Item>
       </Card>
 
-      <Card title="🔑 キーワード" size="small">
-        <Form.Item label="検索キーワード">
+      <Card title="🔑 Keywords" size="small">
+        <Form.Item label="Search Keywords">
           <Select
             mode="tags"
             value={arxivConfig.keywords}
             onChange={(value) => setArxivConfig({...arxivConfig, keywords: value})}
-            placeholder="キーワードを入力"
+            placeholder="Enter keywords"
           />
         </Form.Item>
       </Card>
 
-      <Card title="⚙️ 取得設定" size="small">
+      <Card title="⚙️ Fetch Settings" size="small">
         <Row gutter={16}>
           <Col span={8}>
-            <Form.Item label="期間（日）">
+            <Form.Item label="Period (Days)">
               <InputNumber
                 min={1}
                 max={365}
@@ -357,7 +357,7 @@ const ApiConfigPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="最大結果数">
+            <Form.Item label="Max Results">
               <InputNumber
                 min={10}
                 max={1000}
@@ -368,14 +368,14 @@ const ApiConfigPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="ソート順">
+            <Form.Item label="Sort By">
               <Select
                 value={arxivConfig.sort_by}
                 onChange={(value) => setArxivConfig({...arxivConfig, sort_by: value})}
               >
-                <Option value="relevance">関連度</Option>
-                <Option value="lastUpdatedDate">更新日時</Option>
-                <Option value="submittedDate">投稿日時</Option>
+                <Option value="relevance">Relevance</Option>
+                <Option value="lastUpdatedDate">Updated Date</Option>
+                <Option value="submittedDate">Submitted Date</Option>
               </Select>
             </Form.Item>
           </Col>
@@ -387,15 +387,15 @@ const ApiConfigPage: React.FC = () => {
   // Hugging Face配置面板
   const renderHuggingFaceConfig = () => (
     <Space direction="vertical" style={{ width: '100%' }}>
-      <Card title="🤖 モデル設定" size="small">
+      <Card title="🤖 Model Settings" size="small">
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item label="パイプラインタスク">
+            <Form.Item label="Pipeline Tasks">
               <Select
                 mode="multiple"
                 value={huggingfaceConfig.pipeline_tags}
                 onChange={(value) => setHuggingfaceConfig({...huggingfaceConfig, pipeline_tags: value})}
-                placeholder="タスクを選択"
+                placeholder="Select tasks"
               >
                 {huggingfacePipelineTags.map(tag => (
                   <Option key={tag} value={tag}>{tag}</Option>
@@ -404,29 +404,29 @@ const ApiConfigPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label="対応言語">
+            <Form.Item label="Supported Languages">
               <Select
                 mode="multiple"
                 value={huggingfaceConfig.languages}
                 onChange={(value) => setHuggingfaceConfig({...huggingfaceConfig, languages: value})}
-                placeholder="言語を選択"
+                placeholder="Select languages"
               >
-                <Option value="en">英語</Option>
-                <Option value="ja">日本語</Option>
-                <Option value="zh">中国語</Option>
-                <Option value="ko">韓国語</Option>
-                <Option value="fr">フランス語</Option>
-                <Option value="de">ドイツ語</Option>
+                <Option value="en">English</Option>
+                <Option value="ja">Japanese</Option>
+                <Option value="zh">Chinese</Option>
+                <Option value="ko">Korean</Option>
+                <Option value="fr">French</Option>
+                <Option value="de">German</Option>
               </Select>
             </Form.Item>
           </Col>
         </Row>
       </Card>
 
-      <Card title="📊 フィルタ条件" size="small">
+      <Card title="📊 Filter Conditions" size="small">
         <Row gutter={16}>
           <Col span={8}>
-            <Form.Item label="最小ダウンロード数">
+            <Form.Item label="Min Downloads">
               <InputNumber
                 min={0}
                 value={huggingfaceConfig.min_downloads}
@@ -436,7 +436,7 @@ const ApiConfigPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="期間（日）">
+            <Form.Item label="Period (Days)">
               <InputNumber
                 min={1}
                 max={365}
@@ -447,15 +447,15 @@ const ApiConfigPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="ソート順">
+            <Form.Item label="Sort By">
               <Select
                 value={huggingfaceConfig.sort_by}
                 onChange={(value) => setHuggingfaceConfig({...huggingfaceConfig, sort_by: value})}
               >
-                <Option value="downloads">ダウンロード数</Option>
-                <Option value="likes">いいね数</Option>
-                <Option value="updated">更新日時</Option>
-                <Option value="created">作成日時</Option>
+                <Option value="downloads">Downloads</Option>
+                <Option value="likes">Likes</Option>
+                <Option value="updated">Updated</Option>
+                <Option value="created">Created</Option>
               </Select>
             </Form.Item>
           </Col>
@@ -463,7 +463,7 @@ const ApiConfigPage: React.FC = () => {
 
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item label="データセットを含む">
+            <Form.Item label="Include Datasets">
               <Switch
                 checked={huggingfaceConfig.include_datasets}
                 onChange={(checked) => setHuggingfaceConfig({...huggingfaceConfig, include_datasets: checked})}
@@ -471,7 +471,7 @@ const ApiConfigPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label="Spacesを含む">
+            <Form.Item label="Include Spaces">
               <Switch
                 checked={huggingfaceConfig.include_spaces}
                 onChange={(checked) => setHuggingfaceConfig({...huggingfaceConfig, include_spaces: checked})}
@@ -486,19 +486,19 @@ const ApiConfigPage: React.FC = () => {
   // Zenn配置面板
   const renderZennConfig = () => (
     <Space direction="vertical" style={{ width: '100%' }}>
-      <Card title="📝 記事設定" size="small">
-        <Form.Item label="興味のあるトピック">
+      <Card title="📝 Article Settings" size="small">
+        <Form.Item label="Topics of Interest">
           <Select
             mode="tags"
             value={zennConfig.topics}
             onChange={(value) => setZennConfig({...zennConfig, topics: value})}
-            placeholder="トピックを入力"
+            placeholder="Enter topics"
           />
         </Form.Item>
 
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item label="最小いいね数">
+            <Form.Item label="Min Likes">
               <InputNumber
                 min={0}
                 value={zennConfig.min_likes}
@@ -508,7 +508,7 @@ const ApiConfigPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label="期間（日）">
+            <Form.Item label="Period (Days)">
               <InputNumber
                 min={1}
                 max={365}
@@ -522,19 +522,19 @@ const ApiConfigPage: React.FC = () => {
 
         <Row gutter={16}>
           <Col span={8}>
-            <Form.Item label="ソート順">
+            <Form.Item label="Sort By">
               <Select
                 value={zennConfig.sort_by}
                 onChange={(value) => setZennConfig({...zennConfig, sort_by: value})}
               >
-                <Option value="liked">いいね順</Option>
-                <Option value="published_at">公開日順</Option>
-                <Option value="updated_at">更新日順</Option>
+                <Option value="liked">Likes</Option>
+                <Option value="published_at">Published Date</Option>
+                <Option value="updated_at">Updated Date</Option>
               </Select>
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="本を含む">
+            <Form.Item label="Include Books">
               <Switch
                 checked={zennConfig.include_books}
                 onChange={(checked) => setZennConfig({...zennConfig, include_books: checked})}
@@ -542,7 +542,7 @@ const ApiConfigPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="スクラップを含む">
+            <Form.Item label="Include Scraps">
               <Switch
                 checked={zennConfig.include_scraps}
                 onChange={(checked) => setZennConfig({...zennConfig, include_scraps: checked})}
@@ -556,10 +556,10 @@ const ApiConfigPage: React.FC = () => {
 
   // 调度配置面板
   const renderScheduleConfig = () => (
-    <Card title="⏰ 自動収集スケジュール">
+    <Card title="⏰ Auto Collection Schedule">
       <Row gutter={16}>
         <Col span={6}>
-          <Form.Item label="有効化">
+          <Form.Item label="Enable">
             <Switch
               checked={scheduleConfig.enabled}
               onChange={(checked) => setScheduleConfig({...scheduleConfig, enabled: checked})}
@@ -567,20 +567,20 @@ const ApiConfigPage: React.FC = () => {
           </Form.Item>
         </Col>
         <Col span={6}>
-          <Form.Item label="頻度">
+          <Form.Item label="Frequency">
             <Select
               value={scheduleConfig.frequency}
               onChange={(value) => setScheduleConfig({...scheduleConfig, frequency: value})}
               disabled={!scheduleConfig.enabled}
             >
-              <Option value="hourly">毎時</Option>
-              <Option value="daily">毎日</Option>
-              <Option value="weekly">毎週</Option>
+              <Option value="hourly">Hourly</Option>
+              <Option value="daily">Daily</Option>
+              <Option value="weekly">Weekly</Option>
             </Select>
           </Form.Item>
         </Col>
         <Col span={6}>
-          <Form.Item label="実行時刻">
+          <Form.Item label="Execution Time">
             <TimePicker
               value={dayjs(scheduleConfig.time, 'HH:mm')}
               format="HH:mm"
@@ -593,7 +593,7 @@ const ApiConfigPage: React.FC = () => {
           </Form.Item>
         </Col>
         <Col span={6}>
-          <Form.Item label="タイムゾーン">
+          <Form.Item label="Timezone">
             <Select
               value={scheduleConfig.timezone}
               onChange={(value) => setScheduleConfig({...scheduleConfig, timezone: value})}
@@ -642,8 +642,8 @@ const ApiConfigPage: React.FC = () => {
       </div>
 
       <Alert
-        message="データソース設定について"
-        description="ここで設定した条件に基づいて、各データソースから技術情報が自動収集されます。設定変更後は必ず保存ボタンをクリックしてください。"
+        message="About Data Source Settings"
+        description="Based on the conditions set here, technical information will be automatically collected from each data source. Be sure to click the save button after changing settings."
         type="info"
         showIcon
         style={{ marginBottom: 24 }}

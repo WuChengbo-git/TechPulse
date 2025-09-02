@@ -118,44 +118,44 @@ const Overview: React.FC = () => {
         <Col xs={24} sm={6}>
           <Card>
             <Statistic
-              title="総データ量"
+              title={t('overview.totalData')}
               value={stats?.total_cards || 0}
               valueStyle={{ color: '#1890ff' }}
               prefix={<LineChartOutlined />}
-              suffix="件"
+              suffix={t('overview.count')}
             />
           </Card>
         </Col>
         <Col xs={24} sm={6}>
           <Card>
             <Statistic
-              title="本日の新規"
+              title={t('overview.todayNew')}
               value={stats?.today_cards || 0}
               valueStyle={{ color: '#52c41a' }}
               prefix={<ArrowUpOutlined />}
-              suffix="件"
+              suffix={t('overview.count')}
             />
           </Card>
         </Col>
         <Col xs={24} sm={6}>
           <Card>
             <Statistic
-              title="人気プロジェクト"
+              title={t('overview.hotProjects')}
               value={trendingCards.filter(c => (c.stars || 0) > 1000).length}
               valueStyle={{ color: '#fa8c16' }}
               prefix={<FireOutlined />}
-              suffix="個"
+              suffix={t('overview.unit')}
             />
           </Card>
         </Col>
         <Col xs={24} sm={6}>
           <Card>
             <Statistic
-              title="データソース"
+              title={t('overview.dataSources')}
               value={Object.keys(stats?.sources_stats || {}).length}
               valueStyle={{ color: '#722ed1' }}
               prefix={<ClockCircleOutlined />}
-              suffix="個"
+              suffix={t('overview.unit')}
             />
           </Card>
         </Col>
@@ -164,7 +164,7 @@ const Overview: React.FC = () => {
       {/* 数据源分布 */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col xs={24} lg={12}>
-          <Card title="📊 データソース分散" extra={<Button size="small">詳細を表示</Button>}>
+          <Card title={t('overview.dataSourceDistribution')} extra={<Button size="small">{t('overview.viewDetails')}</Button>}>
             <Row gutter={[8, 8]}>
               {Object.entries(stats?.sources_stats || {}).map(([source, count]) => (
                 <Col span={12} key={source}>
@@ -197,7 +197,7 @@ const Overview: React.FC = () => {
         </Col>
         
         <Col xs={24} lg={12}>
-          <Card title="🔥 人気タグ" extra={<Button size="small">タグクラウド</Button>}>
+          <Card title={t('overview.hotTags')} extra={<Button size="small">{t('overview.tagCloud')}</Button>}>
             <div style={{ minHeight: '200px' }}>
               {stats?.trending_tags ? (
                 <Space wrap size="small">
@@ -220,7 +220,7 @@ const Overview: React.FC = () => {
                 </Space>
               ) : (
                 <div style={{ textAlign: 'center', color: '#999', padding: '60px 0' }}>
-                  タグデータがありません
+                  {t('overview.noTagData')}
                 </div>
               )}
             </div>
@@ -232,56 +232,90 @@ const Overview: React.FC = () => {
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={12}>
           <Card 
-            title="⏰ 最新コンテンツ" 
-            extra={<Button size="small">全て表示</Button>}
+            title={t('overview.latestContent')} 
+            extra={<Button size="small">{t('overview.viewAll')}</Button>}
             style={{ height: '500px' }}
+            bodyStyle={{ padding: '16px', paddingTop: '12px' }}
           >
-            <Timeline style={{ maxHeight: '400px', overflow: 'auto' }}>
-              {recentCards.map((card) => (
-                <Timeline.Item 
-                  key={card.id}
-                  dot={<Avatar size="small" style={{ backgroundColor: '#1890ff' }}>
+            <Timeline 
+              style={{ 
+                maxHeight: '400px', 
+                overflow: 'auto', 
+                paddingTop: '8px',
+                paddingRight: '8px'
+              }}
+              items={recentCards.map((card) => ({
+                key: card.id,
+                dot: (
+                  <Avatar 
+                    size="small" 
+                    style={{ 
+                      backgroundColor: '#1890ff',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '12px'
+                    }}
+                  >
                     {getSourceIcon(card.source)}
-                  </Avatar>}
-                >
-                  <div style={{ marginBottom: 8 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                      <Text strong style={{ fontSize: '13px' }}>
-                        {card.title.length > 40 ? card.title.substring(0, 40) + '...' : card.title}
+                  </Avatar>
+                ),
+                children: (
+                  <div style={{ marginBottom: 12, paddingLeft: '4px' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
+                      <Text strong style={{ fontSize: '13px', lineHeight: '1.4', flex: 1, minWidth: 0 }}>
+                        {card.title.length > 35 ? card.title.substring(0, 35) + '...' : card.title}
                       </Text>
-                      <Tag size="small" color="blue">{card.source.toUpperCase()}</Tag>
+                      <Tag color="blue" style={{ flexShrink: 0 }}>{card.source.toUpperCase()}</Tag>
                     </div>
                     
                     {card.summary && (
                       <Paragraph 
                         ellipsis={{ rows: 2 }} 
-                        style={{ fontSize: '11px', color: '#666', margin: 0 }}
+                        style={{ 
+                          fontSize: '11px', 
+                          color: '#666', 
+                          margin: '4px 0 6px 0',
+                          lineHeight: '1.3'
+                        }}
                       >
                         {card.summary}
                       </Paragraph>
                     )}
                     
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
-                      <div>
+                    <div style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      alignItems: 'flex-end', 
+                      marginTop: 6,
+                      gap: 8
+                    }}>
+                      <div style={{ flex: 1 }}>
                         {card.chinese_tags?.slice(0, 2).map((tag, i) => (
-                          <Tag key={i} size="small" color="green">{tag}</Tag>
+                          <Tag key={i} color="green" style={{ marginBottom: 2, fontSize: '11px' }}>
+                            {tag}
+                          </Tag>
                         ))}
                       </div>
-                      <Text type="secondary" style={{ fontSize: '10px' }}>
+                      <Text type="secondary" style={{ 
+                        fontSize: '10px',
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0
+                      }}>
                         {new Date(card.created_at).toLocaleDateString()}
                       </Text>
                     </div>
                   </div>
-                </Timeline.Item>
-              ))}
-            </Timeline>
+                )
+              }))}
+            />
           </Card>
         </Col>
         
         <Col xs={24} lg={12}>
           <Card 
-            title="🌟 人気プロジェクト" 
-            extra={<Button size="small">全て表示</Button>}
+            title={t('overview.hotProjectsRank')} 
+            extra={<Button size="small">{t('overview.viewAll')}</Button>}
             style={{ height: '500px' }}
           >
             <div style={{ maxHeight: '400px', overflow: 'auto' }}>

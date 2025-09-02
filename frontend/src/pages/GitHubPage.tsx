@@ -70,7 +70,7 @@ const GitHubPage: React.FC = () => {
       }
     } catch (error) {
       console.error('Failed to fetch GitHub data:', error)
-      message.error('GitHub データの取得に失敗しました')
+      message.error('Failed to fetch GitHub data')
     } finally {
       setLoading(false)
     }
@@ -84,7 +84,7 @@ const GitHubPage: React.FC = () => {
       
       if (response.ok) {
         const result = await response.json()
-        message.success(`GitHub データ更新完了！${result.count || 0} 件の新しいリポジトリを取得しました`)
+        message.success(`GitHub data update completed! Retrieved ${result.count || 0} new repositories`)
         
         // 添加更新历史
         setUpdateHistory(prev => [{
@@ -98,7 +98,7 @@ const GitHubPage: React.FC = () => {
         throw new Error('Update failed')
       }
     } catch (error) {
-      message.error('GitHub データの更新に失敗しました')
+      message.error('Failed to update GitHub data')
       setUpdateHistory(prev => [{
         time: new Date().toLocaleString(),
         count: 0,
@@ -118,10 +118,10 @@ const GitHubPage: React.FC = () => {
         setPreviewData(data)
         setPreviewModalVisible(true)
       } else {
-        message.error('プレビュー失敗')
+        message.error('Preview failed')
       }
     } catch (err) {
-      message.error('プレビュー失敗: ' + err)
+      message.error('Preview failed: ' + err)
     }
   }
 
@@ -264,7 +264,7 @@ const GitHubPage: React.FC = () => {
           <Card title={`📦 ${t('github.repositories')}`} style={{ minHeight: '600px' }}>
             {loading ? (
               <div style={{ textAlign: 'center', padding: '50px' }}>
-                <span>データを読み込み中...</span>
+                <span>{t('common.loading')}</span>
               </div>
             ) : (
               <List
@@ -318,7 +318,7 @@ const GitHubPage: React.FC = () => {
                   showSizeChanger: true,
                   showQuickJumper: true,
                   showTotal: (total, range) =>
-                    `${range[0]}-${range[1]} / ${total} リポジトリ`
+                    `${range[0]}-${range[1]} / ${total} repositories`
                 }}
               />
             )}
@@ -385,7 +385,7 @@ const GitHubPage: React.FC = () => {
 
       {/* GitHub Trending 预览模态框 */}
       <Modal
-        title="🔥 GitHub Trending プレビュー"
+        title={t('dataSources.previewTitle')}
         open={previewModalVisible}
         onCancel={() => setPreviewModalVisible(false)}
         width={800}
@@ -401,29 +401,29 @@ const GitHubPage: React.FC = () => {
               updateGitHubData()
             }}
           >
-            これらのデータを保存
+            {t('dataSources.saveData')}
           </Button>
         ]}
       >
         {previewData && (
           <div>
             <Alert
-              message={`${previewData.total_count || 0} 個のトレンドプロジェクトを発見`}
-              description="以下は本日最新のトレンドプロジェクトのプレビューです"
+              message={`Found ${previewData.total_count || 0} trending projects`}
+              description="Below is a preview of today's latest trending projects"
               type="info"
               style={{ marginBottom: 16 }}
             />
             
             {previewData.python_trending && previewData.python_trending.length > 0 && (
               <div style={{ marginBottom: 16 }}>
-                <Title level={4}>Python プロジェクト</Title>
+                <Title level={4}>Python Projects</Title>
                 {previewData.python_trending.slice(0, 5).map((repo: any, index: number) => (
                   <div key={index} style={{ padding: '8px 0', borderBottom: '1px solid #f0f0f0' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <Text strong>{repo.title}</Text>
                       <Space>
                         <Text>⭐ {repo.stars}</Text>
-                        <Text type="secondary">スコア: {repo.trending_score?.toFixed(1)}</Text>
+                        <Text type="secondary">Score: {repo.trending_score?.toFixed(1)}</Text>
                       </Space>
                     </div>
                     <Text type="secondary" style={{ fontSize: '12px' }}>

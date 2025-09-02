@@ -11,6 +11,7 @@ import {
 } from '@ant-design/icons'
 import { Column, Line, Pie, WordCloud } from '@ant-design/charts'
 import dayjs from 'dayjs'
+import { useLanguage } from '../contexts/LanguageContext'
 
 const { Title, Text } = Typography
 const { RangePicker } = DatePicker
@@ -38,6 +39,7 @@ interface AnalyticsData {
 }
 
 const Analytics: React.FC = () => {
+  const { t } = useLanguage()
   const [loading, setLoading] = useState(true)
   const [cards, setCards] = useState<TechCard[]>([])
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null)
@@ -195,7 +197,7 @@ const Analytics: React.FC = () => {
     return (
       <div style={{ textAlign: 'center', padding: '50px' }}>
         <Spin size="large" />
-        <div style={{ marginTop: 16 }}>データ分析を読み込み中...</div>
+        <div style={{ marginTop: 16 }}>{t('analytics.loading')}</div>
       </div>
     )
   }
@@ -203,8 +205,8 @@ const Analytics: React.FC = () => {
   if (!analyticsData) {
     return (
       <Alert
-        message="データがありません"
-        description="分析できるデータが見つかりません"
+        message={t('analytics.noData')}
+        description={t('analytics.noDataDescription')}
         type="info"
         showIcon
       />
@@ -223,7 +225,7 @@ const Analytics: React.FC = () => {
       style: { fill: '#FFFFFF', fontWeight: 'bold' }
     },
     meta: {
-      source: { alias: 'データソース' },
+      source: { alias: 'Data Source' },
       count: { alias: '数量' }
     }
   }
@@ -239,7 +241,7 @@ const Analytics: React.FC = () => {
     meta: {
       date: { alias: '日付' },
       count: { alias: '数量' },
-      source: { alias: 'ソース' }
+      source: { alias: 'Source' }
     }
   }
   
@@ -274,9 +276,9 @@ const Analytics: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <Title level={2} style={{ margin: 0 }}>
-              📊 技術トレンド分析
+              {t('analytics.title')}
             </Title>
-            <Text type="secondary">リアルタイム技術情報データ分析と可視化</Text>
+            <Text type="secondary">{t('analytics.subtitle')}</Text>
           </div>
           
           <Space>
@@ -295,7 +297,7 @@ const Analytics: React.FC = () => {
               onClick={fetchCards}
               loading={loading}
             >
-              データを更新
+              {t('analytics.refreshData')}
             </Button>
           </Space>
         </div>
@@ -306,7 +308,7 @@ const Analytics: React.FC = () => {
         <Col xs={24} sm={12} md={6}>
           <Card>
             <Statistic
-              title="総プロジェクト数"
+              title={t('analytics.totalProjects')}
               value={analyticsData.totalCards}
               prefix={<FireOutlined style={{ color: '#ff4d4f' }} />}
               valueStyle={{ color: '#3f8600' }}
@@ -320,7 +322,7 @@ const Analytics: React.FC = () => {
               title="人気技術"
               value={analyticsData.techTrends[0]?.tech || 'N/A'}
               prefix={<ArrowUpOutlined style={{ color: '#1890ff' }} />}
-              suffix={`(${analyticsData.techTrends[0]?.count || 0}プロジェクト)`}
+              suffix={`(${analyticsData.techTrends[0]?.count || 0} ${t('analytics.projects')})`}
             />
           </Card>
         </Col>
@@ -328,7 +330,7 @@ const Analytics: React.FC = () => {
         <Col xs={24} sm={12} md={6}>
           <Card>
             <Statistic
-              title="主要ソース"
+              title={t('analytics.mainSource')}
               value={analyticsData.sourceDistribution[0]?.source.toUpperCase() || 'N/A'}
               prefix={getSourceIcon(analyticsData.sourceDistribution[0]?.source || '')}
               suffix={`${analyticsData.sourceDistribution[0]?.percentage || 0}%`}
@@ -339,7 +341,7 @@ const Analytics: React.FC = () => {
         <Col xs={24} sm={12} md={6}>
           <Card>
             <Statistic
-              title="技術タグ"
+              title={t('analytics.techTags')}
               value={analyticsData.popularTags.length}
               prefix={<Tag />}
               valueStyle={{ color: '#722ed1' }}
@@ -353,7 +355,7 @@ const Analytics: React.FC = () => {
         {/* 数据源分布 */}
         <Col xs={24} lg={12}>
           <Card 
-            title="データソース分散" 
+            title={t('analytics.dataSourceDistribution')} 
             extra={
               <Radio.Group 
                 value={chartType} 
@@ -375,14 +377,14 @@ const Analytics: React.FC = () => {
         
         {/* 趋势图 */}
         <Col xs={24} lg={12}>
-          <Card title="日別新規トレンド" extra={<LineChartOutlined />}>
+          <Card title={t('analytics.dailyNewTrend')} extra={<LineChartOutlined />}>
             <Line {...trendChartConfig} height={300} />
           </Card>
         </Col>
         
         {/* 技术热门度排行 */}
         <Col xs={24} lg={12}>
-          <Card title="技術人気ランキング">
+          <Card title={t('analytics.techPopularityRanking')}>
             <div style={{ maxHeight: 300, overflowY: 'auto' }}>
               {analyticsData.techTrends.slice(0, 15).map((item, index) => (
                 <div key={item.tech} style={{ 
@@ -414,14 +416,14 @@ const Analytics: React.FC = () => {
         
         {/* 技术词云 */}
         <Col xs={24} lg={12}>
-          <Card title="技術キーワードクラウド">
+          <Card title={t('analytics.techKeywordCloud')}>
             <WordCloud {...wordCloudConfig} height={300} />
           </Card>
         </Col>
         
         {/* 热门项目 */}
         <Col xs={24}>
-          <Card title="人気プロジェクトランキング">
+          <Card title={t('analytics.hotProjectsRanking')}>
             <Row gutter={[16, 16]}>
               {analyticsData.topProjects.map((project, index) => (
                 <Col xs={24} sm={12} md={8} lg={6} key={project.name}>

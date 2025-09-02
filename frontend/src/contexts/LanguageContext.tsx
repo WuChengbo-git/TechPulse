@@ -143,7 +143,7 @@ export const translations = {
     'chat.copySummary': '复制摘要',
     'chat.detailAnalysisTitle': '详细网页分析',
     'chat.copyAnalysis': '复制分析',
-    'chat.title': '📄 标题：',
+    'chat.titleLabel': '📄 标题：',
     'chat.link': '🔗 链接：',
     'chat.contentType': '🏷️ 内容类型：',
     'chat.keyPoints': '🔍 关键要点：',
@@ -181,8 +181,8 @@ export const translations = {
     'dataSources.score': '得分',
 
     // GitHub页面
-    'github.title': 'GitHub リポジトリ管理',
-    'github.subtitle': 'オープンソースプロジェクトとトレンドリポジトリを管理',
+    'github.title': 'GitHub 仓库管理',
+    'github.subtitle': '开源项目和热门仓库管理',
     'github.totalRepos': '总仓库数',
     'github.todayNew': '本日新增',
     'github.trendingRepos': '热门仓库',
@@ -412,7 +412,7 @@ export const translations = {
     'chat.copySummary': '概要をコピー',
     'chat.detailAnalysisTitle': '詳細ウェブページ分析',
     'chat.copyAnalysis': '分析をコピー',
-    'chat.title': '📄 タイトル：',
+    'chat.titleLabel': '📄 タイトル：',
     'chat.link': '🔗 リンク：',
     'chat.contentType': '🏷️ コンテンツタイプ：',
     'chat.keyPoints': '🔍 キーポイント：',

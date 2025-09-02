@@ -9,6 +9,7 @@ import {
   GlobalOutlined, CodeOutlined, FileTextOutlined, BookOutlined,
   EyeOutlined
 } from '@ant-design/icons'
+import { useLanguage } from '../contexts/LanguageContext'
 
 const { Text, Title, Paragraph } = Typography
 const { TextArea } = Input
@@ -39,6 +40,7 @@ interface ConversationHistory {
 }
 
 const Chat: React.FC = () => {
+  const { t } = useLanguage()
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -65,7 +67,7 @@ const Chat: React.FC = () => {
     const welcomeMessage: ChatMessage = {
       id: 'welcome',
       type: 'system',
-      content: '👋 TechPulse AI アシスタントへようこそ！\n\n私にできること：\n• 📎 任意のウェブページリンクのコンテンツを分析\n• 💬 ウェブページの内容をベースにしたQ&A\n• 🔍 技術的な質問の解答\n\nウェブページリンクを入力して分析を開始するか、直接質問してください！',
+      content: t('chat.welcome'),
       timestamp: new Date()
     }
     setMessages([welcomeMessage])
@@ -98,7 +100,7 @@ const Chat: React.FC = () => {
       })
       
       if (!response.ok) {
-        throw new Error('ウェブページの分析に失敗しました')
+        throw new Error('URL analysis failed')
       }
       
       const analysis: URLAnalysis = await response.json()
@@ -107,7 +109,7 @@ const Chat: React.FC = () => {
       const analysisMessage: ChatMessage = {
         id: Date.now().toString(),
         type: 'ai',
-        content: '🔍 ウェブページ分析完了！クリックして詳細な分析結果を表示。',
+        content: t('chat.analysisComplete'),
         timestamp: new Date(),
         isUrl: true,
         urlAnalysis: analysis
@@ -119,24 +121,24 @@ const Chat: React.FC = () => {
       
       // 更新建议
       setSuggestions([
-        'このコンテンツの主要な技術スタックは何ですか？',
-        'このプロジェクトを素早く始めるにはどうすればいいですか？',
-        'このコンテンツの実用的な価値はどうですか？',
-        '注意すべき点はありますか？'
+        t('chat.suggestions.techStack'),
+        t('chat.suggestions.quickStart'),
+        t('chat.suggestions.practicalValue'),
+        t('chat.suggestions.attention')
       ])
       
-      message.success('ウェブページ分析完了！')
+      message.success('Analysis complete!')
       
     } catch (error) {
       console.error('URL analysis failed:', error)
       const errorMessage: ChatMessage = {
         id: Date.now().toString(),
         type: 'ai',
-        content: `❌ 分析失敗：${error instanceof Error ? error.message : '未知のエラー'}`,
+        content: `❌ Analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
         timestamp: new Date()
       }
       setMessages(prev => [...prev, errorMessage])
-      message.error('ウェブページ分析失敗')
+      message.error('Analysis failed')
     } finally {
       setIsLoading(false)
     }
@@ -160,7 +162,7 @@ const Chat: React.FC = () => {
       })
       
       if (!response.ok) {
-        throw new Error('チャット失敗')
+        throw new Error('Chat failed')
       }
       
       const chatResponse = await response.json()
@@ -192,11 +194,11 @@ const Chat: React.FC = () => {
       const errorMessage: ChatMessage = {
         id: Date.now().toString(),
         type: 'ai',
-        content: `❌ 返答失敗：${error instanceof Error ? error.message : '未知のエラー'}`,
+        content: `❌ Response failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
         timestamp: new Date()
       }
       setMessages(prev => [...prev, errorMessage])
-      message.error('メッセージ送信失敗')
+      message.error('Message send failed')
     } finally {
       setIsLoading(false)
     }
@@ -243,7 +245,7 @@ const Chat: React.FC = () => {
     const welcomeMessage: ChatMessage = {
       id: 'welcome-new',
       type: 'system',
-      content: '🔄 チャットがクリアされました。新しい会話を始められます！',
+      content: '🔄 Chat cleared. You can start a new conversation!',
       timestamp: new Date()
     }
     setMessages([welcomeMessage])
@@ -252,7 +254,7 @@ const Chat: React.FC = () => {
   // 复制内容
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
-    message.success('クリップボードにコピーしました')
+    message.success('Copied to clipboard')
   }
   
   // 获取内容类型图标
@@ -276,15 +278,15 @@ const Chat: React.FC = () => {
   // 获取内容类型名称
   const getContentTypeName = (contentType: string) => {
     const types: Record<string, string> = {
-      'github_repository': 'GitHubリポジトリ',
-      'tech_blog': '技術ブログ',
-      'documentation': '技術ドキュメント',
-      'academic_paper': '学術論文',
-      'news': '技術ニュース',
-      'technical_content': '技術コンテンツ',
-      'general_web_page': '一般ウェブページ'
+      'github_repository': 'GitHub Repository',
+      'tech_blog': 'Tech Blog',
+      'documentation': 'Technical Documentation',
+      'academic_paper': 'Academic Paper',
+      'news': 'Tech News',
+      'technical_content': 'Technical Content',
+      'general_web_page': 'General Web Page'
     }
-    return types[contentType] || 'ウェブページコンテンツ'
+    return types[contentType] || 'Web Page Content'
   }
   
   // 渲染消息
@@ -357,14 +359,14 @@ const Chat: React.FC = () => {
                         setAnalysisModalVisible(true)
                       }}
                     >
-                      詳細分析を表示
+                      {t('chat.detailAnalysis')}
                     </Button>
                     <Button 
                       size="small" 
                       icon={<CopyOutlined />}
                       onClick={() => copyToClipboard(msg.urlAnalysis!.content_summary)}
                     >
-                      概要をコピー
+                      {t('chat.copySummary')}
                     </Button>
                   </Space>
                 </Space>
@@ -400,14 +402,14 @@ const Chat: React.FC = () => {
           <div>
             <Title level={3} style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
               <RobotOutlined style={{ color: '#1890ff' }} />
-              TechPulse AI アシスタント
+              {t('chat.title')}
             </Title>
-            <Text type="secondary">インテリジェントウェブページ分析と技術Q&A</Text>
+            <Text type="secondary">{t('chat.subtitle')}</Text>
           </div>
           
           <Space>
             {currentUrl && (
-              <Tooltip title="現在分析中のウェブページ">
+              <Tooltip title={t('chat.currentPage')}>
                 <Tag color="blue" icon={<LinkOutlined />}>
                   {currentUrl.length > 30 ? currentUrl.substring(0, 30) + '...' : currentUrl}
                 </Tag>
@@ -418,7 +420,7 @@ const Chat: React.FC = () => {
               onClick={clearChat}
               type="text"
             >
-              チャットをクリア
+              {t('chat.clearChat')}
             </Button>
           </Space>
         </div>
@@ -452,7 +454,7 @@ const Chat: React.FC = () => {
           {isLoading && (
             <div style={{ textAlign: 'center', padding: 20 }}>
               <Spin>
-                <div style={{ marginTop: 8 }}>AI が考えています...</div>
+                <div style={{ marginTop: 8 }}>{t('chat.aiThinking')}</div>
               </Spin>
             </div>
           )}
@@ -462,7 +464,7 @@ const Chat: React.FC = () => {
         {/* 建议区域 */}
         {suggestions.length > 0 && (
           <div style={{ marginBottom: 16 }}>
-            <Text type="secondary" style={{ fontSize: '12px' }}>💡 推奨質問：</Text>
+            <Text type="secondary" style={{ fontSize: '12px' }}>{t('chat.suggestedQuestions')}</Text>
             <div style={{ marginTop: 8 }}>
               {suggestions.map((suggestion, index) => (
                 <Tag 
@@ -486,7 +488,7 @@ const Chat: React.FC = () => {
           <TextArea
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder="ウェブページリンクを入力して分析するか、技術的な質問をしてください..."
+            placeholder={t('chat.inputPlaceholder')}
             autoSize={{ minRows: 1, maxRows: 4 }}
             onPressEnter={(e) => {
               if (!e.shiftKey) {
@@ -503,18 +505,18 @@ const Chat: React.FC = () => {
             loading={isLoading}
             style={{ height: 'auto' }}
           >
-            送信
+            {t('chat.send')}
           </Button>
         </div>
         
         <Text type="secondary" style={{ fontSize: '11px', marginTop: 4 }}>
-          💡 ヒント：URLを入力して自動分析、Shift+Enterで改行、Enterで送信
+          {t('chat.hint')}
         </Text>
       </Card>
       
       {/* 详细分析模态框 */}
       <Modal
-        title="詳細ウェブページ分析"
+        title={t('chat.detailAnalysisTitle')}
         open={analysisModalVisible}
         onCancel={() => setAnalysisModalVisible(false)}
         footer={[
@@ -523,10 +525,10 @@ const Chat: React.FC = () => {
               copyToClipboard(currentAnalysis.analysis)
             }
           }}>
-            分析をコピー
+            {t('chat.copyAnalysis')}
           </Button>,
           <Button key="close" type="primary" onClick={() => setAnalysisModalVisible(false)}>
-            閉じる
+            {t('common.close')}
           </Button>
         ]}
         width={800}
@@ -534,14 +536,14 @@ const Chat: React.FC = () => {
         {currentAnalysis && (
           <Space direction="vertical" style={{ width: '100%' }}>
             <div>
-              <Text strong>📄 タイトル：</Text>
+              <Text strong>{t('chat.titleLabel')}</Text>
               <Paragraph copyable={{ text: currentAnalysis.title }}>
                 {currentAnalysis.title}
               </Paragraph>
             </div>
             
             <div>
-              <Text strong>🔗 リンク：</Text>
+              <Text strong>{t('chat.link')}</Text>
               <Paragraph copyable={{ text: currentAnalysis.url }}>
                 <a href={currentAnalysis.url} target="_blank" rel="noopener noreferrer">
                   {currentAnalysis.url}
@@ -550,14 +552,14 @@ const Chat: React.FC = () => {
             </div>
             
             <div>
-              <Text strong>🏷️ コンテンツタイプ：</Text>
+              <Text strong>{t('chat.contentType')}</Text>
               <Tag color="blue" style={{ marginLeft: 8 }}>
                 {getContentTypeName(currentAnalysis.content_type)}
               </Tag>
             </div>
             
             <div>
-              <Text strong>🔍 キーポイント：</Text>
+              <Text strong>{t('chat.keyPoints')}</Text>
               <ul style={{ marginTop: 8 }}>
                 {currentAnalysis.key_points.map((point, index) => (
                   <li key={index}>{point}</li>
@@ -566,7 +568,7 @@ const Chat: React.FC = () => {
             </div>
             
             <div>
-              <Text strong>📊 詳細分析：</Text>
+              <Text strong>{t('chat.detailedAnalysis')}</Text>
               <Paragraph style={{ 
                 whiteSpace: 'pre-wrap', 
                 backgroundColor: '#fafafa', 
@@ -579,7 +581,7 @@ const Chat: React.FC = () => {
             </div>
             
             <div>
-              <Text strong>🏷️ 関連タグ：</Text>
+              <Text strong>{t('chat.relatedTags')}</Text>
               <div style={{ marginTop: 8 }}>
                 {currentAnalysis.tags.map((tag, index) => (
                   <Tag key={index} style={{ marginBottom: 4 }}>

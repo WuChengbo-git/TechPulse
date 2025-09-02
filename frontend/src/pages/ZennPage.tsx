@@ -91,7 +91,7 @@ const ZennPage: React.FC = () => {
       }
     } catch (error) {
       console.error('Failed to fetch Zenn data:', error)
-      message.error('Zenn データの取得に失敗しました')
+      message.error('Failed to fetch Zenn data')
     } finally {
       setLoading(false)
     }
@@ -105,13 +105,13 @@ const ZennPage: React.FC = () => {
       
       if (response.ok) {
         const result = await response.json()
-        message.success(`Zenn データ更新完了！${result.count || 0} 件の新しい記事を取得しました`)
+        message.success(`Zenn data updated successfully! ${result.count || 0} new articles retrieved`)
         await fetchZennData()
       } else {
         throw new Error('Update failed')
       }
     } catch (error) {
-      message.error('Zenn データの更新に失敗しました')
+      message.error('Failed to update Zenn data')
     } finally {
       setLoading(false)
     }
@@ -236,10 +236,10 @@ const ZennPage: React.FC = () => {
 
       {/* Tab导航 */}
       <Tabs activeKey={activeTab} onChange={setActiveTab} style={{ marginBottom: 24 }}>
-        <TabPane tab={`全て (${articles.length})`} key="all" />
-        <TabPane tab={`人気 (${articles.filter(a => a.likes_count > 10).length})`} key="popular" />
-        <TabPane tab="最近" key="recent" />
-        <TabPane tab="有料記事" key="premium" />
+        <TabPane tab={`All (${articles.length})`} key="all" />
+        <TabPane tab={`Popular (${articles.filter(a => a.likes_count > 10).length})`} key="popular" />
+        <TabPane tab="Recent" key="recent" />
+        <TabPane tab="Premium Articles" key="premium" />
       </Tabs>
 
       {/* 主要内容 */}
@@ -249,7 +249,7 @@ const ZennPage: React.FC = () => {
           <Card title={`📝 ${t('zenn.articles')}`} style={{ minHeight: '600px' }}>
             {loading ? (
               <div style={{ textAlign: 'center', padding: '50px' }}>
-                <span>データを読み込み中...</span>
+                <span>Loading data...</span>
               </div>
             ) : (
               <List
@@ -284,11 +284,11 @@ const ZennPage: React.FC = () => {
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                             <Text strong>{article.title}</Text>
                             <Tag color="blue" size="small">
-                              {article.type === 'article' ? '記事' : 
-                               article.type === 'book' ? '本' : 'スクラップ'}
+                              {article.type === 'article' ? t('zenn.article') : 
+                               article.type === 'book' ? t('zenn.book') : t('zenn.scrap')}
                             </Tag>
                             {article.is_premium && (
-                              <Tag color="gold" size="small">有料</Tag>
+                              <Tag color="gold" size="small">{t('zenn.premium')}</Tag>
                             )}
                           </div>
                           <div style={{ marginBottom: 8 }}>
@@ -304,7 +304,7 @@ const ZennPage: React.FC = () => {
                         <div>
                           <div style={{ marginBottom: 8 }}>
                             <Text type="secondary" style={{ fontSize: '12px' }}>
-                              作成者: {article.author_name}
+                              Author: {article.author_name}
                             </Text>
                           </div>
                           <Paragraph ellipsis={{ rows: 2 }} style={{ marginBottom: 8 }}>
@@ -312,10 +312,10 @@ const ZennPage: React.FC = () => {
                           </Paragraph>
                           <Space>
                             <Text type="secondary" style={{ fontSize: '12px' }}>
-                              <LikeOutlined /> {article.likes_count} いいね
+                              <LikeOutlined /> {article.likes_count} {t('zenn.likes')}
                             </Text>
                             <Text type="secondary" style={{ fontSize: '12px' }}>
-                              💬 {article.comments_count} コメント
+                              💬 {article.comments_count} {t('zenn.comments')}
                             </Text>
                             <Text type="secondary" style={{ fontSize: '12px' }}>
                               <CalendarOutlined /> {new Date(article.published_at).toLocaleDateString()}
@@ -331,7 +331,7 @@ const ZennPage: React.FC = () => {
                   showSizeChanger: true,
                   showQuickJumper: true,
                   showTotal: (total, range) =>
-                    `${range[0]}-${range[1]} / ${total} 記事`
+                    `${range[0]}-${range[1]} / ${total} articles`
                 }}
               />
             )}
@@ -358,7 +358,7 @@ const ZennPage: React.FC = () => {
                       <Text style={{ fontSize: '12px' }}>{author.name}</Text>
                     </div>
                     <Text type="secondary" style={{ fontSize: '12px' }}>
-                      {author.articles} 記事
+                      {author.articles} articles
                     </Text>
                   </div>
                 </List.Item>
@@ -389,10 +389,10 @@ const ZennPage: React.FC = () => {
             
             <div style={{ marginTop: 16, padding: 16, backgroundColor: '#f6ffed', borderRadius: 6 }}>
               <Title level={5} style={{ color: '#389e0d', margin: 0, marginBottom: 8 }}>
-                💡 Zennの特徴
+                💡 About Zenn
               </Title>
               <Text style={{ fontSize: '12px', color: '#52c41a' }}>
-                日本の開発者コミュニティによる高品質な技術記事。実践的な内容と丁寧な解説が特徴。
+                High-quality technical articles by the Japanese developer community. Features practical content and detailed explanations.
               </Text>
             </div>
           </Card>

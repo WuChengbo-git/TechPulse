@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Card, Row, Col, Typography, Spin, Alert, Button, Tag, Space, Select, Modal, message, Tabs, Input, Badge, Divider } from 'antd'
 import { GithubOutlined, FileTextOutlined, RobotOutlined, SyncOutlined, TranslationOutlined, SettingOutlined, SearchOutlined, StarOutlined, ForkOutlined, ExclamationCircleOutlined, EyeOutlined, CloudDownloadOutlined } from '@ant-design/icons'
+import { useLanguage } from '../contexts/LanguageContext'
 
 const { Title, Paragraph, Text } = Typography
 const { Search } = Input
@@ -31,6 +32,7 @@ interface Language {
 }
 
 const Dashboard: React.FC = () => {
+  const { t } = useLanguage()
   const [cards, setCards] = useState<TechCard[]>([])
   const [filteredCards, setFilteredCards] = useState<TechCard[]>([])
   const [loading, setLoading] = useState(true)
@@ -100,10 +102,10 @@ const Dashboard: React.FC = () => {
     try {
       const response = await fetch('/api/v1/sources/collect', { method: 'POST' })
       if (response.ok) {
-        alert('データ収集が開始されました。しばらくしてからページを更新して新しいコンテンツを確認してください')
+        alert('Data collection started. Please refresh the page after a moment to see new content')
       }
     } catch (err) {
-      alert('データ収集の開始に失敗しました: ' + err)
+      alert('Failed to start data collection: ' + err)
     }
   }
 
@@ -144,13 +146,13 @@ const Dashboard: React.FC = () => {
         message.success(`言語を${languages[language]?.name}に切り替えました`)
       }
     } catch (err) {
-      message.error('言語の切り替えに失敗しました')
+      message.error('Language switch failed')
     }
   }
 
   const translateCard = async (cardId: number) => {
     if (!serviceStatus?.ai_service_available) {
-      message.warning('AIサービスが設定されていないため、翻訳できません')
+      message.warning('Cannot translate because AI service is not configured')
       return
     }
 
@@ -183,10 +185,10 @@ const Dashboard: React.FC = () => {
           width: 600
         })
       } else {
-        message.error('翻訳に失敗しました')
+        message.error('Translation failed')
       }
     } catch (err) {
-      message.error('翻訳に失敗しました: ' + err)
+      message.error('Translation failed: ' + err)
     } finally {
       setTranslationLoading(false)
     }
@@ -233,7 +235,7 @@ const Dashboard: React.FC = () => {
     return (
       <div style={{ textAlign: 'center', padding: '50px' }}>
         <Spin size="large" />
-        <div style={{ marginTop: 16 }}>テクノロジー情報を読み込み中...</div>
+        <div style={{ marginTop: 16 }}>{t('common.loading')}</div>
       </div>
     )
   }
@@ -251,10 +253,10 @@ const Dashboard: React.FC = () => {
         message.success('Notionに保存しました!')
         setDetailModalVisible(false)
       } else {
-        message.error('保存に失敗しました')
+        message.error('Save failed')
       }
     } catch (err) {
-      message.error('保存に失敗しました: ' + err)
+      message.error('Save failed: ' + err)
     }
   }
 
@@ -263,7 +265,7 @@ const Dashboard: React.FC = () => {
       {/* 头部区域 */}
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <Title level={2}>🚀 TechPulse テクノロジー情報ダッシュボード</Title>
+          <Title level={2}>{t('dashboard.title')}</Title>
           <Space>
             <Select
               value={currentLanguage}
@@ -279,7 +281,7 @@ const Dashboard: React.FC = () => {
             </Select>
             {serviceStatus && (
               <Tag color={serviceStatus.ai_service_available ? 'green' : 'red'}>
-                AIサービス: {serviceStatus.ai_service_available ? '接続済み' : '未設定'}
+                {t('dashboard.aiService')}: {serviceStatus.ai_service_available ? t('dashboard.connected') : t('dashboard.notConfigured')}
               </Tag>
             )}
           </Space>
@@ -288,7 +290,7 @@ const Dashboard: React.FC = () => {
         {/* 搜索和操作栏 */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
           <Search
-            placeholder="プロジェクト、技術スタック、タグを検索..."
+            placeholder={t('dashboard.searchPlaceholder')}
             allowClear
             style={{ width: 400 }}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -300,13 +302,13 @@ const Dashboard: React.FC = () => {
               icon={<SyncOutlined />}
               onClick={() => fetchCards(activeTab === 'all' ? undefined : activeTab)}
             >
-              更新
+              {t('dashboard.refresh')}
             </Button>
             <Button 
               icon={<SyncOutlined />}
               onClick={triggerDataCollection}
             >
-              新しいデータを収集
+              {t('dashboard.collectNewData')}
             </Button>
           </Space>
         </div>
@@ -314,7 +316,7 @@ const Dashboard: React.FC = () => {
 
       {error && (
         <Alert
-          message="エラー"
+          message={t('dashboard.error')}
           description={error}
           type="error"
           showIcon
@@ -350,15 +352,15 @@ const Dashboard: React.FC = () => {
       {loading && (
         <div style={{ textAlign: 'center', padding: '50px' }}>
           <Spin size="large" />
-          <div style={{ marginTop: 16 }}>テクノロジー情報を読み込み中...</div>
+          <div style={{ marginTop: 16 }}>{t('common.loading')}</div>
         </div>
       )}
 
       {/* 无数据提示 */}
       {filteredCards.length === 0 && !loading && (
         <Alert
-          message="データがありません"
-          description={cards.length === 0 ? "「新しいデータを収集」ボタンをクリックしてテクノロジー情報の収集を開始" : "一致するコンテンツが見つかりません。検索条件を調整してみてください"}
+          message={t('dashboard.noData')}
+          description={cards.length === 0 ? t('dashboard.noDataDescription1') : t('dashboard.noDataDescription2')}
           type="info"
           showIcon
         />
@@ -468,7 +470,7 @@ const Dashboard: React.FC = () => {
               {/* 技术栈 */}
               {card.tech_stack && card.tech_stack.length > 0 && (
                 <div style={{ marginBottom: 8 }}>
-                  <Text style={{ fontSize: '10px', color: '#666' }}>技術スタック: </Text>
+                  <Text style={{ fontSize: '10px', color: '#666' }}>{t('dashboard.techStack')}: </Text>
                   {card.tech_stack.slice(0, 3).map((tech, index) => (
                     <Tag key={index} color="blue" style={{ fontSize: '10px' }}>
                       {tech}
@@ -485,7 +487,7 @@ const Dashboard: React.FC = () => {
               {/* 中文标签 */}
               {card.chinese_tags && card.chinese_tags.length > 0 && (
                 <div style={{ marginBottom: 8 }}>
-                  <Text style={{ fontSize: '10px', color: '#666' }}>タグ: </Text>
+                  <Text style={{ fontSize: '10px', color: '#666' }}>{t('dashboard.tags')}: </Text>
                   {card.chinese_tags.slice(0, 2).map((tag, index) => (
                     <Tag key={index} color="green" style={{ fontSize: '10px' }}>
                       {tag}
@@ -573,7 +575,7 @@ const Dashboard: React.FC = () => {
             {/* 摘要 */}
             {selectedCard.summary && (
               <div style={{ marginBottom: 24 }}>
-                <Title level={4}>📝 プロジェクト概要</Title>
+                <Title level={4}>{t('dashboard.projectSummary')}</Title>
                 <Paragraph>{selectedCard.summary}</Paragraph>
               </div>
             )}
@@ -595,7 +597,7 @@ const Dashboard: React.FC = () => {
             {/* 技术栈 */}
             {selectedCard.tech_stack && selectedCard.tech_stack.length > 0 && (
               <div style={{ marginBottom: 16 }}>
-                <Title level={5}>⚙️ 技術スタック</Title>
+                <Title level={5}>{t('dashboard.technologyStack')}</Title>
                 <Space wrap>
                   {selectedCard.tech_stack.map((tech, index) => (
                     <Tag key={index} color="blue">
@@ -609,7 +611,7 @@ const Dashboard: React.FC = () => {
             {/* 中文标签 */}
             {selectedCard.chinese_tags && selectedCard.chinese_tags.length > 0 && (
               <div style={{ marginBottom: 16 }}>
-                <Title level={5}>🏷️ タグ</Title>
+                <Title level={5}>{t('dashboard.projectTags')}</Title>
                 <Space wrap>
                   {selectedCard.chinese_tags.map((tag, index) => (
                     <Tag key={index} color="green">

@@ -50,20 +50,20 @@ const HuggingFacePage: React.FC = () => {
 
   // Pipeline类型映射
   const pipelineNames: Record<string, string> = {
-    'text-generation': 'テキスト生成',
-    'text-classification': 'テキスト分類',
-    'token-classification': 'トークン分類',
-    'question-answering': '質問応答',
-    'fill-mask': 'マスク予測',
-    'summarization': '要約',
-    'translation': '翻訳',
-    'text2text-generation': 'テキスト変換',
-    'conversational': '対話',
-    'image-classification': '画像分類',
-    'object-detection': '物体検出',
-    'image-segmentation': '画像分割',
-    'speech-recognition': '音声認識',
-    'text-to-speech': '音声合成'
+    'text-generation': 'Text Generation',
+    'text-classification': 'Text Classification',
+    'token-classification': 'Token Classification',
+    'question-answering': 'Question Answering',
+    'fill-mask': 'Fill Mask',
+    'summarization': 'Summarization',
+    'translation': 'Translation',
+    'text2text-generation': 'Text-to-Text Generation',
+    'conversational': 'Conversational',
+    'image-classification': 'Image Classification',
+    'object-detection': 'Object Detection',
+    'image-segmentation': 'Image Segmentation',
+    'speech-recognition': 'Speech Recognition',
+    'text-to-speech': 'Text-to-Speech'
   }
 
   // 获取Hugging Face数据
@@ -104,7 +104,7 @@ const HuggingFacePage: React.FC = () => {
       }
     } catch (error) {
       console.error('Failed to fetch Hugging Face data:', error)
-      message.error('Hugging Face データの取得に失敗しました')
+      message.error('Failed to fetch Hugging Face data')
     } finally {
       setLoading(false)
     }
@@ -118,13 +118,13 @@ const HuggingFacePage: React.FC = () => {
       
       if (response.ok) {
         const result = await response.json()
-        message.success(`Hugging Face データ更新完了！${result.count || 0} 件の新しいモデルを取得しました`)
+        message.success(`Hugging Face data updated successfully! ${result.count || 0} new models retrieved`)
         await fetchHuggingFaceData()
       } else {
         throw new Error('Update failed')
       }
     } catch (error) {
-      message.error('Hugging Face データの更新に失敗しました')
+      message.error('Failed to update Hugging Face data')
     } finally {
       setLoading(false)
     }
@@ -219,10 +219,10 @@ const HuggingFacePage: React.FC = () => {
         <Col xs={24} sm={6}>
           <Card>
             <Statistic
-              title="人気タスク"
+              title={t('huggingface.popularTask')}
               value={stats?.pipeline_distribution ? 
-                pipelineNames[Object.keys(stats.pipeline_distribution)[0]] || 'テキスト生成' : 
-                'テキスト生成'
+                pipelineNames[Object.keys(stats.pipeline_distribution)[0]] || 'Text Generation' : 
+                'Text Generation'
               }
               prefix={<SearchOutlined style={{ color: '#722ed1' }} />}
               valueStyle={{ color: '#722ed1' }}
@@ -250,11 +250,11 @@ const HuggingFacePage: React.FC = () => {
               placeholder={t('huggingface.taskFilter')}
             >
               <Option value="all">{t('huggingface.allTasks')}</Option>
-              <Option value="text-generation">テキスト生成</Option>
-              <Option value="text-classification">テキスト分類</Option>
-              <Option value="question-answering">質問応答</Option>
-              <Option value="translation">翻訳</Option>
-              <Option value="image-classification">画像分類</Option>
+              <Option value="text-generation">Text Generation</Option>
+              <Option value="text-classification">Text Classification</Option>
+              <Option value="question-answering">Question Answering</Option>
+              <Option value="translation">Translation</Option>
+              <Option value="image-classification">Image Classification</Option>
             </Select>
           </Col>
         </Row>
@@ -262,11 +262,11 @@ const HuggingFacePage: React.FC = () => {
 
       {/* Tab导航 */}
       <Tabs activeKey={activeTab} onChange={setActiveTab} style={{ marginBottom: 24 }}>
-        <TabPane tab={`全て (${models.length})`} key="all" />
-        <TabPane tab={`人気 (${models.filter(m => m.downloads > 1000).length})`} key="popular" />
-        <TabPane tab="最近" key="recent" />
-        <TabPane tab="テキスト関連" key="text" />
-        <TabPane tab="ビジョン関連" key="vision" />
+        <TabPane tab={`All (${models.length})`} key="all" />
+        <TabPane tab={`Popular (${models.filter(m => m.downloads > 1000).length})`} key="popular" />
+        <TabPane tab="Recent" key="recent" />
+        <TabPane tab="Text Related" key="text" />
+        <TabPane tab="Vision Related" key="vision" />
       </Tabs>
 
       {/* 主要内容 */}
@@ -276,7 +276,7 @@ const HuggingFacePage: React.FC = () => {
           <Card title={`🤖 ${t('huggingface.models')}`} style={{ minHeight: '600px' }}>
             {loading ? (
               <div style={{ textAlign: 'center', padding: '50px' }}>
-                <span>データを読み込み中...</span>
+                <span>Loading data...</span>
               </div>
             ) : (
               <List
@@ -316,20 +316,20 @@ const HuggingFacePage: React.FC = () => {
                       description={
                         <div>
                           <Text type="secondary" style={{ fontSize: '12px' }}>
-                            作成者: {model.author}
+                            {t('huggingface.author')}: {model.author}
                           </Text>
                           <Paragraph ellipsis={{ rows: 2 }} style={{ marginBottom: 8, marginTop: 4 }}>
                             {model.description}
                           </Paragraph>
                           <Space>
                             <Text type="secondary" style={{ fontSize: '12px' }}>
-                              <DownloadOutlined /> {formatNumber(model.downloads)} ダウンロード
+                              <DownloadOutlined /> {formatNumber(model.downloads)} {t('huggingface.downloads')}
                             </Text>
                             <Text type="secondary" style={{ fontSize: '12px' }}>
-                              <HeartOutlined /> {model.likes} いいね
+                              <HeartOutlined /> {model.likes} {t('huggingface.likes')}
                             </Text>
                             <Text type="secondary" style={{ fontSize: '12px' }}>
-                              作成: {new Date(model.created_at).toLocaleDateString()}
+                              {t('huggingface.created')}: {new Date(model.created_at).toLocaleDateString()}
                             </Text>
                           </Space>
                         </div>
@@ -342,7 +342,7 @@ const HuggingFacePage: React.FC = () => {
                   showSizeChanger: true,
                   showQuickJumper: true,
                   showTotal: (total, range) =>
-                    `${range[0]}-${range[1]} / ${total} モデル`
+                    `${range[0]}-${range[1]} / ${total} models`
                 }}
               />
             )}
@@ -386,15 +386,15 @@ const HuggingFacePage: React.FC = () => {
           {/* 人气趋势 */}
           <Card title={`🔥 ${t('huggingface.trends')}`}>
             <Alert
-              message="大規模言語モデルが人気"
-              description="最近では、GPT系列やLLaMAベースのモデルが注目を集めています。マルチモーダルモデルも増加傾向。"
+              message="Large Language Models are Popular"
+              description="Recently, GPT series and LLaMA-based models have been attracting attention. Multimodal models are also on the rise."
               type="success"
               showIcon
               style={{ marginBottom: 16 }}
             />
             
             <div>
-              <Title level={5}>人気のタグ</Title>
+              <Title level={5}>Popular Tags</Title>
               <Space wrap>
                 {stats?.top_tags.slice(0, 12).map((tag, index) => (
                   <Tag 

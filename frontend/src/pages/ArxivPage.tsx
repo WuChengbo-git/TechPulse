@@ -46,14 +46,14 @@ const ArxivPage: React.FC = () => {
 
   // arXiv分类映射
   const categoryNames: Record<string, string> = {
-    'cs.AI': 'AI・機械学習',
-    'cs.CL': '自然言語処理',
-    'cs.CV': 'コンピュータビジョン',
-    'cs.LG': '機械学習',
-    'cs.RO': 'ロボティクス',
-    'cs.SE': 'ソフトウェア工学',
-    'stat.ML': '統計的機械学習',
-    'math.OC': '最適化制御'
+    'cs.AI': 'AI・Machine Learning',
+    'cs.CL': 'Natural Language Processing',
+    'cs.CV': 'Computer Vision',
+    'cs.LG': 'Machine Learning',
+    'cs.RO': 'Robotics',
+    'cs.SE': 'Software Engineering',
+    'stat.ML': 'Statistical Machine Learning',
+    'math.OC': 'Optimization and Control'
   }
 
   // 获取arXiv数据
@@ -86,7 +86,7 @@ const ArxivPage: React.FC = () => {
       }
     } catch (error) {
       console.error('Failed to fetch arXiv data:', error)
-      message.error('arXiv データの取得に失敗しました')
+      message.error('Failed to fetch arXiv data')
     } finally {
       setLoading(false)
     }
@@ -100,13 +100,13 @@ const ArxivPage: React.FC = () => {
       
       if (response.ok) {
         const result = await response.json()
-        message.success(`arXiv データ更新完了！${result.count || 0} 件の新しい論文を取得しました`)
+        message.success(`arXiv data updated successfully! ${result.count || 0} new papers retrieved`)
         await fetchArxivData()
       } else {
         throw new Error('Update failed')
       }
     } catch (error) {
-      message.error('arXiv データの更新に失敗しました')
+      message.error('Failed to update arXiv data')
     } finally {
       setLoading(false)
     }
@@ -195,7 +195,7 @@ const ArxivPage: React.FC = () => {
         <Col xs={24} sm={6}>
           <Card>
             <Statistic
-              title="主要カテゴリ"
+              title={t('arxiv.mainCategory')}
               value={stats?.categories ? Object.keys(stats.categories)[0] || 'cs.AI' : 'cs.AI'}
               prefix={<CalendarOutlined style={{ color: '#fa8c16' }} />}
               valueStyle={{ color: '#fa8c16' }}
@@ -223,11 +223,11 @@ const ArxivPage: React.FC = () => {
               placeholder={t('arxiv.categoryFilter')}
             >
               <Option value="all">{t('arxiv.allCategories')}</Option>
-              <Option value="cs.AI">AI・機械学習</Option>
-              <Option value="cs.CL">自然言語処理</Option>
-              <Option value="cs.CV">コンピュータビジョン</Option>
-              <Option value="cs.LG">機械学習</Option>
-              <Option value="cs.RO">ロボティクス</Option>
+              <Option value="cs.AI">AI・Machine Learning</Option>
+              <Option value="cs.CL">Natural Language Processing</Option>
+              <Option value="cs.CV">Computer Vision</Option>
+              <Option value="cs.LG">Machine Learning</Option>
+              <Option value="cs.RO">Robotics</Option>
             </Select>
           </Col>
         </Row>
@@ -235,12 +235,12 @@ const ArxivPage: React.FC = () => {
 
       {/* Tab导航 */}
       <Tabs activeKey={activeTab} onChange={setActiveTab} style={{ marginBottom: 24 }}>
-        <TabPane tab={`全て (${papers.length})`} key="all" />
-        <TabPane tab={`最近 (${papers.filter(p => 
+        <TabPane tab={`All (${papers.length})`} key="all" />
+        <TabPane tab={`Recent (${papers.filter(p => 
           new Date(p.published_date) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
         ).length})`} key="recent" />
-        <TabPane tab="AI関連" key="ai" />
-        <TabPane tab="コンピュータビジョン" key="cv" />
+        <TabPane tab="AI Related" key="ai" />
+        <TabPane tab="Computer Vision" key="cv" />
       </Tabs>
 
       {/* 主要内容 */}
@@ -250,7 +250,7 @@ const ArxivPage: React.FC = () => {
           <Card title={`📚 ${t('arxiv.papers')}`} style={{ minHeight: '600px' }}>
             {loading ? (
               <div style={{ textAlign: 'center', padding: '50px' }}>
-                <span>データを読み込み中...</span>
+                <span>Loading data...</span>
               </div>
             ) : (
               <List
@@ -299,7 +299,7 @@ const ArxivPage: React.FC = () => {
                             <UserOutlined style={{ marginRight: 4 }} />
                             <Text type="secondary">
                               {paper.authors.slice(0, 3).join(', ')}
-                              {paper.authors.length > 3 && ` 他 ${paper.authors.length - 3} 名`}
+                              {paper.authors.length > 3 && ` and ${paper.authors.length - 3} others`}
                             </Text>
                           </div>
                           <Paragraph ellipsis={{ rows: 3 }} style={{ marginBottom: 8 }}>
@@ -307,11 +307,11 @@ const ArxivPage: React.FC = () => {
                           </Paragraph>
                           <Space>
                             <Text type="secondary">
-                              <CalendarOutlined /> 公開: {new Date(paper.published_date).toLocaleDateString()}
+                              <CalendarOutlined /> {t('arxiv.published')}: {new Date(paper.published_date).toLocaleDateString()}
                             </Text>
                             {paper.updated_date !== paper.published_date && (
                               <Text type="secondary">
-                                更新: {new Date(paper.updated_date).toLocaleDateString()}
+                                {t('arxiv.updated')}: {new Date(paper.updated_date).toLocaleDateString()}
                               </Text>
                             )}
                           </Space>
@@ -325,7 +325,7 @@ const ArxivPage: React.FC = () => {
                   showSizeChanger: true,
                   showQuickJumper: true,
                   showTotal: (total, range) =>
-                    `${range[0]}-${range[1]} / ${total} 論文`
+                    `${range[0]}-${range[1]} / ${total} papers`
                 }}
               />
             )}
@@ -368,15 +368,15 @@ const ArxivPage: React.FC = () => {
           {/* 研究趋势 */}
           <Card title={`📈 ${t('arxiv.researchTrends')}`}>
             <Alert
-              message="AI・機械学習分野が活発"
-              description="最近の投稿では、大規模言語モデルとコンピュータビジョンに関する研究が増加傾向にあります。"
+              message="AI & Machine Learning Field Active"
+              description="Recent submissions show an increasing trend in research on large language models and computer vision."
               type="info"
               showIcon
               style={{ marginBottom: 16 }}
             />
             
             <div>
-              <Title level={5}>注目の研究キーワード</Title>
+              <Title level={5}>Hot Research Keywords</Title>
               <Space wrap>
                 <Tag color="magenta">Transformer</Tag>
                 <Tag color="red">Large Language Models</Tag>
