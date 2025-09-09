@@ -28,7 +28,7 @@ env/
 ENV/
 
 # Poetry
-poetry.lock
+# poetry.lock (uncomment if needed)
 
 # IDE
 .vscode/
@@ -73,6 +73,7 @@ backend/.coverage
 *.db
 *.sqlite
 *.sqlite3
+techpulse.db
 
 # Temporary files
 tmp/
@@ -132,3 +133,13 @@ jspm_packages/
 
 # DynamoDB Local files
 .dynamodb/
+
+# Project specific
+version-config.json
+version.json
+dev.sh
+start.sh
+stop.sh
+update-version.sh
+version.sh
+version-manager.js

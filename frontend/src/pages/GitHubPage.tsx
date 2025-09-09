@@ -16,15 +16,18 @@ const { TabPane } = Tabs
 const { Option } = Select
 
 interface GitHubRepo {
-  id: string
+  id: number
   title: string
-  description: string
-  url: string
-  stars: number
-  forks: number
-  language: string
-  trending_score: number
+  description?: string
+  summary?: string
+  original_url: string
+  url?: string  // 兼容字段
+  stars?: number
+  forks?: number
+  language?: string
+  trending_score?: number
   created_at: string
+  source: string
 }
 
 interface GitHubStats {
@@ -54,15 +57,22 @@ const GitHubPage: React.FC = () => {
       const response = await fetch('/api/v1/cards/?source=github&limit=100')
       if (response.ok) {
         const data = await response.json()
-        setRepos(data)
+        console.log('GitHub data sample:', data[0]) // 调试信息
+        // 处理数据，适配 TechCard 结构
+        const processedRepos = data.map((repo: any) => ({
+          ...repo,
+          url: repo.original_url || repo.url, // 使用 original_url 作为主要URL
+          description: repo.summary || repo.description || ''
+        }))
+        setRepos(processedRepos)
         
         // 模拟统计数据
         const mockStats: GitHubStats = {
-          total_repos: data.length,
-          today_new: data.filter((repo: GitHubRepo) => 
+          total_repos: processedRepos.length,
+          today_new: processedRepos.filter((repo: any) => 
             new Date(repo.created_at).toDateString() === new Date().toDateString()
           ).length,
-          trending_repos: data.filter((repo: GitHubRepo) => repo.stars > 1000).length,
+          trending_repos: processedRepos.filter((repo: any) => (repo.stars || 0) > 1000).length,
           top_languages: ['Python', 'JavaScript', 'TypeScript', 'Go', 'Rust'],
           last_update: new Date().toISOString()
         }
@@ -129,12 +139,12 @@ const GitHubPage: React.FC = () => {
   const filteredRepos = repos.filter(repo => {
     const matchesSearch = !searchQuery || 
       repo.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      repo.description.toLowerCase().includes(searchQuery.toLowerCase())
+      (repo.description && repo.description.toLowerCase().includes(searchQuery.toLowerCase()))
     
     const matchesLanguage = languageFilter === 'all' || repo.language === languageFilter
     const matchesTab = activeTab === 'all' || 
-      (activeTab === 'trending' && repo.stars > 100) ||
-      (activeTab === 'popular' && repo.stars > 1000) ||
+      (activeTab === 'trending' && (repo.stars || 0) > 100) ||
+      (activeTab === 'popular' && (repo.stars || 0) > 1000) ||
       (activeTab === 'recent' && new Date(repo.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
     
     return matchesSearch && matchesLanguage && matchesTab
@@ -252,8 +262,8 @@ const GitHubPage: React.FC = () => {
       {/* Tab导航 */}
       <Tabs activeKey={activeTab} onChange={setActiveTab} style={{ marginBottom: 24 }}>
         <TabPane tab={`${t('github.all')} (${repos.length})`} key="all" />
-        <TabPane tab={`${t('github.trending')} (${repos.filter(r => r.stars > 100).length})`} key="trending" />
-        <TabPane tab={`${t('github.popular')} (${repos.filter(r => r.stars > 1000).length})`} key="popular" />
+        <TabPane tab={`${t('github.trending')} (${repos.filter(r => (r.stars || 0) > 100).length})`} key="trending" />
+        <TabPane tab={`${t('github.popular')} (${repos.filter(r => (r.stars || 0) > 1000).length})`} key="popular" />
         <TabPane tab={t('github.recent')} key="recent" />
       </Tabs>
 
@@ -275,9 +285,14 @@ const GitHubPage: React.FC = () => {
                       <Button 
                         key="view" 
                         type="link" 
-                        href={repo.url} 
-                        target="_blank"
                         icon={<EyeOutlined />}
+                        onClick={() => {
+                          if (repo.url) {
+                            window.open(repo.url, '_blank')
+                          } else {
+                            message.warning('仓库链接不可用')
+                          }
+                        }}
                       >
                         {t('common.view')}
                       </Button>
@@ -391,7 +406,7 @@ const GitHubPage: React.FC = () => {
         width={800}
         footer={[
           <Button key="close" onClick={() => setPreviewModalVisible(false)}>
-            閉じる
+            {t('dataSources.close')}
           </Button>,
           <Button 
             key="update" 

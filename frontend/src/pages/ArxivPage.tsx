@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { 
-  Card, Row, Col, Button, message, Typography, Space, Badge, 
+  Card, Row, Col, Button, message, Typography, Space, 
   Statistic, List, Tag, Tabs, Input, Select, Progress, Alert
 } from 'antd'
 import { 
   FileTextOutlined, SyncOutlined, BookOutlined, 
-  SearchOutlined, CalendarOutlined, UserOutlined, LinkOutlined
+  SearchOutlined, CalendarOutlined, LinkOutlined
 } from '@ant-design/icons'
 import { useLanguage } from '../contexts/LanguageContext'
 
@@ -15,15 +15,21 @@ const { TabPane } = Tabs
 const { Option } = Select
 
 interface ArxivPaper {
-  id: string
+  id: number
   title: string
-  authors: string[]
-  abstract: string
-  categories: string[]
-  published_date: string
-  updated_date: string
-  url: string
-  pdf_url: string
+  source: string
+  original_url: string
+  summary?: string
+  chinese_tags?: string[]
+  ai_category?: string[]
+  created_at: string
+  // arXiv特有字段
+  authors?: string[]
+  abstract?: string
+  categories?: string[]
+  published_date?: string
+  updated_date?: string
+  pdf_url?: string
   citations?: number
 }
 
@@ -63,30 +69,77 @@ const ArxivPage: React.FC = () => {
       const response = await fetch('/api/v1/cards/?source=arxiv&limit=100')
       if (response.ok) {
         const data = await response.json()
-        setPapers(data)
+        // 确保数据是数组格式
+        const papersArray = Array.isArray(data) ? data : []
+        console.log('ArXiv data sample:', papersArray[0]) // 调试信息
+        
+        // 处理数据，适配 TechCard 结构
+        const processedPapers = papersArray.map((paper: any) => {
+          // 使用 TechCard 的 original_url 字段
+          const originalUrl = paper.original_url || ''
+          
+          // 生成 PDF URL（arXiv 特有）
+          let pdfUrl = paper.pdf_url || ''
+          if (!pdfUrl && originalUrl && originalUrl.includes('arxiv.org/abs/')) {
+            pdfUrl = originalUrl.replace('/abs/', '/pdf/') + '.pdf'
+          }
+          
+          return {
+            ...paper,
+            // 保持原有字段
+            original_url: originalUrl,
+            // 添加 PDF URL
+            pdf_url: pdfUrl,
+            // 将 summary 作为 abstract 使用
+            abstract: paper.summary || paper.abstract || '',
+            // 将 chinese_tags 作为 categories 使用
+            categories: paper.chinese_tags || paper.categories || []
+          }
+        })
+        setPapers(processedPapers)
         
         // 模拟统计数据
-        const categories = data.reduce((acc: Record<string, number>, paper: ArxivPaper) => {
-          paper.categories.forEach(cat => {
-            acc[cat] = (acc[cat] || 0) + 1
-          })
+        const categories = processedPapers.reduce((acc: Record<string, number>, paper: any) => {
+          // 确保categories存在且是数组
+          const paperCategories = paper.categories || []
+          if (Array.isArray(paperCategories)) {
+            paperCategories.forEach(cat => {
+              acc[cat] = (acc[cat] || 0) + 1
+            })
+          }
           return acc
         }, {})
 
         const mockStats: ArxivStats = {
-          total_papers: data.length,
-          today_new: data.filter((paper: ArxivPaper) => 
-            new Date(paper.published_date).toDateString() === new Date().toDateString()
-          ).length,
+          total_papers: processedPapers.length,
+          today_new: processedPapers.filter((paper: any) => {
+            if (!paper.created_at) return false
+            try {
+              return new Date(paper.created_at).toDateString() === new Date().toDateString()
+            } catch {
+              return false
+            }
+          }).length,
           categories,
           top_authors: ['Geoffrey Hinton', 'Yann LeCun', 'Yoshua Bengio', 'Andrew Ng'],
           last_update: new Date().toISOString()
         }
         setStats(mockStats)
+      } else {
+        throw new Error('Failed to fetch data')
       }
     } catch (error) {
       console.error('Failed to fetch arXiv data:', error)
-      message.error('Failed to fetch arXiv data')
+      message.error('获取arXiv数据失败')
+      // 设置空数据以防止页面崩溃
+      setPapers([])
+      setStats({
+        total_papers: 0,
+        today_new: 0,
+        categories: {},
+        top_authors: [],
+        last_update: new Date().toISOString()
+      })
     } finally {
       setLoading(false)
     }
@@ -114,16 +167,31 @@ const ArxivPage: React.FC = () => {
 
   // 过滤论文
   const filteredPapers = papers.filter(paper => {
-    const matchesSearch = !searchQuery || 
-      paper.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      paper.abstract.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      paper.authors.some(author => author.toLowerCase().includes(searchQuery.toLowerCase()))
+    if (!paper) return false
     
-    const matchesCategory = categoryFilter === 'all' || paper.categories.includes(categoryFilter)
+    const matchesSearch = !searchQuery || 
+      (paper.title && paper.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (paper.abstract && paper.abstract.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (paper.summary && paper.summary.toLowerCase().includes(searchQuery.toLowerCase()))
+    
+    const paperCategories = paper.categories || []
+    const matchesCategory = categoryFilter === 'all' || 
+      (Array.isArray(paperCategories) && paperCategories.includes(categoryFilter))
+    
     const matchesTab = activeTab === 'all' || 
-      (activeTab === 'recent' && new Date(paper.published_date) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) ||
-      (activeTab === 'ai' && paper.categories.some(cat => cat.includes('cs.AI') || cat.includes('cs.LG'))) ||
-      (activeTab === 'cv' && paper.categories.some(cat => cat.includes('cs.CV')))
+      (activeTab === 'recent' && paper.created_at && 
+        new Date(paper.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) ||
+      (activeTab === 'ai' && (
+        (Array.isArray(paperCategories) && 
+          paperCategories.some(cat => cat && (cat.includes('AI') || cat.includes('机器学习') || cat.includes('人工智能')))) ||
+        (paper.summary && paper.summary.toLowerCase().includes('ai')) ||
+        (paper.title && paper.title.toLowerCase().includes('ai'))
+      )) ||
+      (activeTab === 'cv' && (
+        (Array.isArray(paperCategories) && 
+          paperCategories.some(cat => cat && (cat.includes('计算机视觉') || cat.includes('computer vision') || cat.includes('cv')))) ||
+        (paper.summary && (paper.summary.toLowerCase().includes('vision') || paper.summary.toLowerCase().includes('视觉')))
+      ))
     
     return matchesSearch && matchesCategory && matchesTab
   })
@@ -184,9 +252,12 @@ const ArxivPage: React.FC = () => {
           <Card>
             <Statistic
               title={t('arxiv.aiRelated')}
-              value={papers.filter(p => p.categories.some(cat => 
-                cat.includes('cs.AI') || cat.includes('cs.LG') || cat.includes('cs.CL')
-              )).length}
+              value={papers.filter(p => {
+                const categories = p.categories || []
+                return Array.isArray(categories) && categories.some(cat => 
+                  cat && (cat.includes('AI') || cat.includes('机器学习') || cat.includes('人工智能'))
+                ) || (p.summary && p.summary.toLowerCase().includes('ai'))
+              }).length}
               prefix={<SearchOutlined style={{ color: '#1890ff' }} />}
               valueStyle={{ color: '#1890ff' }}
             />
@@ -235,12 +306,17 @@ const ArxivPage: React.FC = () => {
 
       {/* Tab导航 */}
       <Tabs activeKey={activeTab} onChange={setActiveTab} style={{ marginBottom: 24 }}>
-        <TabPane tab={`All (${papers.length})`} key="all" />
-        <TabPane tab={`Recent (${papers.filter(p => 
-          new Date(p.published_date) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-        ).length})`} key="recent" />
-        <TabPane tab="AI Related" key="ai" />
-        <TabPane tab="Computer Vision" key="cv" />
+        <TabPane tab={`全部 (${papers.length})`} key="all" />
+        <TabPane tab={`最近 (${papers.filter(p => {
+          if (!p.created_at) return false
+          try {
+            return new Date(p.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+          } catch {
+            return false
+          }
+        }).length})`} key="recent" />
+        <TabPane tab="AI相关" key="ai" />
+        <TabPane tab="计算机视觉" key="cv" />
       </Tabs>
 
       {/* 主要内容 */}
@@ -250,7 +326,11 @@ const ArxivPage: React.FC = () => {
           <Card title={`📚 ${t('arxiv.papers')}`} style={{ minHeight: '600px' }}>
             {loading ? (
               <div style={{ textAlign: 'center', padding: '50px' }}>
-                <span>Loading data...</span>
+                <span>{t('common.loading')}</span>
+              </div>
+            ) : filteredPapers.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '50px' }}>
+                <span>暂无arXiv论文数据</span>
               </div>
             ) : (
               <List
@@ -261,18 +341,32 @@ const ArxivPage: React.FC = () => {
                       <Button 
                         key="abstract" 
                         type="link" 
-                        href={paper.url} 
-                        target="_blank"
                         icon={<LinkOutlined />}
+                        disabled={!paper.original_url}
+                        onClick={() => {
+                          console.log('Abstract URL:', paper.original_url) // 调试
+                          if (paper.original_url) {
+                            window.open(paper.original_url, '_blank')
+                          } else {
+                            message.warning('摘要链接不可用')
+                          }
+                        }}
                       >
                         {t('arxiv.abstract')}
                       </Button>,
                       <Button 
                         key="pdf" 
                         type="link" 
-                        href={paper.pdf_url} 
-                        target="_blank"
                         style={{ color: '#b31b1b' }}
+                        disabled={!paper.pdf_url}
+                        onClick={() => {
+                          console.log('PDF URL:', paper.pdf_url) // 调试
+                          if (paper.pdf_url) {
+                            window.open(paper.pdf_url, '_blank')
+                          } else {
+                            message.warning('PDF链接不可用')
+                          }
+                        }}
                       >
                         {t('arxiv.pdf')}
                       </Button>
@@ -282,11 +376,11 @@ const ArxivPage: React.FC = () => {
                       title={
                         <div>
                           <Text strong style={{ display: 'block', marginBottom: 4 }}>
-                            {paper.title}
+                            {paper.title || '无标题'}
                           </Text>
                           <div style={{ marginBottom: 8 }}>
-                            {paper.categories.map(cat => (
-                              <Tag key={cat} color="red">
+                            {(paper.categories || []).map((cat, index) => (
+                              <Tag key={index} color="red">
                                 {categoryNames[cat] || cat}
                               </Tag>
                             ))}
@@ -295,25 +389,13 @@ const ArxivPage: React.FC = () => {
                       }
                       description={
                         <div>
-                          <div style={{ marginBottom: 8 }}>
-                            <UserOutlined style={{ marginRight: 4 }} />
-                            <Text type="secondary">
-                              {paper.authors.slice(0, 3).join(', ')}
-                              {paper.authors.length > 3 && ` and ${paper.authors.length - 3} others`}
-                            </Text>
-                          </div>
                           <Paragraph ellipsis={{ rows: 3 }} style={{ marginBottom: 8 }}>
-                            {paper.abstract}
+                            {paper.abstract || paper.summary || '暂无摘要'}
                           </Paragraph>
                           <Space>
                             <Text type="secondary">
-                              <CalendarOutlined /> {t('arxiv.published')}: {new Date(paper.published_date).toLocaleDateString()}
+                              <CalendarOutlined /> {t('arxiv.published')}: {paper.created_at ? new Date(paper.created_at).toLocaleDateString() : '未知'}
                             </Text>
-                            {paper.updated_date !== paper.published_date && (
-                              <Text type="secondary">
-                                {t('arxiv.updated')}: {new Date(paper.updated_date).toLocaleDateString()}
-                              </Text>
-                            )}
                           </Space>
                         </div>
                       }
@@ -325,7 +407,7 @@ const ArxivPage: React.FC = () => {
                   showSizeChanger: true,
                   showQuickJumper: true,
                   showTotal: (total, range) =>
-                    `${range[0]}-${range[1]} / ${total} papers`
+                    `${range[0]}-${range[1]} / ${total} 篇论文`
                 }}
               />
             )}

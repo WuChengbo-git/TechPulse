@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { 
   Card, Row, Col, Button, message, Typography, Space, Badge, 
-  Statistic, List, Tag, Tabs, Input, Select, Avatar, Rate
+  Statistic, List, Tag, Tabs, Input, Select, Avatar
 } from 'antd'
 import { 
   EditOutlined, SyncOutlined, UserOutlined, 
-  SearchOutlined, LikeOutlined, EyeOutlined, LinkOutlined,
+  SearchOutlined, LikeOutlined, LinkOutlined,
   CalendarOutlined, BookOutlined
 } from '@ant-design/icons'
 import { useLanguage } from '../contexts/LanguageContext'
@@ -16,20 +16,26 @@ const { TabPane } = Tabs
 const { Option } = Select
 
 interface ZennArticle {
-  id: string
+  id: number
   title: string
-  content_excerpt: string
-  author_name: string
-  author_avatar: string
-  published_at: string
-  updated_at: string
-  url: string
-  likes_count: number
-  comments_count: number
-  emoji: string
-  tags: string[]
-  type: 'article' | 'book' | 'scrap'
-  is_premium: boolean
+  source: string
+  original_url: string
+  summary?: string
+  chinese_tags?: string[]
+  created_at: string
+  // Zenn特有字段
+  content_excerpt?: string
+  author_name?: string
+  author_avatar?: string
+  published_at?: string
+  updated_at?: string
+  url?: string  // 兼容字段
+  likes_count?: number
+  comments_count?: number
+  emoji?: string
+  tags?: string[]
+  type?: 'article' | 'book' | 'scrap'
+  is_premium?: boolean
 }
 
 interface ZennStats {
@@ -57,32 +63,55 @@ const ZennPage: React.FC = () => {
       const response = await fetch('/api/v1/cards/?source=zenn&limit=100')
       if (response.ok) {
         const data = await response.json()
-        setArticles(data)
+        console.log('Zenn data sample:', data[0]) // 调试信息
+        
+        // 处理数据，适配 TechCard 结构
+        const processedArticles = data.map((article: any) => ({
+          ...article,
+          url: article.original_url || article.url || '',
+          content_excerpt: article.summary || article.content_excerpt || '',
+          tags: article.chinese_tags || article.tags || [],
+          // 设置默认值
+          author_name: article.author_name || '匿名',
+          likes_count: article.likes_count || 0,
+          comments_count: article.comments_count || 0,
+          emoji: article.emoji || '📝',
+          type: article.type || 'article',
+          is_premium: article.is_premium || false,
+          published_at: article.created_at || new Date().toISOString()
+        }))
+        setArticles(processedArticles)
         
         // 模拟统计数据
-        const authorCounts = data.reduce((acc: Record<string, number>, article: ZennArticle) => {
-          acc[article.author_name] = (acc[article.author_name] || 0) + 1
+        const authorCounts = processedArticles.reduce((acc: Record<string, number>, article: any) => {
+          const author = article.author_name || '匿名'
+          acc[author] = (acc[author] || 0) + 1
           return acc
         }, {})
 
-        const allTags = data.flatMap((article: ZennArticle) => article.tags)
+        const allTags = processedArticles.flatMap((article: any) => article.tags || [])
         const tagCounts = allTags.reduce((acc: Record<string, number>, tag: string) => {
-          acc[tag] = (acc[tag] || 0) + 1
+          if (tag) acc[tag] = (acc[tag] || 0) + 1
           return acc
         }, {})
 
         const mockStats: ZennStats = {
-          total_articles: data.length,
-          today_new: data.filter((article: ZennArticle) => 
-            new Date(article.published_at).toDateString() === new Date().toDateString()
-          ).length,
-          total_likes: data.reduce((sum: number, article: ZennArticle) => sum + article.likes_count, 0),
+          total_articles: processedArticles.length,
+          today_new: processedArticles.filter((article: any) => {
+            if (!article.published_at) return false
+            try {
+              return new Date(article.published_at).toDateString() === new Date().toDateString()
+            } catch {
+              return false
+            }
+          }).length,
+          total_likes: processedArticles.reduce((sum: number, article: any) => sum + (article.likes_count || 0), 0),
           top_authors: Object.entries(authorCounts)
-            .sort(([,a], [,b]) => b - a)
+            .sort(([,a], [,b]) => (b as number) - (a as number))
             .slice(0, 5)
-            .map(([name, articles]) => ({ name, articles })),
+            .map(([name, articles]) => ({ name, articles: articles as number })),
           popular_tags: Object.entries(tagCounts)
-            .sort(([,a], [,b]) => b - a)
+            .sort(([,a], [,b]) => (b as number) - (a as number))
             .slice(0, 15)
             .map(([tag]) => tag),
           last_update: new Date().toISOString()
@@ -120,14 +149,15 @@ const ZennPage: React.FC = () => {
   // 过滤文章
   const filteredArticles = articles.filter(article => {
     const matchesSearch = !searchQuery || 
-      article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.content_excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.author_name.toLowerCase().includes(searchQuery.toLowerCase())
+      (article.title && article.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (article.content_excerpt && article.content_excerpt.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (article.author_name && article.author_name.toLowerCase().includes(searchQuery.toLowerCase()))
     
     const matchesType = typeFilter === 'all' || article.type === typeFilter
     const matchesTab = activeTab === 'all' || 
-      (activeTab === 'popular' && article.likes_count > 10) ||
-      (activeTab === 'recent' && new Date(article.published_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) ||
+      (activeTab === 'popular' && (article.likes_count || 0) > 10) ||
+      (activeTab === 'recent' && article.published_at && 
+        new Date(article.published_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) ||
       (activeTab === 'premium' && article.is_premium)
     
     return matchesSearch && matchesType && matchesTab
@@ -237,7 +267,7 @@ const ZennPage: React.FC = () => {
       {/* Tab导航 */}
       <Tabs activeKey={activeTab} onChange={setActiveTab} style={{ marginBottom: 24 }}>
         <TabPane tab={`All (${articles.length})`} key="all" />
-        <TabPane tab={`Popular (${articles.filter(a => a.likes_count > 10).length})`} key="popular" />
+        <TabPane tab={`Popular (${articles.filter(a => (a.likes_count || 0) > 10).length})`} key="popular" />
         <TabPane tab="Recent" key="recent" />
         <TabPane tab="Premium Articles" key="premium" />
       </Tabs>
@@ -260,9 +290,14 @@ const ZennPage: React.FC = () => {
                       <Button 
                         key="view" 
                         type="link" 
-                        href={article.url} 
-                        target="_blank"
                         icon={<LinkOutlined />}
+                        onClick={() => {
+                          if (article.url) {
+                            window.open(article.url, '_blank')
+                          } else {
+                            message.warning('文章链接不可用')
+                          }
+                        }}
                       >
                         {t('zenn.readArticle')}
                       </Button>
@@ -271,7 +306,7 @@ const ZennPage: React.FC = () => {
                     <List.Item.Meta
                       avatar={
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <span style={{ fontSize: '24px' }}>{article.emoji}</span>
+                          <span style={{ fontSize: '24px' }}>{article.emoji || '📝'}</span>
                           <Avatar 
                             src={article.author_avatar} 
                             size="small"
@@ -282,18 +317,18 @@ const ZennPage: React.FC = () => {
                       title={
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                            <Text strong>{article.title}</Text>
-                            <Tag color="blue" size="small">
+                            <Text strong>{article.title || '无标题'}</Text>
+                            <Tag color="blue">
                               {article.type === 'article' ? t('zenn.article') : 
                                article.type === 'book' ? t('zenn.book') : t('zenn.scrap')}
                             </Tag>
                             {article.is_premium && (
-                              <Tag color="gold" size="small">{t('zenn.premium')}</Tag>
+                              <Tag color="gold">{t('zenn.premium')}</Tag>
                             )}
                           </div>
                           <div style={{ marginBottom: 8 }}>
-                            {article.tags.slice(0, 4).map(tag => (
-                              <Tag key={tag} size="small" color="cyan">
+                            {(article.tags || []).slice(0, 4).map(tag => (
+                              <Tag key={tag} color="cyan">
                                 {tag}
                               </Tag>
                             ))}
@@ -304,21 +339,21 @@ const ZennPage: React.FC = () => {
                         <div>
                           <div style={{ marginBottom: 8 }}>
                             <Text type="secondary" style={{ fontSize: '12px' }}>
-                              Author: {article.author_name}
+                              Author: {article.author_name || '匿名'}
                             </Text>
                           </div>
                           <Paragraph ellipsis={{ rows: 2 }} style={{ marginBottom: 8 }}>
-                            {article.content_excerpt}
+                            {article.content_excerpt || '暂无摘要'}
                           </Paragraph>
                           <Space>
                             <Text type="secondary" style={{ fontSize: '12px' }}>
-                              <LikeOutlined /> {article.likes_count} {t('zenn.likes')}
+                              <LikeOutlined /> {article.likes_count || 0} {t('zenn.likes')}
                             </Text>
                             <Text type="secondary" style={{ fontSize: '12px' }}>
-                              💬 {article.comments_count} {t('zenn.comments')}
+                              💬 {article.comments_count || 0} {t('zenn.comments')}
                             </Text>
                             <Text type="secondary" style={{ fontSize: '12px' }}>
-                              <CalendarOutlined /> {new Date(article.published_at).toLocaleDateString()}
+                              <CalendarOutlined /> {article.published_at ? new Date(article.published_at).toLocaleDateString() : '未知'}
                             </Text>
                           </Space>
                         </div>

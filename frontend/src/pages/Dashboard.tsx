@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Card, Row, Col, Typography, Spin, Alert, Button, Tag, Space, Select, Modal, message, Tabs, Input, Badge, Divider } from 'antd'
-import { GithubOutlined, FileTextOutlined, RobotOutlined, SyncOutlined, TranslationOutlined, SettingOutlined, SearchOutlined, StarOutlined, ForkOutlined, ExclamationCircleOutlined, EyeOutlined, CloudDownloadOutlined } from '@ant-design/icons'
+import { GithubOutlined, FileTextOutlined, RobotOutlined, SyncOutlined, TranslationOutlined, SettingOutlined, SearchOutlined, StarOutlined, ForkOutlined, ExclamationCircleOutlined, EyeOutlined, CloudDownloadOutlined, LinkOutlined } from '@ant-design/icons'
 import { useLanguage } from '../contexts/LanguageContext'
 
 const { Title, Paragraph, Text } = Typography
@@ -143,7 +143,7 @@ const Dashboard: React.FC = () => {
       })
       if (response.ok) {
         setCurrentLanguage(language)
-        message.success(`言語を${languages[language]?.name}に切り替えました`)
+        message.success(`语言已切换为${languages[language]?.name}`)
       }
     } catch (err) {
       message.error('Language switch failed')
@@ -167,16 +167,16 @@ const Dashboard: React.FC = () => {
       if (response.ok) {
         const data = await response.json()
         Modal.info({
-          title: '翻訳結果',
+          title: '翻译结果',
           content: (
             <div>
-              <p><strong>元文概要：</strong></p>
+              <p><strong>原文概要：</strong></p>
               <p>{data.original_summary}</p>
-              <p><strong>翻訳概要：</strong></p>
+              <p><strong>翻译概要：</strong></p>
               <p>{data.translated_summary}</p>
               {data.translated_trial_suggestion && (
                 <>
-                  <p><strong>試用推奨：</strong></p>
+                  <p><strong>试用建议：</strong></p>
                   <p>{data.translated_trial_suggestion}</p>
                 </>
               )}
@@ -250,7 +250,7 @@ const Dashboard: React.FC = () => {
       })
       
       if (response.ok) {
-        message.success('Notionに保存しました!')
+        message.success('已保存到Notion！')
         setDetailModalVisible(false)
       } else {
         message.error('Save failed')
@@ -267,18 +267,7 @@ const Dashboard: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
           <Title level={2}>{t('dashboard.title')}</Title>
           <Space>
-            <Select
-              value={currentLanguage}
-              onChange={handleLanguageChange}
-              style={{ width: 120 }}
-              placeholder="言語を選択"
-            >
-              {Object.entries(languages).map(([code, lang]) => (
-                <Select.Option key={code} value={code}>
-                  {lang.flag} {lang.name}
-                </Select.Option>
-              ))}
-            </Select>
+            {/* 移除语言选择器 */}
             {serviceStatus && (
               <Tag color={serviceStatus.ai_service_available ? 'green' : 'red'}>
                 {t('dashboard.aiService')}: {serviceStatus.ai_service_available ? t('dashboard.connected') : t('dashboard.notConfigured')}
@@ -331,7 +320,7 @@ const Dashboard: React.FC = () => {
         style={{ marginBottom: 24 }}
       >
         <TabPane 
-          tab={<span><SettingOutlined />全て ({cards.length})</span>} 
+          tab={<span><SettingOutlined />{t('dashboard.all')} ({cards.length})</span>} 
           key="all" 
         />
         <TabPane 
@@ -396,16 +385,17 @@ const Dashboard: React.FC = () => {
                   onClick={() => showDetail(card)}
                   style={{ fontSize: '12px' }}
                 >
-                  詳細
+                  {t('dashboard.details')}
                 </Button>,
-                <a 
-                  href={card.original_url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<LinkOutlined />}
+                  onClick={() => window.open(card.original_url, '_blank')}
                   style={{ fontSize: '12px' }}
                 >
-                  元文
-                </a>,
+                  {t('dashboard.viewOriginal')}
+                </Button>,
                 <Button
                   type="text"
                   size="small"
@@ -415,7 +405,7 @@ const Dashboard: React.FC = () => {
                   disabled={!serviceStatus?.ai_service_available}
                   style={{ fontSize: '12px' }}
                 >
-                  翻訳
+                  {t('dashboard.translate')}
                 </Button>
               ]}
             >
@@ -453,7 +443,7 @@ const Dashboard: React.FC = () => {
               {/* AI分类标签 */}
               {card.ai_category && card.ai_category.length > 0 && (
                 <div style={{ marginBottom: 8 }}>
-                  <Text style={{ fontSize: '10px', color: '#666' }}>AI分類: </Text>
+                  <Text style={{ fontSize: '10px', color: '#666' }}>{t('dashboard.aiCategory')}: </Text>
                   {card.ai_category.slice(0, 2).map((cat, index) => (
                     <Tag key={index} color="purple" style={{ fontSize: '10px' }}>
                       {cat}
@@ -524,13 +514,13 @@ const Dashboard: React.FC = () => {
         width={800}
         footer={[
           <Button key="close" onClick={() => setDetailModalVisible(false)}>
-            閉じる
+            {t('dashboard.close')}
           </Button>,
           <Button 
             key="original" 
             onClick={() => window.open(selectedCard?.original_url, '_blank')}
           >
-            元文を表示
+            {t('dashboard.viewOriginal')}
           </Button>,
           <Button 
             key="notion" 
@@ -538,7 +528,7 @@ const Dashboard: React.FC = () => {
             icon={<CloudDownloadOutlined />}
             onClick={() => selectedCard && saveToNotion(selectedCard)}
           >
-            Notionに保存
+            {t('dashboard.saveToNotion')}
           </Button>
         ]}
       >
@@ -583,7 +573,7 @@ const Dashboard: React.FC = () => {
             {/* AI分类标签 */}
             {selectedCard.ai_category && selectedCard.ai_category.length > 0 && (
               <div style={{ marginBottom: 16 }}>
-                <Title level={5}>🤖 AI分類</Title>
+                <Title level={5}>{t('dashboard.aiClassification')}</Title>
                 <Space wrap>
                   {selectedCard.ai_category.map((cat, index) => (
                     <Tag key={index} color="purple">
@@ -625,7 +615,7 @@ const Dashboard: React.FC = () => {
             {/* 试用建议 */}
             {selectedCard.trial_suggestion && (
               <div style={{ marginBottom: 16 }}>
-                <Title level={5}>💡 試用推奨</Title>
+                <Title level={5}>{t('dashboard.trialSuggestion')}</Title>
                 <div style={{ 
                   padding: '16px', 
                   backgroundColor: '#f0f0f0', 
@@ -639,7 +629,7 @@ const Dashboard: React.FC = () => {
 
             {/* 创建时间 */}
             <div style={{ textAlign: 'right', color: '#999', fontSize: '12px' }}>
-              作成日時: {new Date(selectedCard.created_at).toLocaleString('ja-JP')}
+              {t('dashboard.createTime')}: {new Date(selectedCard.created_at).toLocaleString('zh-CN')}
             </div>
           </div>
         )}

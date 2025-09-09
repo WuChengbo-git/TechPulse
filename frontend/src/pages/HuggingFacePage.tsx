@@ -15,17 +15,23 @@ const { TabPane } = Tabs
 const { Option } = Select
 
 interface HuggingFaceModel {
-  id: string
-  name: string
-  description: string
-  author: string
-  downloads: number
-  likes: number
-  tags: string[]
-  pipeline_tag: string
-  url: string
+  id: number
+  title: string
+  source: string
+  original_url: string
+  summary?: string
+  chinese_tags?: string[]
   created_at: string
-  last_modified: string
+  // HuggingFace特有字段
+  name?: string
+  description?: string
+  author?: string
+  downloads?: number
+  likes?: number
+  tags?: string[]
+  pipeline_tag?: string
+  url?: string  // 兼容字段
+  last_modified?: string
   model_size?: string
   language?: string[]
 }
@@ -73,29 +79,45 @@ const HuggingFacePage: React.FC = () => {
       const response = await fetch('/api/v1/cards/?source=huggingface&limit=100')
       if (response.ok) {
         const data = await response.json()
-        setModels(data)
+        console.log('HuggingFace data sample:', data[0]) // 调试信息
+        // 处理数据，适配 TechCard 结构
+        const processedModels = data.map((model: any) => ({
+          ...model,
+          name: model.title || model.name || '',
+          description: model.summary || model.description || '',
+          url: model.original_url || model.url || '',
+          tags: model.chinese_tags || model.tags || [],
+          pipeline_tag: model.pipeline_tag || 'unknown'
+        }))
+        setModels(processedModels)
         
         // 模拟统计数据
-        const pipelineDistribution = data.reduce((acc: Record<string, number>, model: HuggingFaceModel) => {
-          acc[model.pipeline_tag] = (acc[model.pipeline_tag] || 0) + 1
+        const pipelineDistribution = processedModels.reduce((acc: Record<string, number>, model: any) => {
+          const pipeline = model.pipeline_tag || 'unknown'
+          acc[pipeline] = (acc[pipeline] || 0) + 1
           return acc
         }, {})
 
-        const allTags = data.flatMap((model: HuggingFaceModel) => model.tags)
+        const allTags = processedModels.flatMap((model: any) => model.tags || [])
         const tagCounts = allTags.reduce((acc: Record<string, number>, tag: string) => {
-          acc[tag] = (acc[tag] || 0) + 1
+          if (tag) acc[tag] = (acc[tag] || 0) + 1
           return acc
         }, {})
 
         const mockStats: HuggingFaceStats = {
-          total_models: data.length,
-          total_datasets: Math.floor(data.length * 0.3), // 假设数据集是模型的30%
-          today_new: data.filter((model: HuggingFaceModel) => 
-            new Date(model.created_at).toDateString() === new Date().toDateString()
-          ).length,
+          total_models: processedModels.length,
+          total_datasets: Math.floor(processedModels.length * 0.3),
+          today_new: processedModels.filter((model: any) => {
+            if (!model.created_at) return false
+            try {
+              return new Date(model.created_at).toDateString() === new Date().toDateString()
+            } catch {
+              return false
+            }
+          }).length,
           pipeline_distribution: pipelineDistribution,
           top_tags: Object.entries(tagCounts)
-            .sort(([,a], [,b]) => b - a)
+            .sort(([,a], [,b]) => (b as number) - (a as number))
             .slice(0, 10)
             .map(([tag]) => tag),
           last_update: new Date().toISOString()
@@ -133,16 +155,16 @@ const HuggingFacePage: React.FC = () => {
   // 过滤模型
   const filteredModels = models.filter(model => {
     const matchesSearch = !searchQuery || 
-      model.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      model.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      model.author.toLowerCase().includes(searchQuery.toLowerCase())
+      (model.name && model.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (model.description && model.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (model.author && model.author.toLowerCase().includes(searchQuery.toLowerCase()))
     
     const matchesPipeline = pipelineFilter === 'all' || model.pipeline_tag === pipelineFilter
     const matchesTab = activeTab === 'all' || 
-      (activeTab === 'popular' && model.downloads > 1000) ||
+      (activeTab === 'popular' && (model.downloads || 0) > 1000) ||
       (activeTab === 'recent' && new Date(model.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) ||
-      (activeTab === 'text' && model.pipeline_tag.includes('text')) ||
-      (activeTab === 'vision' && model.pipeline_tag.includes('image'))
+      (activeTab === 'text' && model.pipeline_tag && model.pipeline_tag.includes('text')) ||
+      (activeTab === 'vision' && model.pipeline_tag && model.pipeline_tag.includes('image'))
     
     return matchesSearch && matchesPipeline && matchesTab
   })
@@ -263,7 +285,7 @@ const HuggingFacePage: React.FC = () => {
       {/* Tab导航 */}
       <Tabs activeKey={activeTab} onChange={setActiveTab} style={{ marginBottom: 24 }}>
         <TabPane tab={`All (${models.length})`} key="all" />
-        <TabPane tab={`Popular (${models.filter(m => m.downloads > 1000).length})`} key="popular" />
+        <TabPane tab={`Popular (${models.filter(m => (m.downloads || 0) > 1000).length})`} key="popular" />
         <TabPane tab="Recent" key="recent" />
         <TabPane tab="Text Related" key="text" />
         <TabPane tab="Vision Related" key="vision" />
@@ -300,13 +322,13 @@ const HuggingFacePage: React.FC = () => {
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                             <Text strong>{model.name}</Text>
-                            <Tag color="orange" size="small">
-                              {pipelineNames[model.pipeline_tag] || model.pipeline_tag}
+                            <Tag color="orange">
+                              {pipelineNames[model.pipeline_tag || ''] || model.pipeline_tag || 'unknown'}
                             </Tag>
                           </div>
                           <div style={{ marginBottom: 8 }}>
-                            {model.tags.slice(0, 5).map(tag => (
-                              <Tag key={tag} size="small" style={{ fontSize: '10px' }}>
+                            {(model.tags || []).slice(0, 5).map(tag => (
+                              <Tag key={tag} style={{ fontSize: '10px' }}>
                                 {tag}
                               </Tag>
                             ))}
@@ -323,7 +345,7 @@ const HuggingFacePage: React.FC = () => {
                           </Paragraph>
                           <Space>
                             <Text type="secondary" style={{ fontSize: '12px' }}>
-                              <DownloadOutlined /> {formatNumber(model.downloads)} {t('huggingface.downloads')}
+                              <DownloadOutlined /> {formatNumber(model.downloads || 0)} {t('huggingface.downloads')}
                             </Text>
                             <Text type="secondary" style={{ fontSize: '12px' }}>
                               <HeartOutlined /> {model.likes} {t('huggingface.likes')}

@@ -8,8 +8,8 @@ interface VersionInfoProps {
 }
 
 const VersionInfo: React.FC<VersionInfoProps> = ({ style }) => {
-  const version = '0.1.3'
-  const build = '20250901'
+  const version = '0.1.5'
+  const build = '20250909'
   
   return (
     <Space style={style} split={<Text type="secondary">|</Text>}>

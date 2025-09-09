@@ -41,7 +41,7 @@ const DataSources: React.FC = () => {
       name: 'arXiv',
       icon: <FileTextOutlined />,
       color: '#b31b1b', 
-      description: '最新の学術論文と研究成果を取得',
+      description: t('dataSources.arxiv.description'),
       status: 'idle'
     },
     {
@@ -273,7 +273,7 @@ const DataSources: React.FC = () => {
                 </Col>
                 <Col span={12}>
                   <Statistic 
-                    title="本日新規" 
+                    title={t('dataSources.todayNew')} 
                     value={source.todayCount || 0} 
                     valueStyle={{ fontSize: '16px', color: '#52c41a' }}
                   />
@@ -304,7 +304,7 @@ const DataSources: React.FC = () => {
               </Col>
               <Col span={8}>
                 <Statistic
-                  title="本日新規"
+                  title={t('dataSources.todayNew')}
                   value={sources.reduce((sum, s) => sum + (s.todayCount || 0), 0)}
                   valueStyle={{ color: '#52c41a' }}
                 />
@@ -361,7 +361,7 @@ const DataSources: React.FC = () => {
         width={800}
         footer={[
           <Button key="close" onClick={() => setPreviewModalVisible(false)}>
-            閉じる
+            {t('dataSources.close')}
           </Button>,
           <Button 
             key="update" 

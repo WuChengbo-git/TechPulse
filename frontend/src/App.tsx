@@ -3,7 +3,6 @@ import { ConfigProvider, Layout, Button, Breadcrumb, Typography, Space, Avatar }
 import { BrowserRouter as Router } from 'react-router-dom'
 import { MenuFoldOutlined, MenuUnfoldOutlined, BellOutlined, SettingOutlined } from '@ant-design/icons'
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext'
-import LanguageSwitch from './components/LanguageSwitch'
 import Sidebar from './components/Sidebar'
 import VersionInfo from './components/VersionInfo'
 import Dashboard from './pages/Dashboard'
@@ -111,7 +110,6 @@ function AppContent() {
               </div>
               
               <Space>
-                <LanguageSwitch />
                 <Button type="text" icon={<BellOutlined />} />
                 <Button type="text" icon={<SettingOutlined />} />
                 <Avatar style={{ backgroundColor: '#1890ff' }}>A</Avatar>
