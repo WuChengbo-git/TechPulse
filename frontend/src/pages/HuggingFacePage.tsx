@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { 
   Card, Row, Col, Button, message, Typography, Space, Badge, 
-  Statistic, List, Tag, Tabs, Input, Select, Progress, Alert
+  Statistic, List, Tag, Tabs, Input, Select, Progress, Alert, Modal, Divider
 } from 'antd'
 import { 
   RobotOutlined, SyncOutlined, DatabaseOutlined, 
-  SearchOutlined, DownloadOutlined, HeartOutlined, ApiOutlined
+  SearchOutlined, DownloadOutlined, HeartOutlined, ApiOutlined,
+  EyeOutlined, MessageOutlined, SendOutlined, LinkOutlined
 } from '@ant-design/icons'
 import { useLanguage } from '../contexts/LanguageContext'
 
@@ -53,6 +54,11 @@ const HuggingFacePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [pipelineFilter, setPipelineFilter] = useState('all')
+  const [detailModalVisible, setDetailModalVisible] = useState(false)
+  const [selectedModel, setSelectedModel] = useState<HuggingFaceModel | null>(null)
+  const [chatMessage, setChatMessage] = useState('')
+  const [chatHistory, setChatHistory] = useState<Array<{user: string, ai: string}>>([])
+  const [chatLoading, setChatLoading] = useState(false)
 
   // Pipeline类型映射
   const pipelineNames: Record<string, string> = {
@@ -70,6 +76,57 @@ const HuggingFacePage: React.FC = () => {
     'image-segmentation': 'Image Segmentation',
     'speech-recognition': 'Speech Recognition',
     'text-to-speech': 'Text-to-Speech'
+  }
+
+  // 打开详细信息Modal
+  const openDetailModal = (model: HuggingFaceModel) => {
+    setSelectedModel(model)
+    setDetailModalVisible(true)
+    setChatHistory([])
+    setChatMessage('')
+  }
+
+  // 发送聊天消息
+  const sendChatMessage = async () => {
+    if (!chatMessage.trim() || !selectedModel) return
+    
+    setChatLoading(true)
+    try {
+      const userMessage = chatMessage.trim()
+      const response = await fetch('/api/v1/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: `关于这个HuggingFace模型 "${selectedModel.title}"，${userMessage}`,
+          context: {
+            title: selectedModel.title,
+            description: selectedModel.description,
+            author: selectedModel.author,
+            pipeline_tag: selectedModel.pipeline_tag,
+            downloads: selectedModel.downloads,
+            url: selectedModel.original_url
+          }
+        }),
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setChatHistory(prev => [...prev, {
+          user: userMessage,
+          ai: data.response || '抱歉，我无法回答这个问题。'
+        }])
+        setChatMessage('')
+      } else {
+        message.error('发送消息失败')
+      }
+    } catch (error) {
+      console.error('Chat error:', error)
+      message.error('发送消息失败')
+    } finally {
+      setChatLoading(false)
+    }
   }
 
   // 获取Hugging Face数据
@@ -307,11 +364,20 @@ const HuggingFacePage: React.FC = () => {
                   <List.Item
                     actions={[
                       <Button 
+                        key="detail" 
+                        type="primary"
+                        size="small"
+                        icon={<EyeOutlined />}
+                        onClick={() => openDetailModal(model)}
+                      >
+                        详细查看
+                      </Button>,
+                      <Button 
                         key="view" 
                         type="link" 
                         href={model.url} 
                         target="_blank"
-                        icon={<RobotOutlined />}
+                        icon={<LinkOutlined />}
                       >
                         {t('common.view')}
                       </Button>
@@ -431,6 +497,138 @@ const HuggingFacePage: React.FC = () => {
           </Card>
         </Col>
       </Row>
+
+      {/* 详细信息Modal */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <RobotOutlined style={{ color: '#ff6f00' }} />
+            模型详细信息
+          </div>
+        }
+        open={detailModalVisible}
+        onCancel={() => setDetailModalVisible(false)}
+        width={900}
+        footer={null}
+        style={{ top: 20 }}
+      >
+        {selectedModel && (
+          <div>
+            {/* 模型基本信息 */}
+            <Card style={{ marginBottom: 16 }}>
+              <Title level={4} style={{ marginBottom: 16 }}>
+                {selectedModel.name}
+              </Title>
+              
+              <div style={{ marginBottom: 12 }}>
+                <Tag color="orange">
+                  {pipelineNames[selectedModel.pipeline_tag || ''] || selectedModel.pipeline_tag || 'unknown'}
+                </Tag>
+                {(selectedModel.tags || []).slice(0, 5).map(tag => (
+                  <Tag key={tag} style={{ fontSize: '10px' }}>
+                    {tag}
+                  </Tag>
+                ))}
+              </div>
+
+              <div style={{ marginBottom: 12 }}>
+                <Text strong>作者: </Text>
+                <Text>{selectedModel.author}</Text>
+              </div>
+
+              <div style={{ marginBottom: 12 }}>
+                <Text strong>下载量: </Text>
+                <Text>{formatNumber(selectedModel.downloads || 0)}</Text>
+              </div>
+
+              <Divider />
+
+              <div>
+                <Title level={5}>完整描述</Title>
+                <Paragraph style={{ whiteSpace: 'pre-wrap', textAlign: 'justify' }}>
+                  {selectedModel.description || '暂无描述'}
+                </Paragraph>
+              </div>
+
+              <Divider />
+
+              <div style={{ display: 'flex', gap: 12 }}>
+                <Button
+                  type="primary"
+                  icon={<LinkOutlined />}
+                  onClick={() => {
+                    if (selectedModel.original_url) {
+                      window.open(selectedModel.original_url, '_blank')
+                    }
+                  }}
+                  disabled={!selectedModel.original_url}
+                >
+                  查看模型
+                </Button>
+              </div>
+            </Card>
+
+            {/* AI聊天功能 */}
+            <Card title={
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <MessageOutlined style={{ color: '#1890ff' }} />
+                关于这个模型的问答
+              </div>
+            }>
+              {/* 聊天历史 */}
+              <div style={{ maxHeight: 300, overflowY: 'auto', marginBottom: 16 }}>
+                {chatHistory.length === 0 ? (
+                  <div style={{ textAlign: 'center', color: '#999', padding: 20 }}>
+                    您可以问我关于这个HuggingFace模型的任何问题
+                  </div>
+                ) : (
+                  chatHistory.map((chat, index) => (
+                    <div key={index} style={{ marginBottom: 16 }}>
+                      <div style={{ 
+                        backgroundColor: '#e6f7ff', 
+                        padding: 8, 
+                        borderRadius: 6, 
+                        marginBottom: 8 
+                      }}>
+                        <Text strong>您: </Text>
+                        <Text>{chat.user}</Text>
+                      </div>
+                      <div style={{ 
+                        backgroundColor: '#f6ffed', 
+                        padding: 8, 
+                        borderRadius: 6 
+                      }}>
+                        <Text strong style={{ color: '#52c41a' }}>AI: </Text>
+                        <Text>{chat.ai}</Text>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* 消息输入 */}
+              <div style={{ display: 'flex', gap: 8 }}>
+                <Input
+                  value={chatMessage}
+                  onChange={(e) => setChatMessage(e.target.value)}
+                  placeholder="问一下关于这个模型的问题..."
+                  onPressEnter={sendChatMessage}
+                  disabled={chatLoading}
+                />
+                <Button
+                  type="primary"
+                  icon={<SendOutlined />}
+                  onClick={sendChatMessage}
+                  loading={chatLoading}
+                  disabled={!chatMessage.trim()}
+                >
+                  发送
+                </Button>
+              </div>
+            </Card>
+          </div>
+        )}
+      </Modal>
     </div>
   )
 }

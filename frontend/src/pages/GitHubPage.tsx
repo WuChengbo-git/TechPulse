@@ -6,7 +6,8 @@ import {
 import { 
   GithubOutlined, SyncOutlined, CheckCircleOutlined, ClockCircleOutlined, 
   ExclamationCircleOutlined, EyeOutlined, StarOutlined, ForkOutlined,
-  SearchOutlined, FilterOutlined, TrophyOutlined
+  SearchOutlined, FilterOutlined, TrophyOutlined, MessageOutlined, SendOutlined,
+  LinkOutlined
 } from '@ant-design/icons'
 import { useLanguage } from '../contexts/LanguageContext'
 
@@ -49,6 +50,62 @@ const GitHubPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [languageFilter, setLanguageFilter] = useState('all')
   const [updateHistory, setUpdateHistory] = useState<any[]>([])
+  const [detailModalVisible, setDetailModalVisible] = useState(false)
+  const [selectedRepo, setSelectedRepo] = useState<GitHubRepo | null>(null)
+  const [chatMessage, setChatMessage] = useState('')
+  const [chatHistory, setChatHistory] = useState<Array<{user: string, ai: string}>>([])
+  const [chatLoading, setChatLoading] = useState(false)
+
+  // 打开详细信息Modal
+  const openDetailModal = (repo: GitHubRepo) => {
+    setSelectedRepo(repo)
+    setDetailModalVisible(true)
+    setChatHistory([])
+    setChatMessage('')
+  }
+
+  // 发送聊天消息
+  const sendChatMessage = async () => {
+    if (!chatMessage.trim() || !selectedRepo) return
+    
+    setChatLoading(true)
+    try {
+      const userMessage = chatMessage.trim()
+      const response = await fetch('/api/v1/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: `关于这个GitHub仓库 "${selectedRepo.title}"，${userMessage}`,
+          context: {
+            title: selectedRepo.title,
+            description: selectedRepo.description || selectedRepo.summary,
+            language: selectedRepo.language,
+            stars: selectedRepo.stars,
+            forks: selectedRepo.forks,
+            url: selectedRepo.original_url
+          }
+        }),
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setChatHistory(prev => [...prev, {
+          user: userMessage,
+          ai: data.response || '抱歉，我无法回答这个问题。'
+        }])
+        setChatMessage('')
+      } else {
+        message.error('发送消息失败')
+      }
+    } catch (error) {
+      console.error('Chat error:', error)
+      message.error('发送消息失败')
+    } finally {
+      setChatLoading(false)
+    }
+  }
 
   // 获取GitHub数据
   const fetchGitHubData = async () => {
@@ -283,9 +340,18 @@ const GitHubPage: React.FC = () => {
                   <List.Item
                     actions={[
                       <Button 
+                        key="detail" 
+                        type="primary"
+                        size="small"
+                        icon={<EyeOutlined />}
+                        onClick={() => openDetailModal(repo)}
+                      >
+                        详细查看
+                      </Button>,
+                      <Button 
                         key="view" 
                         type="link" 
-                        icon={<EyeOutlined />}
+                        icon={<LinkOutlined />}
                         onClick={() => {
                           if (repo.url) {
                             window.open(repo.url, '_blank')
@@ -345,7 +411,7 @@ const GitHubPage: React.FC = () => {
           {/* 更新历史 */}
           <Card title={`⏱️ ${t('github.updateHistory')}`} style={{ marginBottom: 16, height: '300px', overflow: 'auto' }}>
             {updateHistory.length > 0 ? (
-              <Timeline size="small">
+              <Timeline>
                 {updateHistory.map((item, index) => (
                   <Timeline.Item
                     key={index}
@@ -448,6 +514,134 @@ const GitHubPage: React.FC = () => {
                 ))}
               </div>
             )}
+          </div>
+        )}
+      </Modal>
+
+      {/* 详细信息Modal */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <GithubOutlined style={{ color: '#24292e' }} />
+            仓库详细信息
+          </div>
+        }
+        open={detailModalVisible}
+        onCancel={() => setDetailModalVisible(false)}
+        width={900}
+        footer={null}
+        style={{ top: 20 }}
+      >
+        {selectedRepo && (
+          <div>
+            {/* 仓库基本信息 */}
+            <Card style={{ marginBottom: 16 }}>
+              <Title level={4} style={{ marginBottom: 16 }}>
+                {selectedRepo.title}
+              </Title>
+              
+              <div style={{ marginBottom: 12 }}>
+                {selectedRepo.language && (
+                  <Tag color="blue">{selectedRepo.language}</Tag>
+                )}
+                <Tag color="gold">
+                  <StarOutlined /> {selectedRepo.stars} stars
+                </Tag>
+                <Tag color="green">
+                  <ForkOutlined /> {selectedRepo.forks} forks
+                </Tag>
+              </div>
+
+              <div style={{ marginBottom: 12 }}>
+                <Text strong>创建时间: </Text>
+                <Text>{selectedRepo.created_at ? new Date(selectedRepo.created_at).toLocaleDateString() : '未知'}</Text>
+              </div>
+
+              <Divider />
+
+              <div>
+                <Title level={5}>完整描述</Title>
+                <Paragraph style={{ whiteSpace: 'pre-wrap', textAlign: 'justify' }}>
+                  {selectedRepo.description || selectedRepo.summary || '暂无描述'}
+                </Paragraph>
+              </div>
+
+              <Divider />
+
+              <div style={{ display: 'flex', gap: 12 }}>
+                <Button
+                  type="primary"
+                  icon={<LinkOutlined />}
+                  onClick={() => {
+                    if (selectedRepo.original_url) {
+                      window.open(selectedRepo.original_url, '_blank')
+                    }
+                  }}
+                  disabled={!selectedRepo.original_url}
+                >
+                  查看仓库
+                </Button>
+              </div>
+            </Card>
+
+            {/* AI聊天功能 */}
+            <Card title={
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <MessageOutlined style={{ color: '#1890ff' }} />
+                关于这个仓库的问答
+              </div>
+            }>
+              {/* 聊天历史 */}
+              <div style={{ maxHeight: 300, overflowY: 'auto', marginBottom: 16 }}>
+                {chatHistory.length === 0 ? (
+                  <div style={{ textAlign: 'center', color: '#999', padding: 20 }}>
+                    您可以问我关于这个GitHub仓库的任何问题
+                  </div>
+                ) : (
+                  chatHistory.map((chat, index) => (
+                    <div key={index} style={{ marginBottom: 16 }}>
+                      <div style={{ 
+                        backgroundColor: '#e6f7ff', 
+                        padding: 8, 
+                        borderRadius: 6, 
+                        marginBottom: 8 
+                      }}>
+                        <Text strong>您: </Text>
+                        <Text>{chat.user}</Text>
+                      </div>
+                      <div style={{ 
+                        backgroundColor: '#f6ffed', 
+                        padding: 8, 
+                        borderRadius: 6 
+                      }}>
+                        <Text strong style={{ color: '#52c41a' }}>AI: </Text>
+                        <Text>{chat.ai}</Text>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* 消息输入 */}
+              <div style={{ display: 'flex', gap: 8 }}>
+                <Input
+                  value={chatMessage}
+                  onChange={(e) => setChatMessage(e.target.value)}
+                  placeholder="问一下关于这个仓库的问题..."
+                  onPressEnter={sendChatMessage}
+                  disabled={chatLoading}
+                />
+                <Button
+                  type="primary"
+                  icon={<SendOutlined />}
+                  onClick={sendChatMessage}
+                  loading={chatLoading}
+                  disabled={!chatMessage.trim()}
+                >
+                  发送
+                </Button>
+              </div>
+            </Card>
           </div>
         )}
       </Modal>

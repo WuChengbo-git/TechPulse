@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { 
   Card, Row, Col, Button, message, Typography, Space, 
-  Statistic, List, Tag, Tabs, Input, Select, Progress, Alert
+  Statistic, List, Tag, Tabs, Input, Select, Progress, Alert, Modal, Divider
 } from 'antd'
 import { 
   FileTextOutlined, SyncOutlined, BookOutlined, 
-  SearchOutlined, CalendarOutlined, LinkOutlined
+  SearchOutlined, CalendarOutlined, LinkOutlined, EyeOutlined, 
+  MessageOutlined, SendOutlined
 } from '@ant-design/icons'
 import { useLanguage } from '../contexts/LanguageContext'
 
@@ -49,6 +50,11 @@ const ArxivPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('all')
+  const [detailModalVisible, setDetailModalVisible] = useState(false)
+  const [selectedPaper, setSelectedPaper] = useState<ArxivPaper | null>(null)
+  const [chatMessage, setChatMessage] = useState('')
+  const [chatHistory, setChatHistory] = useState<Array<{user: string, ai: string}>>([])
+  const [chatLoading, setChatLoading] = useState(false)
 
   // arXiv分类映射
   const categoryNames: Record<string, string> = {
@@ -142,6 +148,56 @@ const ArxivPage: React.FC = () => {
       })
     } finally {
       setLoading(false)
+    }
+  }
+
+  // 打开详细信息Modal
+  const openDetailModal = (paper: ArxivPaper) => {
+    setSelectedPaper(paper)
+    setDetailModalVisible(true)
+    setChatHistory([])
+    setChatMessage('')
+  }
+
+  // 发送聊天消息
+  const sendChatMessage = async () => {
+    if (!chatMessage.trim() || !selectedPaper) return
+    
+    setChatLoading(true)
+    try {
+      const userMessage = chatMessage.trim()
+      const response = await fetch('/api/v1/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: `关于这篇arXiv论文 "${selectedPaper.title}"，${userMessage}`,
+          context: {
+            title: selectedPaper.title,
+            abstract: selectedPaper.abstract || selectedPaper.summary,
+            categories: selectedPaper.categories,
+            authors: selectedPaper.authors,
+            url: selectedPaper.original_url
+          }
+        }),
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setChatHistory(prev => [...prev, {
+          user: userMessage,
+          ai: data.response || '抱歉，我无法回答这个问题。'
+        }])
+        setChatMessage('')
+      } else {
+        message.error('发送消息失败')
+      }
+    } catch (error) {
+      console.error('Chat error:', error)
+      message.error('发送消息失败')
+    } finally {
+      setChatLoading(false)
     }
   }
 
@@ -339,12 +395,20 @@ const ArxivPage: React.FC = () => {
                   <List.Item
                     actions={[
                       <Button 
+                        key="detail" 
+                        type="primary"
+                        size="small"
+                        icon={<EyeOutlined />}
+                        onClick={() => openDetailModal(paper)}
+                      >
+                        详细查看
+                      </Button>,
+                      <Button 
                         key="abstract" 
                         type="link" 
                         icon={<LinkOutlined />}
                         disabled={!paper.original_url}
                         onClick={() => {
-                          console.log('Abstract URL:', paper.original_url) // 调试
                           if (paper.original_url) {
                             window.open(paper.original_url, '_blank')
                           } else {
@@ -360,7 +424,6 @@ const ArxivPage: React.FC = () => {
                         style={{ color: '#b31b1b' }}
                         disabled={!paper.pdf_url}
                         onClick={() => {
-                          console.log('PDF URL:', paper.pdf_url) // 调试
                           if (paper.pdf_url) {
                             window.open(paper.pdf_url, '_blank')
                           } else {
@@ -473,6 +536,150 @@ const ArxivPage: React.FC = () => {
           </Card>
         </Col>
       </Row>
+
+      {/* 详细信息Modal */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <FileTextOutlined style={{ color: '#b31b1b' }} />
+            论文详细信息
+          </div>
+        }
+        open={detailModalVisible}
+        onCancel={() => setDetailModalVisible(false)}
+        width={900}
+        footer={null}
+        style={{ top: 20 }}
+      >
+        {selectedPaper && (
+          <div>
+            {/* 论文基本信息 */}
+            <Card style={{ marginBottom: 16 }}>
+              <Title level={4} style={{ marginBottom: 16 }}>
+                {selectedPaper.title}
+              </Title>
+              
+              <div style={{ marginBottom: 12 }}>
+                {(selectedPaper.categories || []).map((cat, index) => (
+                  <Tag key={index} color="red">
+                    {categoryNames[cat] || cat}
+                  </Tag>
+                ))}
+              </div>
+
+              {selectedPaper.authors && (
+                <div style={{ marginBottom: 12 }}>
+                  <Text strong>作者: </Text>
+                  <Text>{selectedPaper.authors.join(', ')}</Text>
+                </div>
+              )}
+
+              <div style={{ marginBottom: 12 }}>
+                <Text strong>发布时间: </Text>
+                <Text>{selectedPaper.created_at ? new Date(selectedPaper.created_at).toLocaleDateString() : '未知'}</Text>
+              </div>
+
+              <Divider />
+
+              <div>
+                <Title level={5}>完整摘要</Title>
+                <Paragraph style={{ whiteSpace: 'pre-wrap', textAlign: 'justify' }}>
+                  {selectedPaper.abstract || selectedPaper.summary || '暂无摘要'}
+                </Paragraph>
+              </div>
+
+              <Divider />
+
+              <div style={{ display: 'flex', gap: 12 }}>
+                <Button
+                  type="primary"
+                  icon={<LinkOutlined />}
+                  onClick={() => {
+                    if (selectedPaper.original_url) {
+                      window.open(selectedPaper.original_url, '_blank')
+                    }
+                  }}
+                  disabled={!selectedPaper.original_url}
+                >
+                  查看原文
+                </Button>
+                <Button
+                  type="default"
+                  style={{ color: '#b31b1b' }}
+                  icon={<FileTextOutlined />}
+                  onClick={() => {
+                    if (selectedPaper.pdf_url) {
+                      window.open(selectedPaper.pdf_url, '_blank')
+                    }
+                  }}
+                  disabled={!selectedPaper.pdf_url}
+                >
+                  下载PDF
+                </Button>
+              </div>
+            </Card>
+
+            {/* AI聊天功能 */}
+            <Card title={
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <MessageOutlined style={{ color: '#1890ff' }} />
+                关于这篇论文的问答
+              </div>
+            }>
+              {/* 聊天历史 */}
+              <div style={{ maxHeight: 300, overflowY: 'auto', marginBottom: 16 }}>
+                {chatHistory.length === 0 ? (
+                  <div style={{ textAlign: 'center', color: '#999', padding: 20 }}>
+                    您可以问我关于这篇论文的任何问题
+                  </div>
+                ) : (
+                  chatHistory.map((chat, index) => (
+                    <div key={index} style={{ marginBottom: 16 }}>
+                      <div style={{ 
+                        backgroundColor: '#e6f7ff', 
+                        padding: 8, 
+                        borderRadius: 6, 
+                        marginBottom: 8 
+                      }}>
+                        <Text strong>您: </Text>
+                        <Text>{chat.user}</Text>
+                      </div>
+                      <div style={{ 
+                        backgroundColor: '#f6ffed', 
+                        padding: 8, 
+                        borderRadius: 6 
+                      }}>
+                        <Text strong style={{ color: '#52c41a' }}>AI: </Text>
+                        <Text>{chat.ai}</Text>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* 消息输入 */}
+              <div style={{ display: 'flex', gap: 8 }}>
+                <Input
+                  value={chatMessage}
+                  onChange={(e) => setChatMessage(e.target.value)}
+                  placeholder="问一下关于这篇论文的问题..."
+                  onPressEnter={sendChatMessage}
+                  disabled={chatLoading}
+                />
+                <Button
+                  type="primary"
+                  icon={<SendOutlined />}
+                  onClick={sendChatMessage}
+                  loading={chatLoading}
+                  disabled={!chatMessage.trim()}
+                >
+                  发送
+                </Button>
+              </div>
+            </Card>
+          </div>
+        )}
+      </Modal>
     </div>
   )
 }

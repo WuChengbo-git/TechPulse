@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { 
   Card, Row, Col, Button, message, Typography, Space, Badge, 
-  Statistic, List, Tag, Tabs, Input, Select, Avatar
+  Statistic, List, Tag, Tabs, Input, Select, Avatar, Modal, Divider
 } from 'antd'
 import { 
   EditOutlined, SyncOutlined, UserOutlined, 
   SearchOutlined, LikeOutlined, LinkOutlined,
-  CalendarOutlined, BookOutlined
+  CalendarOutlined, BookOutlined, EyeOutlined, MessageOutlined, SendOutlined
 } from '@ant-design/icons'
 import { useLanguage } from '../contexts/LanguageContext'
 
@@ -55,6 +55,61 @@ const ZennPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
+  const [detailModalVisible, setDetailModalVisible] = useState(false)
+  const [selectedArticle, setSelectedArticle] = useState<ZennArticle | null>(null)
+  const [chatMessage, setChatMessage] = useState('')
+  const [chatHistory, setChatHistory] = useState<Array<{user: string, ai: string}>>([])
+  const [chatLoading, setChatLoading] = useState(false)
+
+  // 打开详细信息Modal
+  const openDetailModal = (article: ZennArticle) => {
+    setSelectedArticle(article)
+    setDetailModalVisible(true)
+    setChatHistory([])
+    setChatMessage('')
+  }
+
+  // 发送聊天消息
+  const sendChatMessage = async () => {
+    if (!chatMessage.trim() || !selectedArticle) return
+    
+    setChatLoading(true)
+    try {
+      const userMessage = chatMessage.trim()
+      const response = await fetch('/api/v1/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: `关于这篇Zenn文章 "${selectedArticle.title}"，${userMessage}`,
+          context: {
+            title: selectedArticle.title,
+            content_excerpt: selectedArticle.content_excerpt,
+            author: selectedArticle.author_name,
+            tags: selectedArticle.tags,
+            url: selectedArticle.original_url
+          }
+        }),
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setChatHistory(prev => [...prev, {
+          user: userMessage,
+          ai: data.response || '抱歉，我无法回答这个问题。'
+        }])
+        setChatMessage('')
+      } else {
+        message.error('发送消息失败')
+      }
+    } catch (error) {
+      console.error('Chat error:', error)
+      message.error('发送消息失败')
+    } finally {
+      setChatLoading(false)
+    }
+  }
 
   // 获取Zenn数据
   const fetchZennData = async () => {
@@ -288,6 +343,15 @@ const ZennPage: React.FC = () => {
                   <List.Item
                     actions={[
                       <Button 
+                        key="detail" 
+                        type="primary"
+                        size="small"
+                        icon={<EyeOutlined />}
+                        onClick={() => openDetailModal(article)}
+                      >
+                        详细查看
+                      </Button>,
+                      <Button 
                         key="view" 
                         type="link" 
                         icon={<LinkOutlined />}
@@ -433,6 +497,143 @@ const ZennPage: React.FC = () => {
           </Card>
         </Col>
       </Row>
+
+      {/* 详细信息Modal */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <EditOutlined style={{ color: '#3ea8ff' }} />
+            文章详细信息
+          </div>
+        }
+        open={detailModalVisible}
+        onCancel={() => setDetailModalVisible(false)}
+        width={900}
+        footer={null}
+        style={{ top: 20 }}
+      >
+        {selectedArticle && (
+          <div>
+            {/* 文章基本信息 */}
+            <Card style={{ marginBottom: 16 }}>
+              <Title level={4} style={{ marginBottom: 16 }}>
+                <span style={{ fontSize: '24px', marginRight: 8 }}>{selectedArticle.emoji || '📝'}</span>
+                {selectedArticle.title || '无标题'}
+              </Title>
+              
+              <div style={{ marginBottom: 12 }}>
+                <Tag color="blue">
+                  {selectedArticle.type === 'article' ? t('zenn.article') : 
+                   selectedArticle.type === 'book' ? t('zenn.book') : t('zenn.scrap')}
+                </Tag>
+                {selectedArticle.is_premium && (
+                  <Tag color="gold">{t('zenn.premium')}</Tag>
+                )}
+                {(selectedArticle.tags || []).slice(0, 4).map(tag => (
+                  <Tag key={tag} color="cyan">
+                    {tag}
+                  </Tag>
+                ))}
+              </div>
+
+              <div style={{ marginBottom: 12 }}>
+                <Text strong>作者: </Text>
+                <Text>{selectedArticle.author_name || '匿名'}</Text>
+              </div>
+
+              <div style={{ marginBottom: 12 }}>
+                <Text strong>发布时间: </Text>
+                <Text>{selectedArticle.published_at ? new Date(selectedArticle.published_at).toLocaleDateString() : '未知'}</Text>
+              </div>
+
+              <Divider />
+
+              <div>
+                <Title level={5}>完整摘要</Title>
+                <Paragraph style={{ whiteSpace: 'pre-wrap', textAlign: 'justify' }}>
+                  {selectedArticle.content_excerpt || '暂无摘要'}
+                </Paragraph>
+              </div>
+
+              <Divider />
+
+              <div style={{ display: 'flex', gap: 12 }}>
+                <Button
+                  type="primary"
+                  icon={<LinkOutlined />}
+                  onClick={() => {
+                    if (selectedArticle.original_url) {
+                      window.open(selectedArticle.original_url, '_blank')
+                    }
+                  }}
+                  disabled={!selectedArticle.original_url}
+                >
+                  阅读全文
+                </Button>
+              </div>
+            </Card>
+
+            {/* AI聊天功能 */}
+            <Card title={
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <MessageOutlined style={{ color: '#1890ff' }} />
+                关于这篇文章的问答
+              </div>
+            }>
+              {/* 聊天历史 */}
+              <div style={{ maxHeight: 300, overflowY: 'auto', marginBottom: 16 }}>
+                {chatHistory.length === 0 ? (
+                  <div style={{ textAlign: 'center', color: '#999', padding: 20 }}>
+                    您可以问我关于这篇Zenn文章的任何问题
+                  </div>
+                ) : (
+                  chatHistory.map((chat, index) => (
+                    <div key={index} style={{ marginBottom: 16 }}>
+                      <div style={{ 
+                        backgroundColor: '#e6f7ff', 
+                        padding: 8, 
+                        borderRadius: 6, 
+                        marginBottom: 8 
+                      }}>
+                        <Text strong>您: </Text>
+                        <Text>{chat.user}</Text>
+                      </div>
+                      <div style={{ 
+                        backgroundColor: '#f6ffed', 
+                        padding: 8, 
+                        borderRadius: 6 
+                      }}>
+                        <Text strong style={{ color: '#52c41a' }}>AI: </Text>
+                        <Text>{chat.ai}</Text>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* 消息输入 */}
+              <div style={{ display: 'flex', gap: 8 }}>
+                <Input
+                  value={chatMessage}
+                  onChange={(e) => setChatMessage(e.target.value)}
+                  placeholder="问一下关于这篇文章的问题..."
+                  onPressEnter={sendChatMessage}
+                  disabled={chatLoading}
+                />
+                <Button
+                  type="primary"
+                  icon={<SendOutlined />}
+                  onClick={sendChatMessage}
+                  loading={chatLoading}
+                  disabled={!chatMessage.trim()}
+                >
+                  发送
+                </Button>
+              </div>
+            </Card>
+          </div>
+        )}
+      </Modal>
     </div>
   )
 }
