@@ -9,7 +9,6 @@ import {
   EditOutlined,
   SearchOutlined,
   LineChartOutlined,
-  TagsOutlined,
   SettingOutlined,
   ApiOutlined,
   CloudOutlined,
@@ -61,10 +60,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, selectedKey, onMenuSelect 
       label: t('sidebar.intelligentAnalysis'),
       children: [
         { key: 'analytics', icon: <AnalyticsOutlined />, label: t('nav.dataAnalysis') },
-        { key: 'chat', icon: <MessageOutlined />, label: t('nav.aiAssistant') },
-        { key: 'search', icon: <SearchOutlined />, label: t('nav.smartSearch') },
         { key: 'trends', icon: <LineChartOutlined />, label: t('nav.trendAnalysis') },
-        { key: 'tags', icon: <TagsOutlined />, label: t('nav.tagCloud') }
+        { key: 'chat', icon: <MessageOutlined />, label: t('nav.aiAssistant') }
       ]
     },
     {

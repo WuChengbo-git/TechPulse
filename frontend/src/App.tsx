@@ -13,6 +13,7 @@ import HuggingFacePage from './pages/HuggingFacePage'
 import ZennPage from './pages/ZennPage'
 import Chat from './pages/Chat'
 import Analytics from './pages/Analytics'
+import TrendsPage from './pages/TrendsPage'
 import ApiConfigPage from './pages/ApiConfigPage'
 import './App.css'
 
@@ -33,10 +34,8 @@ function AppContent() {
       huggingface: [t('nav.dataSources'), t('nav.huggingface')],
       zenn: [t('nav.dataSources'), t('nav.zenn')],
       analytics: [t('nav.analytics'), t('nav.dataAnalysis')],
-      chat: [t('nav.analytics'), t('nav.aiAssistant')],
-      search: [t('nav.analytics'), t('nav.smartSearch')],
       trends: [t('nav.analytics'), t('nav.trendAnalysis')],
-      tags: [t('nav.analytics'), t('nav.tagCloud')],
+      chat: [t('nav.analytics'), t('nav.aiAssistant')],
       notion: [t('nav.systemManagement'), t('nav.notionIntegration')],
       'api-config': [t('nav.systemManagement'), t('nav.apiConfig')],
       tasks: [t('nav.systemManagement'), t('nav.taskManagement')],
@@ -55,6 +54,8 @@ function AppContent() {
         return <Dashboard />
       case 'analytics':
         return <Analytics />
+      case 'trends':
+        return <TrendsPage />
       case 'chat':
         return <Chat />
       case 'github':
