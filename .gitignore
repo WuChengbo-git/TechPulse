@@ -80,6 +80,7 @@ tmp/
 temp/
 *.tmp
 *.temp
+.claude/
 
 # Cache
 .cache/

@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ConfigProvider, Layout, Button, Breadcrumb, Typography, Space, Avatar } from 'antd'
 import { BrowserRouter as Router } from 'react-router-dom'
-import { MenuFoldOutlined, MenuUnfoldOutlined, BellOutlined, SettingOutlined } from '@ant-design/icons'
+import { MenuFoldOutlined, MenuUnfoldOutlined, BellOutlined, SettingOutlined, LogoutOutlined } from '@ant-design/icons'
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext'
 import Sidebar from './components/Sidebar'
 import VersionInfo from './components/VersionInfo'
+import LanguageSelector from './components/LanguageSelector'
 import Dashboard from './pages/Dashboard'
 import Overview from './pages/Overview'
 import GitHubPage from './pages/GitHubPage'
@@ -15,6 +16,7 @@ import Chat from './pages/Chat'
 import Analytics from './pages/Analytics'
 import TrendsPage from './pages/TrendsPage'
 import ApiConfigPage from './pages/ApiConfigPage'
+import Login from './pages/Login'
 import './App.css'
 
 const { Header, Content, Footer } = Layout
@@ -23,7 +25,58 @@ const { Text } = Typography
 function AppContent() {
   const [collapsed, setCollapsed] = useState(false)
   const [selectedKey, setSelectedKey] = useState('dashboard')
-  const { t } = useLanguage()
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [username, setUsername] = useState('')
+  const { t, language, setLanguage } = useLanguage()
+
+  // 检查登录状态
+  useEffect(() => {
+    const localToken = localStorage.getItem('techpulse_token')
+    const sessionToken = sessionStorage.getItem('techpulse_token')
+    const localUser = localStorage.getItem('techpulse_user')
+    const sessionUser = sessionStorage.getItem('techpulse_user')
+
+    if ((localToken || sessionToken) && (localUser || sessionUser)) {
+      setIsLoggedIn(true)
+      const userStr = localUser || sessionUser || ''
+      try {
+        const user = JSON.parse(userStr)
+        setUsername(user.username || user.display_name || '')
+      } catch {
+        setUsername(userStr)
+      }
+    }
+  }, [])
+
+  // 处理登录成功
+  const handleLoginSuccess = () => {
+    const localUser = localStorage.getItem('techpulse_user')
+    const sessionUser = sessionStorage.getItem('techpulse_user')
+    const userStr = localUser || sessionUser || ''
+
+    setIsLoggedIn(true)
+    try {
+      const user = JSON.parse(userStr)
+      setUsername(user.username || user.display_name || '')
+    } catch {
+      setUsername(userStr)
+    }
+  }
+
+  // 处理登出
+  const handleLogout = () => {
+    localStorage.removeItem('techpulse_token')
+    localStorage.removeItem('techpulse_user')
+    sessionStorage.removeItem('techpulse_token')
+    sessionStorage.removeItem('techpulse_user')
+    setIsLoggedIn(false)
+    setUsername('')
+  }
+
+  // 如果未登录，显示登录页面
+  if (!isLoggedIn) {
+    return <Login onLoginSuccess={handleLoginSuccess} />
+  }
 
   const getBreadcrumbItems = () => {
     const breadcrumbMap: Record<string, string[]> = {
@@ -110,10 +163,23 @@ function AppContent() {
                 <Breadcrumb items={getBreadcrumbItems()} />
               </div>
               
-              <Space>
+              <Space size="middle">
+                <LanguageSelector
+                  value={language}
+                  onChange={setLanguage}
+                  size="small"
+                />
                 <Button type="text" icon={<BellOutlined />} />
                 <Button type="text" icon={<SettingOutlined />} />
-                <Avatar style={{ backgroundColor: '#1890ff' }}>A</Avatar>
+                <Avatar style={{ backgroundColor: '#1890ff' }}>
+                  {username.charAt(0).toUpperCase()}
+                </Avatar>
+                <Button
+                  type="text"
+                  icon={<LogoutOutlined />}
+                  onClick={handleLogout}
+                  title={t('common.logout')}
+                />
               </Space>
             </Header>
             

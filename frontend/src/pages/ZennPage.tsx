@@ -321,10 +321,10 @@ const ZennPage: React.FC = () => {
 
       {/* Tab导航 */}
       <Tabs activeKey={activeTab} onChange={setActiveTab} style={{ marginBottom: 24 }}>
-        <TabPane tab={`All (${articles.length})`} key="all" />
-        <TabPane tab={`Popular (${articles.filter(a => (a.likes_count || 0) > 10).length})`} key="popular" />
-        <TabPane tab="Recent" key="recent" />
-        <TabPane tab="Premium Articles" key="premium" />
+        <TabPane tab={`${t('zenn.all')} (${articles.length})`} key="all" />
+        <TabPane tab={`${t('zenn.popular')} (${articles.filter(a => (a.likes_count || 0) > 10).length})`} key="popular" />
+        <TabPane tab={t('zenn.recent')} key="recent" />
+        <TabPane tab={t('zenn.premiumArticles')} key="premium" />
       </Tabs>
 
       {/* 主要内容 */}

@@ -1,0 +1,343 @@
+import React, { useState } from 'react';
+import { Form, Input, Button, Checkbox, message, Card, Space } from 'antd';
+import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
+import Logo from '../components/Logo';
+import LanguageSelector from '../components/LanguageSelector';
+import { authAPI } from '../utils/api';
+import { useLanguage } from '../contexts/LanguageContext';
+
+interface LoginFormValues {
+  username: string;
+  email?: string;
+  password: string;
+  confirmPassword?: string;
+  remember: boolean;
+}
+
+interface LoginProps {
+  onLoginSuccess: () => void;
+}
+
+const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
+  const [loading, setLoading] = useState(false);
+  const [isRegister, setIsRegister] = useState(false);
+  const { language, setLanguage, t } = useLanguage();
+
+  const onFinish = async (values: LoginFormValues) => {
+    setLoading(true);
+
+    try {
+      if (isRegister) {
+        // 注册
+        await authAPI.register({
+          username: values.username,
+          email: values.email!,
+          password: values.password,
+        });
+        message.success(t('login.registerSuccess'));
+        setIsRegister(false);
+      } else {
+        // 登录
+        const response = await authAPI.login({
+          username: values.username,
+          password: values.password,
+        });
+
+        const { token, user } = response.data;
+
+        // 存储 token 和用户信息
+        if (values.remember) {
+          localStorage.setItem('techpulse_token', token);
+          localStorage.setItem('techpulse_user', JSON.stringify(user));
+        } else {
+          sessionStorage.setItem('techpulse_token', token);
+          sessionStorage.setItem('techpulse_user', JSON.stringify(user));
+        }
+
+        message.success(t('login.loginSuccess'));
+        onLoginSuccess();
+      }
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.detail ||
+        (isRegister ? t('login.registerFailed') : t('login.loginFailed'));
+      message.error(errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+      {/* 背景装饰 */}
+      <div style={{
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        opacity: 0.1
+      }}>
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            style={{
+              position: 'absolute',
+              width: Math.random() * 100 + 50,
+              height: Math.random() * 100 + 50,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              background: 'white',
+              borderRadius: '50%',
+              animation: `float ${Math.random() * 10 + 10}s infinite ease-in-out`,
+              animationDelay: `${Math.random() * 5}s`
+            }}
+          />
+        ))}
+      </div>
+
+      {/* 语言切换器 - 右上角 */}
+      <div style={{
+        position: 'absolute',
+        top: 20,
+        right: 20,
+        zIndex: 1000
+      }}>
+        <LanguageSelector
+          value={language}
+          onChange={setLanguage}
+          size="large"
+        />
+      </div>
+
+      {/* 登录卡片 */}
+      <Card
+        style={{
+          width: 450,
+          boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+          borderRadius: 16,
+          position: 'relative',
+          zIndex: 1
+        }}
+        bodyStyle={{ padding: '40px 40px 24px' }}
+      >
+        {/* Logo */}
+        <div style={{ marginBottom: 32 }}>
+          <Logo size={100} showText={false} />
+          <h1 style={{
+            textAlign: 'center',
+            margin: '16px 0 8px 0',
+            fontSize: 32,
+            fontWeight: 'bold',
+            background: 'linear-gradient(90deg, #1890ff, #52c41a, #722ed1)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}>
+            {t('login.title')}
+          </h1>
+          <p style={{
+            textAlign: 'center',
+            color: '#8c8c8c',
+            marginTop: 8,
+            fontSize: 14
+          }}>
+            {t('login.subtitle')}
+          </p>
+        </div>
+
+        {/* 登录/注册表单 */}
+        <Form
+          name={isRegister ? "register" : "login"}
+          initialValues={{ remember: true }}
+          onFinish={onFinish}
+          size="large"
+        >
+          <Form.Item
+            name="username"
+            rules={[{ required: true, message: t('login.usernameRequired') }]}
+          >
+            <Input
+              prefix={<UserOutlined />}
+              placeholder={t('login.usernamePlaceholder')}
+            />
+          </Form.Item>
+
+          {isRegister && (
+            <Form.Item
+              name="email"
+              rules={[
+                { required: true, message: t('login.emailRequired') },
+                { type: 'email', message: t('login.emailInvalid') }
+              ]}
+            >
+              <Input
+                prefix={<MailOutlined />}
+                placeholder={t('login.emailPlaceholder')}
+              />
+            </Form.Item>
+          )}
+
+          <Form.Item
+            name="password"
+            rules={[{ required: true, message: t('login.passwordRequired') }]}
+          >
+            <Input.Password
+              prefix={<LockOutlined />}
+              placeholder={t('login.passwordPlaceholder')}
+            />
+          </Form.Item>
+
+          {isRegister && (
+            <Form.Item
+              name="confirmPassword"
+              dependencies={['password']}
+              rules={[
+                { required: true, message: t('login.confirmPasswordRequired') },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!value || getFieldValue('password') === value) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(new Error(t('login.passwordMismatch')));
+                  },
+                }),
+              ]}
+            >
+              <Input.Password
+                prefix={<LockOutlined />}
+                placeholder={t('login.confirmPasswordPlaceholder')}
+              />
+            </Form.Item>
+          )}
+
+          {!isRegister && (
+            <Form.Item>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Form.Item name="remember" valuePropName="checked" noStyle>
+                  <Checkbox>{t('login.remember')}</Checkbox>
+                </Form.Item>
+                <a href="#" style={{ color: '#1890ff' }}>
+                  {t('login.forgotPassword')}
+                </a>
+              </div>
+            </Form.Item>
+          )}
+
+          <Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              block
+              style={{
+                height: 45,
+                fontSize: 16,
+                fontWeight: 'bold',
+                background: 'linear-gradient(90deg, #1890ff, #52c41a)',
+                border: 'none'
+              }}
+            >
+              {isRegister ? t('login.registerButton') : t('login.loginButton')}
+            </Button>
+          </Form.Item>
+
+          <Form.Item style={{ marginBottom: 0, textAlign: 'center' }}>
+            <Space>
+              <Button
+                type="link"
+                onClick={() => setIsRegister(!isRegister)}
+                style={{ padding: 0 }}
+              >
+                {isRegister ? t('login.switchToLogin') : t('login.switchToRegister')}
+              </Button>
+            </Space>
+          </Form.Item>
+        </Form>
+
+        {/* 第三方登录 */}
+        <div style={{
+          marginTop: 24,
+          paddingTop: 24,
+          borderTop: '1px solid #f0f0f0',
+          textAlign: 'center'
+        }}>
+          <div style={{ color: '#8c8c8c', marginBottom: 16, fontSize: 14 }}>
+            {t('login.thirdPartyLogin')}
+          </div>
+          <Space size="large">
+            <Button
+              shape="circle"
+              size="large"
+              style={{
+                background: '#24292e',
+                color: 'white',
+                border: 'none'
+              }}
+              icon={
+                <svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor">
+                  <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                </svg>
+              }
+            />
+            <Button
+              shape="circle"
+              size="large"
+              style={{
+                background: '#1DA1F2',
+                color: 'white',
+                border: 'none'
+              }}
+              icon={
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                </svg>
+              }
+            />
+            <Button
+              shape="circle"
+              size="large"
+              style={{
+                background: '#EA4335',
+                color: 'white',
+                border: 'none'
+              }}
+              icon={
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+              }
+            />
+          </Space>
+        </div>
+      </Card>
+
+      {/* CSS 动画 */}
+      <style>{`
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0) translateX(0);
+          }
+          25% {
+            transform: translateY(-20px) translateX(10px);
+          }
+          50% {
+            transform: translateY(-10px) translateX(-10px);
+          }
+          75% {
+            transform: translateY(-30px) translateX(5px);
+          }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default Login;

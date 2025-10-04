@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Card, Row, Col, Statistic, Typography, Space, Tag, Timeline, Avatar, Button, Progress, Divider, Modal, Badge, Empty, Checkbox } from 'antd'
 import { LineChartOutlined, StarOutlined, FireOutlined, ClockCircleOutlined, GithubOutlined, FileTextOutlined, RobotOutlined, EditOutlined, ArrowUpOutlined, LinkOutlined } from '@ant-design/icons'
 import { useLanguage } from '../contexts/LanguageContext'
+import { translateTags } from '../utils/translateTags'
 
 const { Title, Text, Paragraph } = Typography
 
@@ -27,7 +28,7 @@ interface Stats {
 }
 
 const Overview: React.FC = () => {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const [stats, setStats] = useState<Stats | null>(null)
   const [recentCards, setRecentCards] = useState<TechCard[]>([])
   const [trendingCards, setTrendingCards] = useState<TechCard[]>([])
@@ -37,6 +38,8 @@ const Overview: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false)
   // 信息源选择状态
   const [selectedSources, setSelectedSources] = useState<string[]>(['github', 'arxiv', 'huggingface', 'zenn'])
+  // 热门标签翻译状态
+  const [translatedTags, setTranslatedTags] = useState<Array<{ tag: string; count: number }>>([])
   // 不需要存储所有数据，直接过滤
 
   const fetchOverviewData = async () => {
@@ -108,6 +111,36 @@ const Overview: React.FC = () => {
   useEffect(() => {
     fetchOverviewData()
   }, [selectedSources]) // 依赖信息源选择变化
+
+  // 当语言或热门标签变化时翻译标签
+  useEffect(() => {
+    const handleTagTranslation = async () => {
+      if (!stats?.trending_tags || stats.trending_tags.length === 0) {
+        setTranslatedTags([])
+        return
+      }
+
+      // 如果是中文，直接使用原标签
+      if (language === 'zh-CN') {
+        setTranslatedTags(stats.trending_tags)
+        return
+      }
+
+      // 翻译标签
+      const tagTexts = stats.trending_tags.map(t => t.tag)
+      const translated = await translateTags(tagTexts, language)
+
+      // 组合翻译结果和计数
+      const translatedWithCounts = stats.trending_tags.map((item, index) => ({
+        tag: translated[index],
+        count: item.count
+      }))
+
+      setTranslatedTags(translatedWithCounts)
+    }
+
+    handleTagTranslation()
+  }, [language, stats?.trending_tags])
   
   // 信息源选项
   const sourceOptions = [
@@ -174,24 +207,24 @@ const Overview: React.FC = () => {
           </div>
           <div style={{ minWidth: '300px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-              <Text strong>选择信息源：</Text>
+              <Text strong>{t('overview.selectSources')}</Text>
               <Space>
-                <Button 
-                  type="link" 
-                  size="small" 
+                <Button
+                  type="link"
+                  size="small"
                   onClick={selectAllSources}
                   style={{ padding: 0, height: 'auto' }}
                 >
-                  全选
+                  {t('overview.selectAll')}
                 </Button>
                 <Text type="secondary">|</Text>
-                <Button 
-                  type="link" 
-                  size="small" 
+                <Button
+                  type="link"
+                  size="small"
                   onClick={clearAllSources}
                   style={{ padding: 0, height: 'auto' }}
                 >
-                  清空
+                  {t('overview.clearAll')}
                 </Button>
               </Space>
             </div>
@@ -306,17 +339,17 @@ const Overview: React.FC = () => {
         <Col xs={24} lg={12}>
           <Card title={t('overview.hotTags')} extra={<Button size="small">{t('overview.tagCloud')}</Button>}>
             <div style={{ minHeight: '200px' }}>
-              {stats?.trending_tags ? (
+              {translatedTags.length > 0 ? (
                 <Space wrap size="small">
-                  {stats.trending_tags.slice(0, 20).map((tagInfo, index) => (
-                    <Tag 
+                  {translatedTags.slice(0, 20).map((tagInfo, index) => (
+                    <Tag
                       key={index}
                       color={[
                         'magenta', 'red', 'volcano', 'orange', 'gold',
-                        'lime', 'green', 'cyan', 'blue', 'geekblue', 
+                        'lime', 'green', 'cyan', 'blue', 'geekblue',
                         'purple'
                       ][index % 11]}
-                      style={{ 
+                      style={{
                         fontSize: `${Math.max(12, 16 - index * 0.3)}px`,
                         padding: '4px 8px'
                       }}

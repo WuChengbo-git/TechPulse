@@ -362,8 +362,8 @@ const ArxivPage: React.FC = () => {
 
       {/* Tab导航 */}
       <Tabs activeKey={activeTab} onChange={setActiveTab} style={{ marginBottom: 24 }}>
-        <TabPane tab={`全部 (${papers.length})`} key="all" />
-        <TabPane tab={`最近 (${papers.filter(p => {
+        <TabPane tab={`${t('arxiv.all')} (${papers.length})`} key="all" />
+        <TabPane tab={`${t('arxiv.recent')} (${papers.filter(p => {
           if (!p.created_at) return false
           try {
             return new Date(p.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
@@ -371,8 +371,8 @@ const ArxivPage: React.FC = () => {
             return false
           }
         }).length})`} key="recent" />
-        <TabPane tab="AI相关" key="ai" />
-        <TabPane tab="计算机视觉" key="cv" />
+        <TabPane tab={t('arxiv.aiRelated')} key="ai" />
+        <TabPane tab={t('arxiv.computerVision')} key="cv" />
       </Tabs>
 
       {/* 主要内容 */}

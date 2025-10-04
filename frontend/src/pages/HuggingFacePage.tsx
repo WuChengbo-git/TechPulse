@@ -341,11 +341,11 @@ const HuggingFacePage: React.FC = () => {
 
       {/* Tab导航 */}
       <Tabs activeKey={activeTab} onChange={setActiveTab} style={{ marginBottom: 24 }}>
-        <TabPane tab={`All (${models.length})`} key="all" />
-        <TabPane tab={`Popular (${models.filter(m => (m.downloads || 0) > 1000).length})`} key="popular" />
-        <TabPane tab="Recent" key="recent" />
-        <TabPane tab="Text Related" key="text" />
-        <TabPane tab="Vision Related" key="vision" />
+        <TabPane tab={`${t('huggingface.all')} (${models.length})`} key="all" />
+        <TabPane tab={`${t('huggingface.popular')} (${models.filter(m => (m.downloads || 0) > 1000).length})`} key="popular" />
+        <TabPane tab={t('huggingface.recent')} key="recent" />
+        <TabPane tab={t('huggingface.textRelated')} key="text" />
+        <TabPane tab={t('huggingface.visionRelated')} key="vision" />
       </Tabs>
 
       {/* 主要内容 */}
