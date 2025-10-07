@@ -1,0 +1,84 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 渐变定义 -->
+  <defs>
+    <linearGradient id="techGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1890ff" />
+      <stop offset="50%" stop-color="#52c41a" />
+      <stop offset="100%" stop-color="#722ed1" />
+    </linearGradient>
+
+    <linearGradient id="pulseGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1890ff" stop-opacity="0.2" />
+      <stop offset="50%" stop-color="#52c41a" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#722ed1" stop-opacity="0.2" />
+    </linearGradient>
+
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- 背景圆 -->
+  <circle cx="256" cy="256" r="240" fill="url(#techGradient)" opacity="0.1"/>
+
+  <!-- 外圈 - 科技感圆环 -->
+  <circle
+    cx="256"
+    cy="256"
+    r="220"
+    stroke="url(#techGradient)"
+    stroke-width="10"
+    fill="none"
+    stroke-dasharray="25 13"
+  />
+
+  <!-- 中圈 - 数据流 -->
+  <circle
+    cx="256"
+    cy="256"
+    r="180"
+    stroke="url(#techGradient)"
+    stroke-width="6"
+    fill="none"
+    stroke-dasharray="13 25"
+    opacity="0.6"
+  />
+
+  <!-- 核心 T 字母 -->
+  <g filter="url(#glow)">
+    <path
+      d="M 160 140 L 352 140 L 352 180 L 280 180 L 280 372 L 232 372 L 232 180 L 160 180 Z"
+      fill="url(#techGradient)"
+    />
+  </g>
+
+  <!-- 脉冲波形左侧 -->
+  <path
+    d="M 80 256 L 110 256 L 140 200 L 170 312 L 200 232 L 230 280 L 256 256"
+    stroke="url(#pulseGradient)"
+    stroke-width="8"
+    fill="none"
+    stroke-linecap="round"
+    opacity="0.7"
+  />
+
+  <!-- 脉冲波形右侧 -->
+  <path
+    d="M 256 256 L 282 280 L 312 232 L 342 312 L 372 200 L 402 256 L 432 256"
+    stroke="url(#pulseGradient)"
+    stroke-width="8"
+    fill="none"
+    stroke-linecap="round"
+    opacity="0.7"
+  />
+
+  <!-- 数据点 -->
+  <circle cx="143" cy="143" r="12" fill="url(#techGradient)" opacity="0.8"/>
+  <circle cx="369" cy="143" r="12" fill="url(#techGradient)" opacity="0.8"/>
+  <circle cx="143" cy="369" r="12" fill="url(#techGradient)" opacity="0.8"/>
+  <circle cx="369" cy="369" r="12" fill="url(#techGradient)" opacity="0.8"/>
+</svg>

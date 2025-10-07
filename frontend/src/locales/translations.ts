@@ -67,6 +67,7 @@ export const translations: Record<Language, Translations> = {
       trendAnalysis: '趋势分析',
       aiAssistant: 'AI 助手',
       systemManagement: '系统管理',
+      systemSettings: '系统设置',
       notionIntegration: 'Notion 集成',
       apiConfig: 'API 配置',
       taskManagement: '任务管理',

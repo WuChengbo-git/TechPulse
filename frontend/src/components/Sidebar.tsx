@@ -69,7 +69,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, selectedKey, onMenuSelect 
       icon: <SettingOutlined />,
       label: t('sidebar.systemManagement'),
       children: [
-        { key: 'notion', icon: <CloudOutlined />, label: t('nav.notionIntegration') },
+        { key: 'settings', icon: <SettingOutlined />, label: t('nav.systemSettings') },
         { key: 'api-config', icon: <ApiOutlined />, label: t('nav.apiConfig') },
         { key: 'tasks', icon: <UnorderedListOutlined />, label: t('nav.taskManagement') },
         { key: 'status', icon: <MonitorOutlined />, label: t('nav.systemStatus') }

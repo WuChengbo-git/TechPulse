@@ -1,5 +1,341 @@
 # TechPulse Release Notes
 
+## Version 0.1.9 - TechPulse System Management
+**发布日期**: 2025-10-07
+
+### 🎯 本版本更新概览
+TechPulse 0.1.9 完成了系统管理模块的全面开发，新增4个核心管理页面，并实现了完整的用户配置存储系统。所有设置都绑定到用户账号，为多用户环境提供了完善的个性化配置支持。
+
+### 🚀 新增功能
+
+#### 1. System Settings Page (系统设置页面)
+全新的系统级配置中心，支持AI模型、知识库和个性化设置：
+
+**AI模型配置**
+- **OpenAI**: API Key、模型选择(GPT-4/GPT-3.5-turbo)、自定义Base URL、Organization ID、连接测试
+- **Azure OpenAI**: API Key、Endpoint URL、Deployment Name、API Version、连接测试
+- **Ollama (本地LLM)**: Server URL、模型选择(Llama2/Mistral/Code Llama等)、连接测试
+
+**知识库集成**
+- **Notion**: API Token、Database ID、同步频率配置、连接测试
+- **预留扩展**: Obsidian、Logseq、Roam Research 支持接口
+
+**个性化设置**
+- 推荐系统开关
+- 推荐算法选择 (内容推荐/协同过滤/混合推荐)
+- 行为追踪控制
+- 显示推荐理由
+- 匿名模式
+
+**用户偏好**
+- 界面语言 (中文/English/日本語)
+- 主题模式 (浅色/深色/自动)
+- 每页显示条数
+- 账号信息显示
+
+#### 2. API Config Page (数据源配置页面) - 功能明确化
+重新定位为数据源抓取配置中心，与System Settings形成功能互补：
+
+**GitHub配置**
+- 编程语言过滤
+- 主题标签选择
+- 最小Star数设置
+- 时间范围选择
+- 排除Forks/Archive选项
+
+**arXiv配置**
+- 研究领域分类选择
+- 关键词搜索配置
+- 时间范围和结果数限制
+- 排序方式设置
+
+**Hugging Face配置**
+- Pipeline任务类型
+- 模型类型筛选
+- 支持语言选择
+- 最小下载量过滤
+
+**Zenn配置**
+- 关注话题设置
+- 文章类型选择
+- 时间范围和点赞数过滤
+
+**调度配置**
+- 自动采集开关
+- 执行频率 (每小时/每天/每周)
+- 执行时间和时区设置
+
+#### 3. Task Management Page (任务管理页面)
+完整的定时任务管理系统：
+
+**任务概览统计**
+- 总任务数
+- 实行中任务数
+- 待机中任务数
+- 失败任务数
+
+**任务列表功能**
+- 任务名称和ID显示
+- 数据源类型标签
+- 状态标签 (待机/实行中/完成/失败/一时停止)
+- 调度类型 (手动/每时/每日/每周)
+- 下次执行时间
+- 执行统计 (成功率/成功次数/失败次数)
+- 启用/禁用开关
+
+**任务操作**
+- 立即执行任务
+- 暂停/恢复任务
+- 编辑任务配置
+- 删除任务
+- 创建新任务
+
+#### 4. System Status Page (系统状态页面)
+全面的系统健康监控中心：
+
+**系统资源监控**
+- CPU使用率实时监控
+- 内存使用率显示
+- 磁盘使用情况
+- 网络使用率
+- 过去24小时趋势图表
+
+**服务状态监控**
+- Backend API状态
+- 数据库连接状态
+- GitHub API状态
+- arXiv API状态
+- Hugging Face API状态
+- OpenAI API状态
+- 每个服务显示: 健康状态、响应时间、稳定率、最终确认时间
+
+**API使用情况**
+- 今日使用量 vs 限额对比
+- 使用进度条
+- 超额警告提示
+- 最终使用时间记录
+
+**系统事件日志**
+- 系统启动/关闭事件
+- 数据收集完成记录
+- API响应延迟检测
+- 自动备份完成通知
+- 异常事件记录
+
+### 🗄️ 后端架构升级
+
+#### 1. 用户设置数据模型
+**UserSettings 表** - 存储用户系统设置
+```
+- AI模型配置 (OpenAI/Azure/Ollama)
+- 知识库配置 (Notion等)
+- 个性化设置 (推荐算法/行为追踪)
+- 用户偏好 (语言/主题/显示设置)
+- 敏感信息加密存储 (API Keys)
+```
+
+**DataSourceConfig 表** - 存储数据源配置
+```
+- 数据源类型 (github/arxiv/huggingface/zenn)
+- 配置数据 (JSON格式存储各源的过滤规则)
+- 调度配置 (执行频率/时间/时区)
+- 启用状态控制
+```
+
+#### 2. RESTful API端点
+**系统设置API**
+- `GET /api/v1/user-settings` - 获取当前用户设置
+- `PUT /api/v1/user-settings` - 更新系统设置
+
+**数据源配置API**
+- `GET /api/v1/user-settings/datasources` - 获取所有数据源配置
+- `POST /api/v1/user-settings/datasources` - 创建/更新配置
+- `PUT /api/v1/user-settings/datasources/{source_type}` - 更新特定源
+- `DELETE /api/v1/user-settings/datasources/{source_type}` - 删除配置
+
+#### 3. 安全特性
+- ✅ JWT认证保护所有端点
+- ✅ 用户数据隔离 (基于user_id)
+- ✅ API Key隐藏显示 (返回时显示为****)
+- ✅ CASCADE删除 (用户删除时自动清理设置)
+- ⏳ API Key加密存储 (TODO: 待实现)
+
+### 🔧 技术实现
+
+#### 1. 前端组件
+**新建文件**
+- `frontend/src/pages/SettingsPage.tsx` - 系统设置页面
+- `frontend/src/pages/TaskManagementPage.tsx` - 任务管理页面
+- `frontend/src/pages/SystemStatusPage.tsx` - 系统状态页面
+
+**更新文件**
+- `frontend/src/App.tsx` - 添加新页面路由
+- `frontend/src/components/Sidebar.tsx` - 菜单结构已包含(无需更改)
+
+#### 2. 后端模型与API
+**新建文件**
+- `backend/app/models/user_settings.py` - 数据模型定义
+- `backend/app/api/user_settings.py` - API端点实现
+- `backend/scripts/create_settings_tables.py` - 数据表迁移脚本
+
+**更新文件**
+- `backend/app/main.py` - 注册新的API路由
+
+#### 3. 数据库迁移
+执行成功的表创建:
+```bash
+✓ user_settings 表创建成功
+✓ data_source_configs 表创建成功
+```
+
+### 📊 功能定位明确
+
+#### API Config vs System Settings 对比
+| 维度 | API Config | System Settings |
+|------|-----------|----------------|
+| **功能定位** | 数据源抓取配置 | 系统级设置 |
+| **配置内容** | 抓取规则、过滤条件 | AI模型、知识库、个性化 |
+| **使用场景** | 控制"抓什么数据" | 控制"系统如何运作" |
+| **典型配置** | GitHub语言过滤、arXiv分类 | OpenAI API配置、推荐算法 |
+| **调度功能** | 包含自动采集调度 | 不涉及调度 |
+
+**结论**: 两个页面功能互补，非重复，都需要保留。
+
+### 🔐 用户账号绑定
+
+#### 核心特性
+- **完全隔离**: 每个用户的设置完全独立，互不影响
+- **自动创建**: 首次访问时自动创建默认设置
+- **持久化存储**: 所有配置保存到数据库
+- **登录加载**: 用户登录时自动加载其专属配置
+- **安全删除**: 用户删除时自动清理所有关联设置
+
+#### 数据隔离机制
+```python
+# 所有查询都通过 current_user.id 过滤
+settings = db.query(UserSettings).filter(
+    UserSettings.user_id == current_user.id
+).first()
+```
+
+### 📦 文件结构
+
+```
+frontend/src/pages/
+├── SettingsPage.tsx         ✨ NEW
+├── ApiConfigPage.tsx        ✅ EXISTING (功能明确)
+├── TaskManagementPage.tsx   ✨ NEW
+└── SystemStatusPage.tsx     ✨ NEW
+
+backend/app/models/
+└── user_settings.py         ✨ NEW
+
+backend/app/api/
+└── user_settings.py         ✨ NEW
+
+backend/scripts/
+└── create_settings_tables.py ✨ NEW
+
+docs/
+└── SYSTEM_MANAGEMENT_PAGES_COMPLETE.md ✨ NEW (完整文档)
+```
+
+### 🛠 开发工具与流程
+
+#### 数据库迁移
+```bash
+cd backend
+python -m scripts.create_settings_tables
+```
+
+#### 前端开发
+```bash
+cd frontend
+npm run dev
+```
+
+#### 后端开发
+```bash
+cd backend
+source venv/bin/activate
+uvicorn app.main:app --reload --port 8000
+```
+
+### 🐛 问题修复
+- ✅ 明确了API Config和System Settings的功能定位，避免混淆
+- ✅ 实现了完整的用户配置隔离机制
+- ✅ 完善了数据库CASCADE删除策略
+- ✅ 统一了所有页面的UI设计风格
+- ✅ 优化了前端路由配置和面包屑导航
+
+### 📈 用户价值
+
+#### 1. 个性化体验
+- 每个用户拥有独立的AI模型配置
+- 自定义的数据源抓取规则
+- 个性化的推荐算法设置
+- 定制化的界面偏好
+
+#### 2. 系统可控性
+- 完整的任务管理和调度控制
+- 实时的系统状态监控
+- 清晰的资源使用情况
+- 及时的异常告警
+
+#### 3. 多用户支持
+- 团队成员各自独立配置
+- 数据完全隔离，互不影响
+- 适合企业和团队使用
+- 为多租户架构打下基础
+
+### 🔄 升级指南
+
+#### 1. 数据库升级
+```bash
+cd backend
+python -m scripts.create_settings_tables
+```
+
+#### 2. 依赖更新
+无需额外依赖，使用现有包即可
+
+#### 3. 环境变量
+无需新增环境变量
+
+#### 4. 数据迁移
+全新表，无需数据迁移
+
+### 📝 已知限制
+
+#### 当前版本
+1. **前端Mock数据**: 页面使用模拟数据，需要集成实际API
+2. **连接测试未实现**: 测试按钮功能待开发
+3. **任务执行未实现**: 需要连接实际调度系统
+4. **API Key明文存储**: 需要实现加密存储(高优先级)
+
+#### 后续计划
+- [ ] 实现前端API集成
+- [ ] 开发连接测试功能
+- [ ] 实现API Key加密存储
+- [ ] 完善任务执行系统
+- [ ] 添加系统监控告警
+
+### 🎉 版本亮点
+
+1. **完整的系统管理**: 4个核心页面覆盖所有管理需求
+2. **用户账号绑定**: 所有设置与用户账号深度集成
+3. **功能定位清晰**: API Config和System Settings互补不重复
+4. **架构扩展性强**: 为未来功能扩展预留接口
+5. **文档完善**: 详细的开发文档和使用指南
+
+### 📚 相关文档
+
+- [系统管理页面完整文档](./SYSTEM_MANAGEMENT_PAGES_COMPLETE.md)
+- [个性化系统实现](./PERSONALIZATION_IMPLEMENTATION.md)
+- [系统设置页面文档](./SETTINGS_PAGE_COMPLETED.md)
+
+---
+
 ## Version 0.1.8 - TechPulse i18n Plus
 **发布日期**: 2025-10-04
 

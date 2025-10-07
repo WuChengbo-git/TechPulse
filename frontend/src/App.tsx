@@ -16,6 +16,9 @@ import Chat from './pages/Chat'
 import Analytics from './pages/Analytics'
 import TrendsPage from './pages/TrendsPage'
 import ApiConfigPage from './pages/ApiConfigPage'
+import SettingsPage from './pages/SettingsPage'
+import TaskManagementPage from './pages/TaskManagementPage'
+import SystemStatusPage from './pages/SystemStatusPage'
 import Login from './pages/Login'
 import './App.css'
 
@@ -89,6 +92,7 @@ function AppContent() {
       analytics: [t('nav.analytics'), t('nav.dataAnalysis')],
       trends: [t('nav.analytics'), t('nav.trendAnalysis')],
       chat: [t('nav.analytics'), t('nav.aiAssistant')],
+      settings: [t('nav.systemManagement'), t('nav.systemSettings')],
       notion: [t('nav.systemManagement'), t('nav.notionIntegration')],
       'api-config': [t('nav.systemManagement'), t('nav.apiConfig')],
       tasks: [t('nav.systemManagement'), t('nav.taskManagement')],
@@ -121,6 +125,12 @@ function AppContent() {
         return <ZennPage />
       case 'api-config':
         return <ApiConfigPage />
+      case 'settings':
+        return <SettingsPage />
+      case 'tasks':
+        return <TaskManagementPage />
+      case 'status':
+        return <SystemStatusPage />
       default:
         return <Overview />
     }
