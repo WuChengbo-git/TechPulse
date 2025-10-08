@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { ConfigProvider, Layout, Button, Breadcrumb, Typography, Space, Avatar } from 'antd'
+import { ConfigProvider, Layout, Button, Breadcrumb, Typography, Space, Avatar, Dropdown, Badge, Modal, Form, Input, message } from 'antd'
+import type { MenuProps } from 'antd'
 import { BrowserRouter as Router } from 'react-router-dom'
-import { MenuFoldOutlined, MenuUnfoldOutlined, BellOutlined, SettingOutlined, LogoutOutlined } from '@ant-design/icons'
+import { MenuFoldOutlined, MenuUnfoldOutlined, BellOutlined, SettingOutlined, LogoutOutlined, UserOutlined, GlobalOutlined, LockOutlined, ProfileOutlined, SafetyOutlined, QuestionCircleOutlined, InfoCircleOutlined } from '@ant-design/icons'
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext'
 import Sidebar from './components/Sidebar'
 import VersionInfo from './components/VersionInfo'
@@ -30,6 +31,8 @@ function AppContent() {
   const [selectedKey, setSelectedKey] = useState('dashboard')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [username, setUsername] = useState('')
+  const [changePasswordVisible, setChangePasswordVisible] = useState(false)
+  const [form] = Form.useForm()
   const { t, language, setLanguage } = useLanguage()
 
   // 检查登录状态
@@ -74,6 +77,18 @@ function AppContent() {
     sessionStorage.removeItem('techpulse_user')
     setIsLoggedIn(false)
     setUsername('')
+  }
+
+  // 处理修改密码
+  const handleChangePassword = async (values: any) => {
+    try {
+      // TODO: 调用修改密码API
+      message.success(t('nav.changePasswordSuccess'))
+      setChangePasswordVisible(false)
+      form.resetFields()
+    } catch (error: any) {
+      message.error(error.response?.data?.detail || t('nav.changePasswordFailed'))
+    }
   }
 
   // 如果未登录，显示登录页面
@@ -174,22 +189,101 @@ function AppContent() {
               </div>
               
               <Space size="middle">
-                <LanguageSelector
-                  value={language}
-                  onChange={setLanguage}
-                  size="small"
-                />
-                <Button type="text" icon={<BellOutlined />} />
-                <Button type="text" icon={<SettingOutlined />} />
-                <Avatar style={{ backgroundColor: '#1890ff' }}>
-                  {username.charAt(0).toUpperCase()}
-                </Avatar>
-                <Button
-                  type="text"
-                  icon={<LogoutOutlined />}
-                  onClick={handleLogout}
-                  title={t('common.logout')}
-                />
+                {/* 通知图标 */}
+                <Badge count={0} showZero={false}>
+                  <Button type="text" icon={<BellOutlined />} title={t('nav.notifications')} />
+                </Badge>
+
+                {/* 用户下拉菜单 */}
+                <Dropdown
+                  menu={{
+                    items: [
+                      {
+                        key: 'user-info',
+                        label: (
+                          <div style={{ padding: '8px 0' }}>
+                            <div style={{ fontWeight: 600, fontSize: '14px' }}>{username}</div>
+                            <div style={{ fontSize: '12px', color: '#999' }}>{t('nav.personalCenter')}</div>
+                          </div>
+                        ),
+                        disabled: true,
+                      },
+                      { type: 'divider' },
+                      {
+                        key: 'profile',
+                        label: t('nav.profileSettings'),
+                        icon: <ProfileOutlined />,
+                        onClick: () => message.info(t('nav.comingSoon')),
+                      },
+                      {
+                        key: 'change-password',
+                        label: t('nav.changePassword'),
+                        icon: <LockOutlined />,
+                        onClick: () => setChangePasswordVisible(true),
+                      },
+                      {
+                        key: 'security',
+                        label: t('nav.securitySettings'),
+                        icon: <SafetyOutlined />,
+                        onClick: () => message.info(t('nav.comingSoon')),
+                      },
+                      { type: 'divider' },
+                      {
+                        key: 'language',
+                        label: t('nav.languageSwitch'),
+                        icon: <GlobalOutlined />,
+                        children: [
+                          {
+                            key: 'zh',
+                            label: '简体中文',
+                            onClick: () => setLanguage('zh'),
+                          },
+                          {
+                            key: 'en',
+                            label: 'English',
+                            onClick: () => setLanguage('en'),
+                          },
+                        ],
+                      },
+                      {
+                        key: 'settings',
+                        label: t('nav.systemSettings'),
+                        icon: <SettingOutlined />,
+                        onClick: () => setSelectedKey('settings'),
+                      },
+                      { type: 'divider' },
+                      {
+                        key: 'help',
+                        label: t('nav.helpCenter'),
+                        icon: <QuestionCircleOutlined />,
+                        onClick: () => message.info(t('nav.comingSoon')),
+                      },
+                      {
+                        key: 'about',
+                        label: t('nav.about'),
+                        icon: <InfoCircleOutlined />,
+                        onClick: () => message.info('TechPulse v0.1.9'),
+                      },
+                      { type: 'divider' },
+                      {
+                        key: 'logout',
+                        label: t('common.logout'),
+                        icon: <LogoutOutlined />,
+                        danger: true,
+                        onClick: handleLogout,
+                      },
+                    ],
+                  }}
+                  placement="bottomRight"
+                  trigger={['click']}
+                >
+                  <Avatar
+                    style={{ backgroundColor: '#1890ff', cursor: 'pointer' }}
+                    icon={!username ? <UserOutlined /> : undefined}
+                  >
+                    {username ? username.charAt(0).toUpperCase() : ''}
+                  </Avatar>
+                </Dropdown>
               </Space>
             </Header>
             
@@ -204,8 +298,8 @@ function AppContent() {
               {renderContent()}
             </Content>
             
-            <Footer style={{ 
-              textAlign: 'center', 
+            <Footer style={{
+              textAlign: 'center',
               background: '#f0f2f5',
               padding: '12px 24px',
               fontSize: '12px',
@@ -222,6 +316,61 @@ function AppContent() {
             </Footer>
           </Layout>
         </Layout>
+
+        {/* 修改密码弹窗 */}
+        <Modal
+          title={t('nav.changePassword')}
+          open={changePasswordVisible}
+          onCancel={() => {
+            setChangePasswordVisible(false)
+            form.resetFields()
+          }}
+          onOk={() => form.submit()}
+          okText={t('common.confirm')}
+          cancelText={t('common.cancel')}
+        >
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleChangePassword}
+          >
+            <Form.Item
+              name="oldPassword"
+              label={t('nav.oldPassword')}
+              rules={[{ required: true, message: t('nav.oldPasswordRequired') }]}
+            >
+              <Input.Password placeholder={t('nav.oldPasswordPlaceholder')} />
+            </Form.Item>
+            <Form.Item
+              name="newPassword"
+              label={t('nav.newPassword')}
+              rules={[
+                { required: true, message: t('nav.newPasswordRequired') },
+                { min: 6, message: t('nav.passwordMinLength') }
+              ]}
+            >
+              <Input.Password placeholder={t('nav.newPasswordPlaceholder')} />
+            </Form.Item>
+            <Form.Item
+              name="confirmPassword"
+              label={t('nav.confirmNewPassword')}
+              dependencies={['newPassword']}
+              rules={[
+                { required: true, message: t('nav.confirmPasswordRequired') },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!value || getFieldValue('newPassword') === value) {
+                      return Promise.resolve()
+                    }
+                    return Promise.reject(new Error(t('login.passwordMismatch')))
+                  },
+                }),
+              ]}
+            >
+              <Input.Password placeholder={t('nav.confirmPasswordPlaceholder')} />
+            </Form.Item>
+          </Form>
+        </Modal>
       </Router>
     </ConfigProvider>
   )

@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react'
-import { 
-  Card, Row, Col, Button, Progress, message, Typography, Space, Badge, 
+import {
+  Card, Row, Col, Button, Progress, message, Typography, Space, Badge,
   Statistic, Timeline, Alert, Modal, List, Tag, Tabs, Input, Select, Divider
 } from 'antd'
-import { 
-  GithubOutlined, SyncOutlined, CheckCircleOutlined, ClockCircleOutlined, 
+import {
+  GithubOutlined, SyncOutlined, CheckCircleOutlined, ClockCircleOutlined,
   ExclamationCircleOutlined, EyeOutlined, StarOutlined, ForkOutlined,
   SearchOutlined, FilterOutlined, TrophyOutlined, MessageOutlined, SendOutlined,
   LinkOutlined
 } from '@ant-design/icons'
 import { useLanguage } from '../contexts/LanguageContext'
+import QualityBadge from '../components/QualityBadge'
 
 const { Title, Text, Paragraph } = Typography
 const { Search } = Input
@@ -27,6 +28,7 @@ interface GitHubRepo {
   forks?: number
   language?: string
   trending_score?: number
+  quality_score?: number  // 质量评分
   created_at: string
   source: string
 }
@@ -366,8 +368,11 @@ const GitHubPage: React.FC = () => {
                   >
                     <List.Item.Meta
                       title={
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                           <Text strong>{repo.title}</Text>
+                          {repo.quality_score !== undefined && (
+                            <QualityBadge score={repo.quality_score} size="small" />
+                          )}
                           {repo.language && (
                             <Tag color="blue" size="small">{repo.language}</Tag>
                           )}

@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     port: 5174,
     host: '0.0.0.0',
-    open: true,
+    open: false,  // 关闭自动打开浏览器，避免使用 localhost
     proxy: {
       '/api': {
         target: 'http://localhost:8001',

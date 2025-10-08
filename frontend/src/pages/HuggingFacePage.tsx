@@ -62,20 +62,20 @@ const HuggingFacePage: React.FC = () => {
 
   // Pipeline类型映射
   const pipelineNames: Record<string, string> = {
-    'text-generation': 'Text Generation',
-    'text-classification': 'Text Classification',
-    'token-classification': 'Token Classification',
-    'question-answering': 'Question Answering',
-    'fill-mask': 'Fill Mask',
-    'summarization': 'Summarization',
-    'translation': 'Translation',
-    'text2text-generation': 'Text-to-Text Generation',
-    'conversational': 'Conversational',
-    'image-classification': 'Image Classification',
-    'object-detection': 'Object Detection',
-    'image-segmentation': 'Image Segmentation',
-    'speech-recognition': 'Speech Recognition',
-    'text-to-speech': 'Text-to-Speech'
+    'text-generation': '文本生成',
+    'text-classification': '文本分类',
+    'token-classification': '标记分类',
+    'question-answering': '问答系统',
+    'fill-mask': '填充遮罩',
+    'summarization': '文本摘要',
+    'translation': '机器翻译',
+    'text2text-generation': '文本到文本生成',
+    'conversational': '对话系统',
+    'image-classification': '图像分类',
+    'object-detection': '目标检测',
+    'image-segmentation': '图像分割',
+    'speech-recognition': '语音识别',
+    'text-to-speech': '文本转语音'
   }
 
   // 打开详细信息Modal
@@ -299,12 +299,12 @@ const HuggingFacePage: React.FC = () => {
           <Card>
             <Statistic
               title={t('huggingface.popularTask')}
-              value={stats?.pipeline_distribution ? 
-                pipelineNames[Object.keys(stats.pipeline_distribution)[0]] || 'Text Generation' : 
+              value={stats?.pipeline_distribution ?
+                pipelineNames[Object.keys(stats.pipeline_distribution)[0]] || 'Text Generation' :
                 'Text Generation'
               }
               prefix={<SearchOutlined style={{ color: '#722ed1' }} />}
-              valueStyle={{ color: '#722ed1' }}
+              valueStyle={{ color: '#722ed1', fontSize: '20px' }}
             />
           </Card>
         </Col>
@@ -329,11 +329,11 @@ const HuggingFacePage: React.FC = () => {
               placeholder={t('huggingface.taskFilter')}
             >
               <Option value="all">{t('huggingface.allTasks')}</Option>
-              <Option value="text-generation">Text Generation</Option>
-              <Option value="text-classification">Text Classification</Option>
-              <Option value="question-answering">Question Answering</Option>
-              <Option value="translation">Translation</Option>
-              <Option value="image-classification">Image Classification</Option>
+              <Option value="text-generation">文本生成</Option>
+              <Option value="text-classification">文本分类</Option>
+              <Option value="question-answering">问答系统</Option>
+              <Option value="translation">机器翻译</Option>
+              <Option value="image-classification">图像分类</Option>
             </Select>
           </Col>
         </Row>

@@ -16,6 +16,7 @@ class TechCardBase(BaseModel):
     stars: Optional[int] = 0                 # GitHub Stars
     forks: Optional[int] = 0                 # GitHub Forks
     issues: Optional[int] = 0                # Issue活跃度
+    quality_score: Optional[float] = 5.0     # 质量评分 (0-10)
     trial_suggestion: Optional[str] = None
     status: TrialStatus = TrialStatus.NOT_TRIED
     trial_notes: Optional[str] = None

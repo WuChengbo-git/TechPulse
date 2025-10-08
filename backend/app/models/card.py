@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, Enum, JSON
+from sqlalchemy import Column, Integer, String, Text, DateTime, Enum, JSON, Float
 from sqlalchemy.sql import func
 from ..core.database import Base
 import enum
@@ -33,6 +33,7 @@ class TechCard(Base):
     stars = Column(Integer, default=0)  # GitHub Stars
     forks = Column(Integer, default=0)  # GitHub Forks
     issues = Column(Integer, default=0)  # Issue活跃度
+    quality_score = Column(Float, default=5.0, index=True)  # 质量评分 (0-10)
     trial_suggestion = Column(Text)
     status = Column(Enum(TrialStatus), default=TrialStatus.NOT_TRIED, index=True)
     trial_notes = Column(Text)

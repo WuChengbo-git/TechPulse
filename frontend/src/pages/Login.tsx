@@ -58,9 +58,27 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         onLoginSuccess();
       }
     } catch (error: any) {
-      const errorMsg = error.response?.data?.detail ||
-        (isRegister ? t('login.registerFailed') : t('login.loginFailed'));
-      message.error(errorMsg);
+      console.error('认证错误:', error);
+      console.error('错误响应:', error.response);
+
+      let errorMsg = '';
+
+      // 优先使用后端返回的详细错误信息
+      if (error.response?.data?.detail) {
+        errorMsg = error.response.data.detail;
+      } else if (error.response?.status === 401) {
+        errorMsg = '用户名或密码错误';
+      } else if (error.response?.status === 400) {
+        errorMsg = error.response.data?.detail || '请求参数错误';
+      } else if (error.response?.status === 500) {
+        errorMsg = '服务器错误，请稍后重试';
+      } else if (error.message) {
+        errorMsg = `网络错误: ${error.message}`;
+      } else {
+        errorMsg = isRegister ? t('login.registerFailed') : t('login.loginFailed');
+      }
+
+      message.error(errorMsg, 5); // 显示5秒
     } finally {
       setLoading(false);
     }

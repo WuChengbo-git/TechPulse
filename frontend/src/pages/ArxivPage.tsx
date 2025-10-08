@@ -323,9 +323,12 @@ const ArxivPage: React.FC = () => {
           <Card>
             <Statistic
               title={t('arxiv.mainCategory')}
-              value={stats?.categories ? Object.keys(stats.categories)[0] || 'cs.AI' : 'cs.AI'}
+              value={stats?.categories ?
+                (categoryNames[Object.keys(stats.categories)[0]] || Object.keys(stats.categories)[0] || '大语言模型') :
+                '大语言模型'
+              }
               prefix={<CalendarOutlined style={{ color: '#fa8c16' }} />}
-              valueStyle={{ color: '#fa8c16' }}
+              valueStyle={{ color: '#fa8c16', fontSize: '20px' }}
             />
           </Card>
         </Col>
