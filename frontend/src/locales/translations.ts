@@ -165,6 +165,10 @@ export const translations: Record<Language, Translations> = {
       originalSummary: '原文概要：',
       translatedSummary: '翻译概要：',
       savedToNotion: '已保存到Notion！',
+      statistics: '数据统计',
+      total: '总计',
+      highQuality: '高质量内容',
+      hotTags: '热门标签',
     },
 
     github: {
@@ -304,6 +308,9 @@ export const translations: Record<Language, Translations> = {
       searchPlaceholder: '搜索文章...',
       typeFilter: '类型筛选',
       allTypes: '所有类型',
+      all: '全部',
+      popular: '热门',
+      recent: '最近',
       article: '文章',
       book: '书籍',
       scrap: '片段',
@@ -642,6 +649,10 @@ export const translations: Record<Language, Translations> = {
       originalSummary: 'Original Summary:',
       translatedSummary: 'Translated Summary:',
       savedToNotion: 'Saved to Notion!',
+      statistics: 'Statistics',
+      total: 'Total',
+      highQuality: 'High Quality',
+      hotTags: 'Hot Tags',
     },
 
     github: {
@@ -781,6 +792,9 @@ export const translations: Record<Language, Translations> = {
       searchPlaceholder: 'Search articles...',
       typeFilter: 'Type Filter',
       allTypes: 'All Types',
+      all: 'All',
+      popular: 'Popular',
+      recent: 'Recent',
       article: 'Article',
       book: 'Book',
       scrap: 'Scrap',
@@ -1120,6 +1134,10 @@ export const translations: Record<Language, Translations> = {
       originalSummary: '原文の概要：',
       translatedSummary: '翻訳された概要：',
       savedToNotion: 'Notionに保存しました！',
+      statistics: 'データ統計',
+      total: '合計',
+      highQuality: '高品質コンテンツ',
+      hotTags: '人気タグ',
     },
 
     github: {
@@ -1264,6 +1282,9 @@ export const translations: Record<Language, Translations> = {
       searchPlaceholder: '記事を検索...',
       typeFilter: 'タイプフィルタ',
       allTypes: 'すべてのタイプ',
+      all: 'すべて',
+      popular: '人気',
+      recent: '最近',
       article: '記事',
       book: '本',
       scrap: 'スクラップ',

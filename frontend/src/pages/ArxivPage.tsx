@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react'
-import { 
-  Card, Row, Col, Button, message, Typography, Space, 
+import {
+  Card, Row, Col, Button, message, Typography, Space,
   Statistic, List, Tag, Tabs, Input, Select, Progress, Alert, Modal, Divider
 } from 'antd'
-import { 
-  FileTextOutlined, SyncOutlined, BookOutlined, 
-  SearchOutlined, CalendarOutlined, LinkOutlined, EyeOutlined, 
+import {
+  FileTextOutlined, SyncOutlined, BookOutlined,
+  SearchOutlined, CalendarOutlined, LinkOutlined, EyeOutlined,
   MessageOutlined, SendOutlined
 } from '@ant-design/icons'
 import { useLanguage } from '../contexts/LanguageContext'
+import QualityBadge from '../components/QualityBadge'
 
 const { Title, Text, Paragraph } = Typography
 const { Search } = Input
@@ -24,6 +25,7 @@ interface ArxivPaper {
   chinese_tags?: string[]
   ai_category?: string[]
   created_at: string
+  quality_score?: number  // 质量评分
   // arXiv特有字段
   authors?: string[]
   abstract?: string
@@ -441,12 +443,17 @@ const ArxivPage: React.FC = () => {
                     <List.Item.Meta
                       title={
                         <div>
-                          <Text strong style={{ display: 'block', marginBottom: 4 }}>
-                            {paper.title || '无标题'}
-                          </Text>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
+                            <Text strong>
+                              {paper.title || '无标题'}
+                            </Text>
+                            {paper.quality_score !== undefined && (
+                              <QualityBadge score={paper.quality_score} size="small" />
+                            )}
+                          </div>
                           <div style={{ marginBottom: 8 }}>
                             {(paper.categories || []).map((cat, index) => (
-                              <Tag key={index} color="red">
+                              <Tag key={index} color="red" size="small">
                                 {categoryNames[cat] || cat}
                               </Tag>
                             ))}

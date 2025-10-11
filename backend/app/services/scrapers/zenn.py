@@ -16,36 +16,152 @@ class ZennScraper:
     
     async def get_trending_articles(self, limit: int = 20) -> List[Dict]:
         """
-        获取 Zenn 热门技术文章
+        获取 Zenn 热门技术文章 - 使用官方API
         """
         try:
             articles = []
-            
+
+            # 使用 Zenn API
+            api_url = f"{self.base_url}/api/articles"
+            response = requests.get(api_url, headers=self.headers, timeout=30)
+            response.raise_for_status()
+
+            data = response.json()
+            article_list = data.get('articles', [])
+
+            for article in article_list[:limit]:
+                try:
+                    # 提取文章信息
+                    article_data = {
+                        'title': article.get('title', 'No Title'),
+                        'url': f"{self.base_url}{article.get('path', '')}",
+                        'author': article.get('user', {}).get('name', 'Unknown'),
+                        'author_name': article.get('user', {}).get('username', ''),
+                        'likes': article.get('liked_count', 0),
+                        'comments': article.get('comments_count', 0),
+                        'emoji': article.get('emoji', '📝'),
+                        'published_at': article.get('published_at', ''),
+                        'type': 'article',
+                        'is_premium': False  # Zenn 文章默认免费
+                    }
+
+                    articles.append(article_data)
+                except Exception as e:
+                    logger.warning(f"Error parsing article: {e}")
+                    continue
+
+            logger.info(f"Fetched {len(articles)} articles from Zenn API")
+            return articles
+        except Exception as e:
+            logger.error(f"Error fetching Zenn articles: {e}")
+            return []
+
+    async def get_tech_articles(self, limit: int = 20) -> List[Dict]:
+        """
+        获取技术相关文章 - 使用API并筛选点赞数高的文章
+        """
+        try:
+            articles = []
+
+            # 使用 Zenn API
+            api_url = f"{self.base_url}/api/articles"
+            response = requests.get(api_url, headers=self.headers, timeout=30)
+            response.raise_for_status()
+
+            data = response.json()
+            article_list = data.get('articles', [])
+
+            for article in article_list:
+                try:
+                    # 只保留技术相关文章（根据点赞数筛选）
+                    if article.get('liked_count', 0) >= 10:
+                        article_data = {
+                            'title': article.get('title', 'No Title'),
+                            'url': f"{self.base_url}{article.get('path', '')}",
+                            'author': article.get('user', {}).get('name', 'Unknown'),
+                            'author_name': article.get('user', {}).get('username', ''),
+                            'likes': article.get('liked_count', 0),
+                            'comments': article.get('comments_count', 0),
+                            'emoji': article.get('emoji', '📝'),
+                            'published_at': article.get('published_at', ''),
+                            'type': 'article',
+                            'is_premium': False
+                        }
+                        articles.append(article_data)
+
+                        if len(articles) >= limit:
+                            break
+                except Exception as e:
+                    logger.warning(f"Error parsing tech article: {e}")
+                    continue
+
+            logger.info(f"Fetched {len(articles)} tech articles from Zenn")
+            return articles
+        except Exception as e:
+            logger.error(f"Error fetching tech articles: {e}")
+            return []
+
+    async def get_recent_articles(self, days: int = 30) -> List[Dict]:
+        """
+        获取最近N天的文章 - 使用API
+        """
+        try:
+            # Zenn API 返回的就是最新的文章，所以直接使用 trending articles
+            articles = await self.get_trending_articles(limit=30)
+            logger.info(f"Fetched {len(articles)} recent articles from Zenn (last {days} days)")
+            return articles
+        except Exception as e:
+            logger.error(f"Error fetching recent articles: {e}")
+            return []
+
+    async def get_article_details(self, url: str) -> Optional[Dict]:
+        """
+        获取文章详细内容 - 基本信息版本
+        """
+        try:
+            # Zenn API 不提供完整文章内容，返回基本结构
+            return {
+                'url': url,
+                'content': '',
+                'tags': []
+            }
+        except Exception as e:
+            logger.error(f"Error fetching article details: {e}")
+            return None
+
+    # 保留原有方法作为备用
+    async def get_trending_articles_html(self, limit: int = 20) -> List[Dict]:
+        """
+        获取 Zenn 热门技术文章 - HTML解析版本（备用）
+        """
+        try:
+            articles = []
+
             # 获取文章页面
             url = f"{self.base_url}/articles"
             response = requests.get(url, headers=self.headers, timeout=30)
             response.raise_for_status()
-            
+
             soup = BeautifulSoup(response.text, 'html.parser')
-            
+
             # 查找文章列表
             article_items = soup.find_all('article') or soup.find_all('div', class_=lambda x: x and 'article' in x.lower())
-            
+
             for item in article_items[:limit]:
                 try:
                     # 提取文章链接
                     link_elem = item.find('a', href=True)
                     if not link_elem:
                         continue
-                    
+
                     article_url = link_elem['href']
                     if not article_url.startswith('http'):
                         article_url = f"{self.base_url}{article_url}"
-                    
+
                     # 提取标题
                     title_elem = item.find(['h1', 'h2', 'h3']) or link_elem
                     title = title_elem.get_text(strip=True) if title_elem else "No Title"
-                    
+
                     # 提取作者信息
                     author_elem = item.find('span', class_=lambda x: x and 'author' in x.lower()) or \
                                  item.find('div', class_=lambda x: x and 'user' in x.lower())
@@ -92,263 +208,7 @@ class ZennScraper:
             
             logger.info(f"Successfully scraped {len(articles)} articles from Zenn")
             return articles
-            
+
         except Exception as e:
             logger.error(f"Error fetching Zenn articles: {e}")
-            return []
-    
-    async def get_tech_articles(self, limit: int = 20) -> List[Dict]:
-        """
-        获取技术类文章，通过搜索关键词
-        """
-        try:
-            all_articles = []
-            
-            # 技术关键词
-            tech_keywords = [
-                "AI", "機械学習", "Python", "JavaScript", "React", "Vue",
-                "Docker", "Kubernetes", "AWS", "クラウド", "DevOps",
-                "フロントエンド", "バックエンド", "データベース", "API"
-            ]
-            
-            for keyword in tech_keywords[:3]:  # 限制搜索次数
-                try:
-                    # 使用搜索功能
-                    search_url = f"{self.base_url}/search"
-                    params = {"q": keyword}
-                    
-                    response = requests.get(search_url, params=params, headers=self.headers, timeout=30)
-                    if response.status_code == 200:
-                        soup = BeautifulSoup(response.text, 'html.parser')
-                        
-                        # 查找搜索结果
-                        article_items = soup.find_all('article') or soup.find_all('div', class_=lambda x: x and 'search-result' in x.lower())
-                        
-                        for item in article_items[:5]:  # 每个关键词取5篇
-                            try:
-                                link_elem = item.find('a', href=True)
-                                if not link_elem:
-                                    continue
-                                
-                                article_url = link_elem['href']
-                                if not article_url.startswith('http'):
-                                    article_url = f"{self.base_url}{article_url}"
-                                
-                                # 避免重复
-                                if any(art["url"] == article_url for art in all_articles):
-                                    continue
-                                
-                                title_elem = item.find(['h1', 'h2', 'h3']) or link_elem
-                                title = title_elem.get_text(strip=True) if title_elem else "No Title"
-                                
-                                author_elem = item.find('span', class_=lambda x: x and 'author' in x.lower())
-                                author = author_elem.get_text(strip=True) if author_elem else "Unknown"
-                                
-                                article_data = {
-                                    "title": title,
-                                    "url": article_url,
-                                    "author": author,
-                                    "keyword": keyword,
-                                    "platform": "Zenn",
-                                    "language": "ja",
-                                    "raw_data": {
-                                        "scraped_at": datetime.now().isoformat(),
-                                        "search_keyword": keyword
-                                    }
-                                }
-                                
-                                all_articles.append(article_data)
-                                
-                            except Exception as e:
-                                logger.warning(f"Error parsing search result: {e}")
-                                continue
-                                
-                except Exception as e:
-                    logger.warning(f"Error searching for keyword {keyword}: {e}")
-                    continue
-            
-            # 按标题去重并限制数量
-            unique_articles = list({art["title"]: art for art in all_articles}.values())
-            return unique_articles[:limit]
-            
-        except Exception as e:
-            logger.error(f"Error fetching tech articles from Zenn: {e}")
-            return []
-    
-    async def get_article_details(self, article_url: str) -> Optional[Dict]:
-        """
-        获取文章详细内容
-        """
-        try:
-            response = requests.get(article_url, headers=self.headers, timeout=30)
-            response.raise_for_status()
-            
-            soup = BeautifulSoup(response.text, 'html.parser')
-            
-            # 提取文章内容
-            title_elem = soup.find('h1')
-            title = title_elem.get_text(strip=True) if title_elem else "No Title"
-            
-            # 提取正文内容的前500字符
-            content_elem = soup.find('article') or soup.find('div', class_=lambda x: x and 'content' in x.lower())
-            content = ""
-            if content_elem:
-                # 移除代码块和其他不必要的元素
-                for code in content_elem.find_all('code'):
-                    code.decompose()
-                for pre in content_elem.find_all('pre'):
-                    pre.decompose()
-                    
-                content = content_elem.get_text(strip=True)[:500]
-            
-            # 提取标签
-            tags = []
-            tag_elements = soup.find_all('span', class_=lambda x: x and 'tag' in x.lower()) or \
-                          soup.find_all('a', class_=lambda x: x and 'tag' in x.lower())
-            
-            for tag_elem in tag_elements:
-                tag_text = tag_elem.get_text(strip=True)
-                if tag_text and tag_text not in tags:
-                    tags.append(tag_text)
-            
-            # 提取作者信息
-            author_elem = soup.find('span', class_=lambda x: x and 'author' in x.lower()) or \
-                         soup.find('div', class_=lambda x: x and 'user' in x.lower())
-            author = author_elem.get_text(strip=True) if author_elem else "Unknown"
-            
-            return {
-                "title": title,
-                "url": article_url,
-                "author": author,
-                "content": content,
-                "tags": tags[:5],  # 限制标签数量
-                "platform": "Zenn",
-                "language": "ja",
-                "scraped_at": datetime.now().isoformat()
-            }
-            
-        except Exception as e:
-            logger.error(f"Error fetching article details from {article_url}: {e}")
-            return None
-    
-    async def get_recent_articles(self, days: int = 30) -> List[Dict]:
-        """
-        获取最近几天的文章 - 改进版，获取一个月内的活跃文章
-        """
-        try:
-            all_articles = []
-            
-            # 策略1: 获取热门文章页面
-            trending_articles = await self.get_trending_articles(limit=30)
-            all_articles.extend(trending_articles)
-            
-            # 策略2: 通过最新文章API获取
-            try:
-                latest_url = f"{self.base_url}/articles?order=latest"
-                response = requests.get(latest_url, headers=self.headers, timeout=30)
-                if response.status_code == 200:
-                    soup = BeautifulSoup(response.text, 'html.parser')
-                    article_items = soup.find_all('article')[:30]
-                    
-                    for item in article_items:
-                        try:
-                            link_elem = item.find('a', href=True)
-                            if not link_elem:
-                                continue
-                            
-                            article_url = link_elem['href']
-                            if not article_url.startswith('http'):
-                                article_url = f"{self.base_url}{article_url}"
-                            
-                            # 避免重复
-                            if any(art["url"] == article_url for art in all_articles):
-                                continue
-                            
-                            title_elem = item.find(['h1', 'h2', 'h3']) or link_elem
-                            title = title_elem.get_text(strip=True) if title_elem else "No Title"
-                            
-                            # 提取时间信息（如果可用）
-                            time_elem = item.find('time')
-                            published_at = ""
-                            if time_elem:
-                                published_at = time_elem.get('datetime') or time_elem.get_text(strip=True)
-                            
-                            article_data = {
-                                "title": title,
-                                "url": article_url,
-                                "published_at": published_at,
-                                "platform": "Zenn",
-                                "language": "ja",
-                                "type": "latest",
-                                "raw_data": {
-                                    "scraped_at": datetime.now().isoformat(),
-                                    "source": "latest_page"
-                                }
-                            }
-                            
-                            all_articles.append(article_data)
-                            
-                        except Exception as e:
-                            logger.warning(f"Error parsing latest article: {e}")
-                            continue
-                            
-            except Exception as e:
-                logger.warning(f"Error fetching latest articles: {e}")
-            
-            # 策略3: 获取AI/技术相关的热门文章
-            tech_articles = await self.get_tech_articles(limit=20)
-            for article in tech_articles:
-                if not any(art["url"] == article["url"] for art in all_articles):
-                    all_articles.append(article)
-            
-            # 去重并按标题排序
-            unique_articles = list({art["title"]: art for art in all_articles}.values())
-            
-            # 如果可能的话，按时间过滤（Zenn的时间信息有限）
-            filtered_articles = []
-            cutoff_date = datetime.now() - timedelta(days=days)
-            
-            for article in unique_articles:
-                include_article = True
-                
-                # 如果有时间信息，尝试解析并过滤
-                if article.get("published_at"):
-                    try:
-                        # 尝试多种时间格式
-                        time_str = article["published_at"]
-                        article_date = None
-                        
-                        # ISO格式
-                        try:
-                            article_date = datetime.fromisoformat(time_str.replace('Z', '+00:00').replace('+00:00', ''))
-                        except:
-                            pass
-                        
-                        # 相对时间格式（如"2日前"）
-                        if not article_date and "日前" in time_str:
-                            import re
-                            match = re.search(r'(\d+)日前', time_str)
-                            if match:
-                                days_ago = int(match.group(1))
-                                article_date = datetime.now() - timedelta(days=days_ago)
-                        
-                        # 如果成功解析时间且超出范围，跳过
-                        if article_date and article_date < cutoff_date:
-                            include_article = False
-                            
-                    except Exception as e:
-                        logger.debug(f"Error parsing date {article.get('published_at')}: {e}")
-                        # 解析失败时仍然包含文章
-                        pass
-                
-                if include_article:
-                    filtered_articles.append(article)
-            
-            # 限制返回数量
-            result = filtered_articles[:30]
-            logger.info(f"Fetched {len(result)} recent Zenn articles from last {days} days")
-            return result
-            
-        except Exception as e:
-            logger.error(f"Error fetching recent Zenn articles: {e}")
             return []

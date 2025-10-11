@@ -3,10 +3,14 @@ import { ConfigProvider, Layout, Button, Breadcrumb, Typography, Space, Avatar, 
 import type { MenuProps } from 'antd'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { MenuFoldOutlined, MenuUnfoldOutlined, BellOutlined, SettingOutlined, LogoutOutlined, UserOutlined, GlobalOutlined, LockOutlined, ProfileOutlined, SafetyOutlined, QuestionCircleOutlined, InfoCircleOutlined } from '@ant-design/icons'
+import { QueryClientProvider } from '@tanstack/react-query'
+import { queryClient } from './lib/queryClient'
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext'
 import Sidebar from './components/Sidebar'
 import VersionInfo from './components/VersionInfo'
 import LanguageSelector from './components/LanguageSelector'
+import InterestSurvey from './components/InterestSurvey'
+import type { UserPreferences } from './components/InterestSurvey'
 import Dashboard from './pages/Dashboard'
 import Overview from './pages/Overview'
 import GitHubPage from './pages/GitHubPage'
@@ -22,6 +26,7 @@ import TaskManagementPage from './pages/TaskManagementPage'
 import SystemStatusPage from './pages/SystemStatusPage'
 import Login from './pages/Login'
 import './App.css'
+import './styles/responsive.css'
 
 const { Header, Content, Footer } = Layout
 const { Text } = Typography
@@ -32,6 +37,7 @@ function AppContent() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [username, setUsername] = useState('')
   const [changePasswordVisible, setChangePasswordVisible] = useState(false)
+  const [surveyVisible, setSurveyVisible] = useState(false)
   const [form] = Form.useForm()
   const { t, language, setLanguage } = useLanguage()
 
@@ -54,6 +60,30 @@ function AppContent() {
     }
   }, [])
 
+  // 检查是否需要显示问卷
+  const checkSurveyStatus = async () => {
+    const token = localStorage.getItem('techpulse_token') || sessionStorage.getItem('techpulse_token')
+    if (!token) return
+
+    try {
+      const response = await fetch('/api/v1/preferences/', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+
+      if (response.ok) {
+        const preferences = await response.json()
+        // 如果用户未完成问卷，显示问卷
+        if (!preferences.onboarding_completed) {
+          setSurveyVisible(true)
+        }
+      }
+    } catch (error) {
+      console.error('Failed to check survey status:', error)
+    }
+  }
+
   // 处理登录成功
   const handleLoginSuccess = () => {
     const localUser = localStorage.getItem('techpulse_user')
@@ -67,6 +97,9 @@ function AppContent() {
     } catch {
       setUsername(userStr)
     }
+
+    // 检查是否需要显示问卷
+    checkSurveyStatus()
   }
 
   // 处理登出
@@ -77,6 +110,18 @@ function AppContent() {
     sessionStorage.removeItem('techpulse_user')
     setIsLoggedIn(false)
     setUsername('')
+  }
+
+  // 处理问卷完成
+  const handleSurveyComplete = (preferences: UserPreferences) => {
+    setSurveyVisible(false)
+    message.success('欢迎使用 TechPulse！我们将根据你的偏好推荐内容 🎉')
+  }
+
+  // 处理跳过问卷
+  const handleSurveySkip = () => {
+    setSurveyVisible(false)
+    message.info('你可以随时在个人中心完成偏好设置')
   }
 
   // 处理修改密码
@@ -371,6 +416,13 @@ function AppContent() {
             </Form.Item>
           </Form>
         </Modal>
+
+        {/* 用户兴趣问卷 */}
+        <InterestSurvey
+          visible={surveyVisible}
+          onComplete={handleSurveyComplete}
+          onSkip={handleSurveySkip}
+        />
       </Router>
     </ConfigProvider>
   )
@@ -378,9 +430,11 @@ function AppContent() {
 
 function App() {
   return (
-    <LanguageProvider>
-      <AppContent />
-    </LanguageProvider>
+    <QueryClientProvider client={queryClient}>
+      <LanguageProvider>
+        <AppContent />
+      </LanguageProvider>
+    </QueryClientProvider>
   )
 }
 

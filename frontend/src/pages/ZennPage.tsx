@@ -9,6 +9,7 @@ import {
   CalendarOutlined, BookOutlined, EyeOutlined, MessageOutlined, SendOutlined
 } from '@ant-design/icons'
 import { useLanguage } from '../contexts/LanguageContext'
+import QualityBadge from '../components/QualityBadge'
 
 const { Title, Text, Paragraph } = Typography
 const { Search } = Input
@@ -23,6 +24,7 @@ interface ZennArticle {
   summary?: string
   chinese_tags?: string[]
   created_at: string
+  quality_score?: number
   // Zenn特有字段
   content_excerpt?: string
   author_name?: string
@@ -380,10 +382,13 @@ const ZennPage: React.FC = () => {
                       }
                       title={
                         <div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
                             <Text strong>{article.title || '无标题'}</Text>
+                            {article.quality_score !== undefined && (
+                              <QualityBadge score={article.quality_score} size="small" />
+                            )}
                             <Tag color="blue">
-                              {article.type === 'article' ? t('zenn.article') : 
+                              {article.type === 'article' ? t('zenn.article') :
                                article.type === 'book' ? t('zenn.book') : t('zenn.scrap')}
                             </Tag>
                             {article.is_premium && (

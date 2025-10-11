@@ -1,0 +1,141 @@
+/* 响应式优化样式 */
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+  /* 头部按钮组 */
+  .header-actions {
+    flex-direction: column;
+    gap: 8px !important;
+  }
+
+  /* 搜索框全宽 */
+  .search-bar {
+    width: 100% !important;
+  }
+
+  /* 卡片标题文字缩小 */
+  .card-title {
+    font-size: 13px !important;
+  }
+
+  /* 统计卡片调整 */
+  .stats-card {
+    margin-bottom: 12px !important;
+  }
+
+  /* 按钮文字隐藏，只显示图标 */
+  .mobile-icon-only .ant-btn-text {
+    display: none;
+  }
+
+  /* 标签字体缩小 */
+  .ant-tag {
+    font-size: 11px !important;
+  }
+
+  /* Modal全屏显示 */
+  .ant-modal {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .ant-modal-content {
+    border-radius: 0 !important;
+  }
+}
+
+/* 平板优化 */
+@media (min-width: 768px) and (max-width: 1024px) {
+  /* 侧边栏自动收起 */
+  .ant-layout-sider {
+    width: 80px !important;
+  }
+
+  /* 卡片网格调整 */
+  .content-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* 大屏优化 */
+@media (min-width: 1920px) {
+  /* 内容最大宽度限制 */
+  .content-wrapper {
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+
+  /* 卡片网格3列 */
+  .content-grid-large {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+/* 图片懒加载优化 */
+img[loading="lazy"] {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+img[loading="lazy"].loaded {
+  opacity: 1;
+}
+
+/* 骨架屏动画 */
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e0e0e0 50%,
+    #f0f0f0 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+/* 无限滚动加载指示器 */
+.loading-more {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+  /* 增大点击区域 */
+  .ant-btn {
+    min-height: 44px !important;
+  }
+
+  /* 卡片间距增大 */
+  .ant-card {
+    margin-bottom: 16px !important;
+  }
+
+  /* 移除hover效果 */
+  .ant-card-hoverable:hover {
+    box-shadow: 0 1px 2px -2px rgba(0, 0, 0, 0.16), 0 3px 6px 0 rgba(0, 0, 0, 0.12), 0 5px 12px 4px rgba(0, 0, 0, 0.09) !important;
+    border-color: transparent !important;
+  }
+}
+
+/* 打印样式 */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .ant-card {
+    page-break-inside: avoid;
+  }
+}

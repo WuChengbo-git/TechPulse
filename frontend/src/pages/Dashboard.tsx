@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { Card, Row, Col, Typography, Spin, Alert, Button, Tag, Space, Select, Modal, message, Tabs, Input, Badge, Divider } from 'antd'
-import { GithubOutlined, FileTextOutlined, RobotOutlined, SyncOutlined, TranslationOutlined, SettingOutlined, SearchOutlined, StarOutlined, ForkOutlined, ExclamationCircleOutlined, EyeOutlined, CloudDownloadOutlined, LinkOutlined } from '@ant-design/icons'
+import { Card, Row, Col, Typography, Spin, Alert, Button, Tag, Space, Select, Modal, message, Tabs, Input, Badge, Divider, Statistic, List } from 'antd'
+import { GithubOutlined, FileTextOutlined, RobotOutlined, SyncOutlined, TranslationOutlined, SettingOutlined, SearchOutlined, StarOutlined, ForkOutlined, ExclamationCircleOutlined, EyeOutlined, CloudDownloadOutlined, LinkOutlined, FireOutlined, TrophyOutlined, RiseOutlined } from '@ant-design/icons'
 import { useLanguage } from '../contexts/LanguageContext'
+import QualityBadge from '../components/QualityBadge'
 
 const { Title, Paragraph, Text } = Typography
 const { Search } = Input
@@ -23,6 +24,7 @@ interface TechCard {
   trial_suggestion?: string
   status: string
   created_at: string
+  quality_score?: number
 }
 
 interface Language {
@@ -276,28 +278,36 @@ const Dashboard: React.FC = () => {
           </Space>
         </div>
 
-        {/* 搜索和操作栏 */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        {/* 搜索和操作栏 - 移动端优化 */}
+        <div style={{
+          display: 'flex',
+          flexDirection: window.innerWidth < 768 ? 'column' : 'row',
+          justifyContent: 'space-between',
+          alignItems: window.innerWidth < 768 ? 'stretch' : 'center',
+          gap: window.innerWidth < 768 ? '12px' : '0',
+          marginBottom: 16
+        }}>
           <Search
             placeholder={t('dashboard.searchPlaceholder')}
             allowClear
-            style={{ width: 400 }}
+            style={{ width: window.innerWidth < 768 ? '100%' : 400 }}
             onChange={(e) => setSearchQuery(e.target.value)}
             prefix={<SearchOutlined />}
+            className="search-bar"
           />
-          <Space>
-            <Button 
-              type="primary" 
+          <Space className="header-actions">
+            <Button
+              type="primary"
               icon={<SyncOutlined />}
               onClick={() => fetchCards(activeTab === 'all' ? undefined : activeTab)}
             >
-              {t('dashboard.refresh')}
+              {window.innerWidth >= 768 && t('dashboard.refresh')}
             </Button>
-            <Button 
+            <Button
               icon={<SyncOutlined />}
               onClick={triggerDataCollection}
             >
-              {t('dashboard.collectNewData')}
+              {window.innerWidth >= 768 && t('dashboard.collectNewData')}
             </Button>
           </Space>
         </div>
@@ -355,28 +365,34 @@ const Dashboard: React.FC = () => {
         />
       )}
 
-      {/* 卡片列表 */}
-      <Row gutter={[16, 16]}>
-        {filteredCards.map((card) => (
-          <Col xs={24} sm={12} lg={8} xl={6} key={card.id}>
-            <Card
-              hoverable
-              size="small"
-              title={
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ color: getSourceColor(card.source) }}>
-                    {getSourceIcon(card.source)}
-                  </span>
-                  <span style={{ fontSize: '14px', fontWeight: 'normal' }}>
-                    {card.title.length > 25 ? card.title.substring(0, 25) + '...' : card.title}
-                  </span>
-                </div>
-              }
-              extra={
-                <Tag color={getSourceColor(card.source)}>
-                  {card.source.toUpperCase()}
-                </Tag>
-              }
+      {/* 两栏布局 */}
+      <Row gutter={24}>
+        {/* 左侧：内容信息流 */}
+        <Col xs={24} lg={16}>
+          <Row gutter={[16, 16]}>
+            {filteredCards.map((card) => (
+              <Col xs={24} sm={12} key={card.id}>
+                <Card
+                  hoverable
+                  size="small"
+                  title={
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                      <span style={{ color: getSourceColor(card.source) }}>
+                        {getSourceIcon(card.source)}
+                      </span>
+                      <span style={{ fontSize: '14px', fontWeight: 'normal' }}>
+                        {card.title.length > 30 ? card.title.substring(0, 30) + '...' : card.title}
+                      </span>
+                      {card.quality_score !== undefined && (
+                        <QualityBadge score={card.quality_score} size="small" showLabel={false} />
+                      )}
+                    </div>
+                  }
+                  extra={
+                    <Tag color={getSourceColor(card.source)}>
+                      {card.source.toUpperCase()}
+                    </Tag>
+                  }
               actions={[
                 <Button
                   type="text"
@@ -497,6 +513,128 @@ const Dashboard: React.FC = () => {
             </Card>
           </Col>
         ))}
+          </Row>
+        </Col>
+
+        {/* 右侧：统计和趋势 */}
+        <Col xs={24} lg={8}>
+          {/* 数据统计卡片 */}
+          <Card
+            title={<span><RiseOutlined /> {t('dashboard.statistics')}</span>}
+            style={{ marginBottom: 16 }}
+            size="small"
+          >
+            <Row gutter={16}>
+              <Col span={12}>
+                <Statistic
+                  title={t('dashboard.total')}
+                  value={cards.length}
+                  prefix={<SettingOutlined />}
+                />
+              </Col>
+              <Col span={12}>
+                <Statistic
+                  title="GitHub"
+                  value={cards.filter(c => c.source === 'github').length}
+                  prefix={<GithubOutlined />}
+                  valueStyle={{ color: '#24292e' }}
+                />
+              </Col>
+              <Col span={12} style={{ marginTop: 16 }}>
+                <Statistic
+                  title="arXiv"
+                  value={cards.filter(c => c.source === 'arxiv').length}
+                  prefix={<FileTextOutlined />}
+                  valueStyle={{ color: '#b31b1b' }}
+                />
+              </Col>
+              <Col span={12} style={{ marginTop: 16 }}>
+                <Statistic
+                  title="HuggingFace"
+                  value={cards.filter(c => c.source === 'huggingface').length}
+                  prefix={<RobotOutlined />}
+                  valueStyle={{ color: '#ff6f00' }}
+                />
+              </Col>
+            </Row>
+          </Card>
+
+          {/* 高质量内容 */}
+          <Card
+            title={<span><TrophyOutlined /> {t('dashboard.highQuality')}</span>}
+            style={{ marginBottom: 16 }}
+            size="small"
+          >
+            <List
+              size="small"
+              dataSource={cards
+                .filter(c => c.quality_score && c.quality_score >= 7.0)
+                .sort((a, b) => (b.quality_score || 0) - (a.quality_score || 0))
+                .slice(0, 5)}
+              renderItem={(card) => (
+                <List.Item
+                  style={{ cursor: 'pointer', padding: '8px 0' }}
+                  onClick={() => showDetail(card)}
+                >
+                  <div style={{ width: '100%' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
+                      <Text ellipsis style={{ flex: 1, fontSize: '12px' }}>
+                        {card.title}
+                      </Text>
+                      {card.quality_score !== undefined && (
+                        <QualityBadge score={card.quality_score} size="small" showLabel={false} />
+                      )}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <Tag color={getSourceColor(card.source)} style={{ fontSize: '10px', margin: 0 }}>
+                        {card.source}
+                      </Tag>
+                      <Text type="secondary" style={{ fontSize: '10px' }}>
+                        {new Date(card.created_at).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })}
+                      </Text>
+                    </div>
+                  </div>
+                </List.Item>
+              )}
+            />
+          </Card>
+
+          {/* 热门标签 */}
+          <Card
+            title={<span><FireOutlined /> {t('dashboard.hotTags')}</span>}
+            size="small"
+          >
+            {(() => {
+              const tagCount: Record<string, number> = {}
+              cards.forEach(card => {
+                card.chinese_tags?.forEach(tag => {
+                  tagCount[tag] = (tagCount[tag] || 0) + 1
+                })
+                card.ai_category?.forEach(cat => {
+                  tagCount[cat] = (tagCount[cat] || 0) + 1
+                })
+              })
+              const sortedTags = Object.entries(tagCount)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 12)
+
+              return (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {sortedTags.map(([tag, count]) => (
+                    <Tag
+                      key={tag}
+                      color="blue"
+                      style={{ marginBottom: 0, cursor: 'pointer' }}
+                      onClick={() => setSearchQuery(tag)}
+                    >
+                      {tag} ({count})
+                    </Tag>
+                  ))}
+                </div>
+              )
+            })()}
+          </Card>
+        </Col>
       </Row>
 
       {/* 详情模态框 */}

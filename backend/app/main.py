@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .core.config import settings
 from .core.database import engine, Base
-from .api import cards, sources, ai, notion, chat, auth, translate, user_settings
+from .api import cards, sources, ai, notion, chat, auth, translate, user_settings, preferences, ai_config, health
 from .api import settings as settings_api
 from .services.scheduler import task_scheduler
 import logging
@@ -30,11 +30,14 @@ app.include_router(auth.router, prefix="/api/v1")  # 认证路由
 app.include_router(cards.router, prefix="/api/v1")
 app.include_router(sources.router, prefix="/api/v1")
 app.include_router(ai.router, prefix="/api/v1")
+app.include_router(ai_config.router, prefix="/api/v1")  # AI配置路由
 app.include_router(notion.router, prefix="/api/v1")
 app.include_router(chat.router, prefix="/api/v1")
 app.include_router(settings_api.router, prefix="/api/v1")
 app.include_router(translate.router, prefix="/api/v1")  # 翻译路由
 app.include_router(user_settings.router)  # 用户设置路由（已包含prefix）
+app.include_router(preferences.router, prefix="/api/v1")  # 用户偏好路由
+app.include_router(health.router, prefix="/api/v1")  # 健康检查路由
 
 
 @app.on_event("startup")

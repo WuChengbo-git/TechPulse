@@ -80,52 +80,64 @@ class QualityScorer:
         - Commit活跃度：维护状态
         - 文档完整性：README/Wiki/文档
         """
-        score = 0.0
+        # 基础分数3分，所有repo都有一定价值
+        score = 3.0
 
-        # 1. Star数量得分（最高3分）
+        # 1. Star数量得分（最高4分）- 大幅降低阈值
         stars = repo.get('stars', 0) or 0
-        if stars >= 10000:
-            score += 3.0
-        elif stars >= 5000:
-            score += 2.5
+        if stars >= 5000:
+            score += 4.0
+        elif stars >= 2000:
+            score += 3.5
         elif stars >= 1000:
-            score += 2.0
+            score += 3.0
         elif stars >= 500:
-            score += 1.5
+            score += 2.5
+        elif stars >= 200:
+            score += 2.0
         elif stars >= 100:
+            score += 1.5
+        elif stars >= 50:
+            score += 1.2
+        elif stars >= 20:
             score += 1.0
+        elif stars >= 10:
+            score += 0.8
         else:
             score += 0.5
 
-        # 2. Star增速得分（最高2.5分）
-        # 如果有star_growth_rate字段（需要后续采集）
+        # 2. Fork和活跃度综合得分（最高1.5分）
+        # Star增速（如果有）
         star_growth = repo.get('star_growth_rate', 0) or 0
-        score += min(star_growth * 100, 2.5)
+        score += min(star_growth * 100, 0.8)
 
-        # 3. 活跃度得分（最高2.5分）
-        # 检查最近30天的commit数
+        # Commit活跃度（降低阈值）
         commit_count = repo.get('commit_count_30d', 0) or 0
-        if commit_count >= 100:
-            score += 2.5
-        elif commit_count >= 50:
-            score += 2.0
+        if commit_count >= 50:
+            score += 0.7
         elif commit_count >= 20:
-            score += 1.5
-        elif commit_count >= 10:
-            score += 1.0
-        elif commit_count >= 5:
             score += 0.5
+        elif commit_count >= 5:
+            score += 0.3
 
-        # 4. 文档完整性得分（最高2分）
+        # 3. 文档完整性得分（最高1.5分）
         description = repo.get('description', '') or ''
         summary = repo.get('summary', '') or ''
-        has_readme = len(description) > 50 or len(summary) > 50
+        combined_desc = description + summary
 
-        if has_readme:
+        # 基础文档得分
+        if len(combined_desc) > 200:
             score += 1.0
-            # 如果描述详细（超过200字符），额外加分
-            if len(description + summary) > 200:
-                score += 1.0
+        elif len(combined_desc) > 100:
+            score += 0.8
+        elif len(combined_desc) > 50:
+            score += 0.5
+        elif len(combined_desc) > 20:
+            score += 0.3
+
+        # 详细描述额外加分
+        if len(combined_desc) > 500:
+            score += 0.5
 
         return min(score, 10.0)
 
@@ -227,50 +239,66 @@ class QualityScorer:
         - 文档质量：描述完整性
         - 社区互动：点赞数
         """
-        score = 0.0
+        # 基础分数3分
+        score = 3.0
 
-        # 1. 下载量得分（最高3分）
+        # 1. 下载量得分（最高3.5分）- 大幅降低阈值
         downloads = model.get('downloads', 0) or 0
-        if downloads >= 1000000:
-            score += 3.0
+        if downloads >= 500000:
+            score += 3.5
         elif downloads >= 100000:
+            score += 3.0
+        elif downloads >= 50000:
             score += 2.5
         elif downloads >= 10000:
             score += 2.0
-        elif downloads >= 1000:
+        elif downloads >= 5000:
             score += 1.5
-        elif downloads >= 100:
+        elif downloads >= 1000:
+            score += 1.2
+        elif downloads >= 500:
             score += 1.0
+        elif downloads >= 100:
+            score += 0.8
+        elif downloads >= 50:
+            score += 0.6
         else:
-            score += 0.5
+            score += 0.3
 
-        # 2. 下载增速（最高2.5分）
-        # 如果有download_growth字段（需要后续采集）
+        # 2. 下载增速（最高1分）
         download_growth = model.get('download_growth_rate', 0) or 0
-        score += min(download_growth * 100, 2.5)
+        score += min(download_growth * 100, 1.0)
 
-        # 3. 文档质量（最高2.5分）
+        # 3. 文档质量（最高1.5分）
         description = model.get('description', '') or model.get('summary', '') or ''
 
         if len(description) > 500:
-            score += 2.5
-        elif len(description) > 200:
-            score += 2.0
-        elif len(description) > 100:
             score += 1.5
-        elif len(description) > 50:
+        elif len(description) > 300:
+            score += 1.2
+        elif len(description) > 150:
             score += 1.0
+        elif len(description) > 80:
+            score += 0.7
+        elif len(description) > 30:
+            score += 0.4
 
-        # 4. 社区互动（最高2分）
+        # 4. 社区互动（最高1分）- 降低阈值
         likes = model.get('likes', 0) or 0
-        if likes >= 1000:
-            score += 2.0
-        elif likes >= 500:
-            score += 1.5
-        elif likes >= 100:
+        if likes >= 500:
             score += 1.0
+        elif likes >= 200:
+            score += 0.9
+        elif likes >= 100:
+            score += 0.8
+        elif likes >= 50:
+            score += 0.7
+        elif likes >= 20:
+            score += 0.6
         elif likes >= 10:
             score += 0.5
+        elif likes >= 5:
+            score += 0.3
 
         return min(score, 10.0)
 
@@ -282,50 +310,65 @@ class QualityScorer:
         - 点赞数：内容质量认可
         - 评论数：互动热度
         - Premium标识：付费内容通常质量更高
-        - 作者声誉：历史文章质量
+        - 内容完整性：文章长度和质量
         """
-        score = 0.0
+        # 基础分数3.5分（Zenn是精选平台）
+        score = 3.5
 
-        # 1. 点赞数（最高3分）
+        # 1. 点赞数（最高3分）- 大幅降低阈值
         likes = article.get('likes', 0) or 0
-        if likes >= 100:
+        if likes >= 50:
             score += 3.0
-        elif likes >= 50:
+        elif likes >= 30:
             score += 2.5
         elif likes >= 20:
-            score += 2.0
+            score += 2.2
         elif likes >= 10:
-            score += 1.5
+            score += 2.0
         elif likes >= 5:
+            score += 1.5
+        elif likes >= 3:
+            score += 1.2
+        elif likes >= 1:
             score += 1.0
         else:
             score += 0.5
 
-        # 2. 评论数（最高2分）
+        # 2. 评论数（最高1.5分）- 降低阈值
         comments = article.get('comments', 0) or 0
-        if comments >= 20:
-            score += 2.0
-        elif comments >= 10:
+        if comments >= 10:
             score += 1.5
         elif comments >= 5:
+            score += 1.2
+        elif comments >= 3:
             score += 1.0
-        elif comments >= 2:
-            score += 0.5
+        elif comments >= 1:
+            score += 0.7
+        else:
+            score += 0.3
 
-        # 3. Premium标识（最高3分）
+        # 3. Premium标识（最高1分）
         is_premium = article.get('is_premium', False) or False
         if is_premium:
-            score += 3.0
-
-        # 4. 作者声誉（最高2分）
-        # 基于文章长度和完整性
-        summary = article.get('summary', '') or ''
-        if len(summary) > 300:
-            score += 2.0
-        elif len(summary) > 150:
-            score += 1.5
-        elif len(summary) > 50:
             score += 1.0
+
+        # 4. 内容完整性（最高1分）
+        summary = article.get('summary', '') or ''
+        title = article.get('title', '') or ''
+
+        # 摘要长度评分
+        if len(summary) > 300:
+            score += 0.7
+        elif len(summary) > 150:
+            score += 0.5
+        elif len(summary) > 50:
+            score += 0.4
+        elif len(summary) > 20:
+            score += 0.2
+
+        # 标题质量评分
+        if len(title) > 20:
+            score += 0.3
 
         return min(score, 10.0)
 

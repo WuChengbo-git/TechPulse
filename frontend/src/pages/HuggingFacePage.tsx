@@ -9,6 +9,7 @@ import {
   EyeOutlined, MessageOutlined, SendOutlined, LinkOutlined
 } from '@ant-design/icons'
 import { useLanguage } from '../contexts/LanguageContext'
+import QualityBadge from '../components/QualityBadge'
 
 const { Title, Text, Paragraph } = Typography
 const { Search } = Input
@@ -23,6 +24,7 @@ interface HuggingFaceModel {
   summary?: string
   chinese_tags?: string[]
   created_at: string
+  quality_score?: number
   // HuggingFace特有字段
   name?: string
   description?: string
@@ -300,8 +302,8 @@ const HuggingFacePage: React.FC = () => {
             <Statistic
               title={t('huggingface.popularTask')}
               value={stats?.pipeline_distribution ?
-                pipelineNames[Object.keys(stats.pipeline_distribution)[0]] || 'Text Generation' :
-                'Text Generation'
+                pipelineNames[Object.keys(stats.pipeline_distribution)[0]] || '文本生成' :
+                '文本生成'
               }
               prefix={<SearchOutlined style={{ color: '#722ed1' }} />}
               valueStyle={{ color: '#722ed1', fontSize: '20px' }}
@@ -386,8 +388,11 @@ const HuggingFacePage: React.FC = () => {
                     <List.Item.Meta
                       title={
                         <div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
                             <Text strong>{model.name}</Text>
+                            {model.quality_score !== undefined && (
+                              <QualityBadge score={model.quality_score} size="small" />
+                            )}
                             <Tag color="orange">
                               {pipelineNames[model.pipeline_tag || ''] || model.pipeline_tag || 'unknown'}
                             </Tag>

@@ -8,22 +8,75 @@ logger = logging.getLogger(__name__)
 
 
 class AzureOpenAIService:
-    def __init__(self):
+    def __init__(self, api_key: Optional[str] = None, endpoint: Optional[str] = None,
+                 api_version: Optional[str] = None, deployment_name: Optional[str] = None):
+        """
+        初始化Azure OpenAI服务
+
+        Args:
+            api_key: API密钥（可选，如果不提供则从数据库或配置文件读取）
+            endpoint: API端点（可选）
+            api_version: API版本（可选）
+            deployment_name: 部署名称（可选）
+        """
         self.client = None
-        self._initialize_client()
-    
-    def _initialize_client(self):
-        """初始化Azure OpenAI客户端"""
+        self.deployment_name = deployment_name
+        self._initialize_client(api_key, endpoint, api_version, deployment_name)
+
+    def _initialize_client(self, api_key: Optional[str] = None, endpoint: Optional[str] = None,
+                          api_version: Optional[str] = None, deployment_name: Optional[str] = None):
+        """初始化Azure OpenAI客户端 - 优先使用数据库配置"""
         try:
+            # 如果提供了参数，直接使用（用于测试）
+            if api_key and endpoint:
+                self.client = AzureOpenAI(
+                    api_key=api_key,
+                    api_version=api_version or "2024-02-15-preview",
+                    azure_endpoint=endpoint
+                )
+                self.deployment_name = deployment_name or "gpt-4o"
+                logger.info("Azure OpenAI client initialized with provided credentials")
+                return
+
+            # 尝试从数据库获取配置
+            try:
+                from ...core.database import SessionLocal
+                from ...models.config import AIConfig
+
+                db = SessionLocal()
+                db_config = db.query(AIConfig).filter(
+                    AIConfig.is_enabled == True,
+                    AIConfig.is_primary == True
+                ).first()
+
+                if not db_config:
+                    db_config = db.query(AIConfig).filter(AIConfig.is_enabled == True).first()
+
+                if db_config and db_config.api_key and db_config.api_endpoint:
+                    self.client = AzureOpenAI(
+                        api_key=db_config.api_key,
+                        api_version=db_config.api_version or "2024-02-15-preview",
+                        azure_endpoint=db_config.api_endpoint
+                    )
+                    self.deployment_name = db_config.deployment_name or "gpt-4o"
+                    logger.info("Azure OpenAI client initialized from database config")
+                    db.close()
+                    return
+                db.close()
+            except Exception as db_error:
+                logger.debug(f"Failed to load config from database: {db_error}")
+
+            # 如果数据库没有配置，使用环境变量配置
             if settings.azure_openai_api_key and settings.azure_openai_endpoint:
                 self.client = AzureOpenAI(
                     api_key=settings.azure_openai_api_key,
                     api_version=settings.azure_openai_api_version,
                     azure_endpoint=settings.azure_openai_endpoint
                 )
-                logger.info("Azure OpenAI client initialized successfully")
+                self.deployment_name = settings.azure_openai_deployment_name
+                logger.info("Azure OpenAI client initialized from environment config")
             else:
-                logger.warning("Azure OpenAI credentials not configured")
+                logger.warning("Azure OpenAI credentials not configured in database or environment")
         except Exception as e:
             logger.error(f"Failed to initialize Azure OpenAI client: {e}")
             self.client = None
@@ -66,7 +119,7 @@ class AzureOpenAIService:
             system_prompt = f"{language_prompts.get(language, language_prompts['zh'])}（{source_context.get(source_type, '')}）"
             
             response = self.client.chat.completions.create(
-                model=settings.azure_openai_deployment_name,
+                model=self.deployment_name or settings.azure_openai_deployment_name,
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": content[:4000]}  # 限制输入长度
@@ -106,7 +159,7 @@ class AzureOpenAIService:
             system_prompt = f"请将以下内容翻译成{language_names.get(target_language, '中文')}，保持原意和专业术语的准确性："
             
             response = self.client.chat.completions.create(
-                model=settings.azure_openai_deployment_name,
+                model=self.deployment_name or settings.azure_openai_deployment_name,
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": content[:4000]}
@@ -146,7 +199,7 @@ class AzureOpenAIService:
             system_prompt = language_prompts.get(language, language_prompts['zh'])
             
             response = self.client.chat.completions.create(
-                model=settings.azure_openai_deployment_name,
+                model=self.deployment_name or settings.azure_openai_deployment_name,
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": content[:3000]}
@@ -200,7 +253,7 @@ class AzureOpenAIService:
             system_prompt = language_prompts.get(language, language_prompts['zh'])
             
             response = self.client.chat.completions.create(
-                model=settings.azure_openai_deployment_name,
+                model=self.deployment_name or settings.azure_openai_deployment_name,
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": content[:3000]}
