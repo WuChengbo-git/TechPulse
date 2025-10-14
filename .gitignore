@@ -144,3 +144,11 @@ stop.sh
 update-version.sh
 version.sh
 version-manager.js
+
+# Documentation (internal use only)
+docs/planning/
+docs/implementation/
+docs/system/
+docs/archived/
+docs/*.md
+!docs/README.md
