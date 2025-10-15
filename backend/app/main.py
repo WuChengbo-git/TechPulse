@@ -14,7 +14,7 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(
     title=settings.app_name,
     description="TechPulse - 每日技术情报可视化仪表盘",
-    version="0.1.4",
+    version="0.2.0",
     debug=settings.debug
 )
 
@@ -77,7 +77,7 @@ async def shutdown_event():
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to TechPulse API", "version": "0.1.4"}
+    return {"message": "Welcome to TechPulse API", "version": "0.2.0"}
 
 
 @app.get("/health")

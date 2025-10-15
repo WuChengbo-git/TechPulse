@@ -10,7 +10,7 @@
 
 <br>
 
-[![Version](https://img.shields.io/badge/version-0.1.8-blue.svg)](https://github.com/WuChengbo-git/TechPulse)
+[![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](https://github.com/WuChengbo-git/TechPulse)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/)
 [![React](https://img.shields.io/badge/react-18-blue.svg)](https://reactjs.org/)
@@ -215,12 +215,13 @@ npm run dev
 
 ## 🎯 版本历史
 
-### 最新版本 - v0.1.8 (2025-10-04)
-- ✨ 完整的中英日三语言支持
-- 🤖 AI 驱动的实时标签翻译
-- 🔐 JWT 用户认证系统
-- 🎨 180+ 翻译键值全覆盖
-- ⚡ 双层缓存优化性能
+### 最新版本 - v0.2.0 (2025-10-15)
+- ✅ 完整的后端测试套件（176个测试）
+- 🔍 智能搜索与推荐系统测试
+- 🛡️ 认证与安全性测试覆盖
+- 📊 Cards API 完整测试
+- 🐛 修复推荐系统 exclude_ids 处理
+- 📈 代码覆盖率提升至 35%
 
 查看 [完整版本历史](docs/RELEASE.md)
 
