@@ -3,6 +3,9 @@ import { Card, Row, Col, Typography, Spin, Alert, Button, Tag, Space, Select, Mo
 import { GithubOutlined, FileTextOutlined, RobotOutlined, SyncOutlined, TranslationOutlined, SettingOutlined, SearchOutlined, StarOutlined, ForkOutlined, ExclamationCircleOutlined, EyeOutlined, CloudDownloadOutlined, LinkOutlined, FireOutlined, TrophyOutlined, RiseOutlined } from '@ant-design/icons'
 import { useLanguage } from '../contexts/LanguageContext'
 import QualityBadge from '../components/QualityBadge'
+import SmartSearch from '../components/SmartSearch'
+import RecommendationPanel from '../components/RecommendationPanel'
+import SearchResultList from '../components/SearchResultList'
 
 const { Title, Paragraph, Text } = Typography
 const { Search } = Input
@@ -47,6 +50,9 @@ const Dashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCard, setSelectedCard] = useState<TechCard | null>(null)
   const [detailModalVisible, setDetailModalVisible] = useState(false)
+  const [searchResults, setSearchResults] = useState<any[]>([])
+  const [searchLoading, setSearchLoading] = useState(false)
+  const [searchMode, setSearchMode] = useState<'keyword' | 'ai'>('keyword')
 
   const fetchCards = async (source?: string) => {
     try {
@@ -250,7 +256,7 @@ const Dashboard: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ card_id: card.id })
       })
-      
+
       if (response.ok) {
         message.success('已保存到Notion！')
         setDetailModalVisible(false)
@@ -259,6 +265,55 @@ const Dashboard: React.FC = () => {
       }
     } catch (err) {
       message.error('Save failed: ' + err)
+    }
+  }
+
+  // 处理智能搜索
+  const handleSmartSearch = async (query: string, mode: 'keyword' | 'ai') => {
+    if (!query.trim()) {
+      setSearchResults([])
+      return
+    }
+
+    setSearchLoading(true)
+    setSearchMode(mode)
+
+    try {
+      const response = await fetch('/api/v1/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query,
+          mode,
+          user_id: 1,  // TODO: 使用实际登录用户ID
+          limit: 20
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setSearchResults(data.results || [])
+        if (data.results.length === 0) {
+          message.info(t('search.noResults'))
+        }
+      } else {
+        message.error(t('search.noResults'))
+        setSearchResults([])
+      }
+    } catch (error) {
+      console.error('Search failed:', error)
+      message.error('Search failed')
+      setSearchResults([])
+    } finally {
+      setSearchLoading(false)
+    }
+  }
+
+  // 处理搜索结果卡片点击
+  const handleSearchResultClick = (cardId: number) => {
+    const card = cards.find(c => c.id === cardId)
+    if (card) {
+      showDetail(card)
     }
   }
 
@@ -278,36 +333,29 @@ const Dashboard: React.FC = () => {
           </Space>
         </div>
 
-        {/* 搜索和操作栏 - 移动端优化 */}
-        <div style={{
-          display: 'flex',
-          flexDirection: window.innerWidth < 768 ? 'column' : 'row',
-          justifyContent: 'space-between',
-          alignItems: window.innerWidth < 768 ? 'stretch' : 'center',
-          gap: window.innerWidth < 768 ? '12px' : '0',
-          marginBottom: 16
-        }}>
-          <Search
-            placeholder={t('dashboard.searchPlaceholder')}
-            allowClear
-            style={{ width: window.innerWidth < 768 ? '100%' : 400 }}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            prefix={<SearchOutlined />}
-            className="search-bar"
+        {/* SmartSearch - 智能搜索 */}
+        <div style={{ marginBottom: 16 }}>
+          <SmartSearch
+            onSearch={handleSmartSearch}
+            loading={searchLoading}
           />
+        </div>
+
+        {/* 操作栏 */}
+        <div style={{ marginBottom: 16 }}>
           <Space className="header-actions">
             <Button
               type="primary"
               icon={<SyncOutlined />}
               onClick={() => fetchCards(activeTab === 'all' ? undefined : activeTab)}
             >
-              {window.innerWidth >= 768 && t('dashboard.refresh')}
+              {t('dashboard.refresh')}
             </Button>
             <Button
               icon={<SyncOutlined />}
               onClick={triggerDataCollection}
             >
-              {window.innerWidth >= 768 && t('dashboard.collectNewData')}
+              {t('dashboard.collectNewData')}
             </Button>
           </Space>
         </div>
@@ -323,29 +371,42 @@ const Dashboard: React.FC = () => {
         />
       )}
 
-      {/* Tab导航 */}
-      <Tabs 
-        activeKey={activeTab} 
-        onChange={setActiveTab}
-        style={{ marginBottom: 24 }}
-      >
-        <TabPane 
-          tab={<span><SettingOutlined />{t('dashboard.all')} ({cards.length})</span>} 
-          key="all" 
-        />
-        <TabPane 
-          tab={<span><GithubOutlined />GitHub ({cards.filter(c => c.source === 'github').length})</span>} 
-          key="github" 
-        />
-        <TabPane 
-          tab={<span><FileTextOutlined />arXiv ({cards.filter(c => c.source === 'arxiv').length})</span>} 
-          key="arxiv" 
-        />
-        <TabPane 
-          tab={<span><RobotOutlined />Hugging Face ({cards.filter(c => c.source === 'huggingface').length})</span>} 
-          key="huggingface" 
-        />
-      </Tabs>
+      {/* 显示搜索结果或常规内容 */}
+      {searchResults.length > 0 ? (
+        <div>
+          <SearchResultList
+            results={searchResults}
+            loading={searchLoading}
+            intent={searchMode === 'ai' ? 'analyze' : 'query'}
+            totalCount={searchResults.length}
+            onCardClick={handleSearchResultClick}
+          />
+        </div>
+      ) : (
+        <>
+          {/* Tab导航 */}
+          <Tabs
+            activeKey={activeTab}
+            onChange={setActiveTab}
+            style={{ marginBottom: 24 }}
+          >
+            <TabPane
+              tab={<span><SettingOutlined />{t('dashboard.all')} ({cards.length})</span>}
+              key="all"
+            />
+            <TabPane
+              tab={<span><GithubOutlined />GitHub ({cards.filter(c => c.source === 'github').length})</span>}
+              key="github"
+            />
+            <TabPane
+              tab={<span><FileTextOutlined />arXiv ({cards.filter(c => c.source === 'arxiv').length})</span>}
+              key="arxiv"
+            />
+            <TabPane
+              tab={<span><RobotOutlined />Hugging Face ({cards.filter(c => c.source === 'huggingface').length})</span>}
+              key="huggingface"
+            />
+          </Tabs>
 
       {/* 加载状态 */}
       {loading && (
@@ -603,6 +664,7 @@ const Dashboard: React.FC = () => {
           <Card
             title={<span><FireOutlined /> {t('dashboard.hotTags')}</span>}
             size="small"
+            style={{ marginBottom: 16 }}
           >
             {(() => {
               const tagCount: Record<string, number> = {}
@@ -634,8 +696,17 @@ const Dashboard: React.FC = () => {
               )
             })()}
           </Card>
+
+          {/* 推荐面板 */}
+          <RecommendationPanel
+            userId={1}
+            limit={10}
+            onCardClick={handleSearchResultClick}
+          />
         </Col>
       </Row>
+        </>
+      )}
 
       {/* 详情模态框 */}
       <Modal

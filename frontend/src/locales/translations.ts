@@ -19,6 +19,8 @@ export interface Translations {
   common: Record<string, string>;
   app: Record<string, string>;
   trends: Record<string, string>;
+  search: Record<string, string>;
+  recommendation: Record<string, string>;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -132,7 +134,7 @@ export const translations: Record<Language, Translations> = {
     },
 
     dashboard: {
-      title: '仪表板',
+      title: '首页',
       aiService: 'AI 服务',
       connected: '已连接',
       notConfigured: '未配置',
@@ -505,6 +507,37 @@ export const translations: Record<Language, Translations> = {
       confidence: '置信度',
       popularToolEcosystem: '🔥 热门工具生态',
     },
+
+    search: {
+      keywordMode: '关键词',
+      aiMode: 'AI问答',
+      keywordPlaceholder: '搜索技术内容...',
+      aiPlaceholder: '问我任何技术问题...',
+      clearHistory: '清除历史',
+      trySuggestions: '试试这些',
+      aiHints: 'AI模式提示',
+      aiExample1: '问："最近有哪些关于Transformer的论文？"',
+      aiExample2: '问："有什么好的机器学习框架推荐？"',
+      aiExample3: '问:"如何入门深度学习？"',
+      noResults: '没有找到相关内容',
+      foundResults: '找到',
+      results: '条结果',
+      relevance: '相关度',
+      more: '更多',
+    },
+
+    recommendation: {
+      title: '为你推荐',
+      refresh: '换一批',
+      yourInterests: '你的兴趣',
+      hint: '推荐基于你的兴趣标签和历史行为',
+      noPreferences: '还没有设置兴趣标签',
+      setPreferences: '设置兴趣',
+      goToSettings: '请前往设置页面设置兴趣标签',
+      loadError: '加载推荐失败',
+      favoriteSuccess: '已收藏',
+      favoriteError: '收藏失败',
+    },
   },
 
   'en-US': {
@@ -616,7 +649,7 @@ export const translations: Record<Language, Translations> = {
     },
 
     dashboard: {
-      title: 'Dashboard',
+      title: 'Home',
       aiService: 'AI Service',
       connected: 'Connected',
       notConfigured: 'Not Configured',
@@ -989,6 +1022,37 @@ export const translations: Record<Language, Translations> = {
       confidence: 'Confidence',
       popularToolEcosystem: '🔥 Popular Tool Ecosystem',
     },
+
+    search: {
+      keywordMode: 'Keyword',
+      aiMode: 'AI Q&A',
+      keywordPlaceholder: 'Search tech content...',
+      aiPlaceholder: 'Ask me any technical question...',
+      clearHistory: 'Clear History',
+      trySuggestions: 'Try these',
+      aiHints: 'AI Mode Hints',
+      aiExample1: 'Ask: "What are recent papers about Transformers?"',
+      aiExample2: 'Ask: "Any good machine learning framework recommendations?"',
+      aiExample3: 'Ask: "How to get started with deep learning?"',
+      noResults: 'No results found',
+      foundResults: 'Found',
+      results: 'results',
+      relevance: 'Relevance',
+      more: 'More',
+    },
+
+    recommendation: {
+      title: 'For You',
+      refresh: 'Refresh',
+      yourInterests: 'Your Interests',
+      hint: 'Recommendations based on your interest tags and behavior history',
+      noPreferences: 'No interest tags set yet',
+      setPreferences: 'Set Interests',
+      goToSettings: 'Please go to settings page to set interest tags',
+      loadError: 'Failed to load recommendations',
+      favoriteSuccess: 'Favorited',
+      favoriteError: 'Failed to favorite',
+    },
   },
 
   'ja-JP': {
@@ -1101,7 +1165,7 @@ export const translations: Record<Language, Translations> = {
     },
 
     dashboard: {
-      title: 'ダッシュボード',
+      title: 'ホーム',
       aiService: 'AIサービス',
       connected: '接続済み',
       notConfigured: '未設定',
@@ -1478,6 +1542,37 @@ export const translations: Record<Language, Translations> = {
       edgeAI: 'エッジAI',
       confidence: '信頼度',
       popularToolEcosystem: '🔥 人気ツールエコシステム',
+    },
+
+    search: {
+      keywordMode: 'キーワード',
+      aiMode: 'AI質問応答',
+      keywordPlaceholder: '技術コンテンツを検索...',
+      aiPlaceholder: '技術的な質問を何でもどうぞ...',
+      clearHistory: '履歴をクリア',
+      trySuggestions: 'こちらを試してみてください',
+      aiHints: 'AIモードのヒント',
+      aiExample1: '質問："Transformerに関する最近の論文は？"',
+      aiExample2: '質問："おすすめの機械学習フレームワークは？"',
+      aiExample3: '質問："深層学習の始め方は？"',
+      noResults: '関連コンテンツが見つかりません',
+      foundResults: '見つかりました',
+      results: '件の結果',
+      relevance: '関連度',
+      more: 'もっと見る',
+    },
+
+    recommendation: {
+      title: 'おすすめ',
+      refresh: '別のを表示',
+      yourInterests: 'あなたの興味',
+      hint: '興味タグと履歴行動に基づいて推薦',
+      noPreferences: 'まだ興味タグが設定されていません',
+      setPreferences: '興味を設定',
+      goToSettings: '設定ページで興味タグを設定してください',
+      loadError: '推薦の読み込みに失敗しました',
+      favoriteSuccess: 'お気に入りに追加しました',
+      favoriteError: 'お気に入り追加に失敗しました',
     },
   },
 };

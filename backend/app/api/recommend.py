@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from ..core.database import get_db
 from ..models.card import TechCard
 from ..models.behavior import UserBehavior, ActionType, UserRecommendation
-from ..models.user_settings import UserPreferences
+from ..models.user_preference import UserPreference
 
 router = APIRouter(tags=["recommendations"])
 
@@ -107,11 +107,15 @@ async def get_recommendations(
     """
 
     # 1. 获取用户偏好标签
-    user_prefs = db.query(UserPreferences).filter(
-        UserPreferences.user_id == user_id
-    ).first()
+    user_prefs = db.query(UserPreference).filter(
+        UserPreference.user_id == user_id,
+        UserPreference.preference_type == 'tag'
+    ).all()
 
-    if not user_prefs or not user_prefs.interest_tags:
+    # 提取标签列表
+    interest_tags = [pref.preference_value for pref in user_prefs] if user_prefs else []
+
+    if not interest_tags:
         # 如果用户没有设置偏好，返回高质量内容
         cards = db.query(TechCard).filter(
             TechCard.quality_score >= 7.0
@@ -160,7 +164,7 @@ async def get_recommendations(
     for card in candidate_cards:
         score, matched_tags, reason = RecommendationEngine.calculate_recommendation_score(
             card,
-            user_prefs.interest_tags,
+            interest_tags,
             user_behaviors
         )
 
@@ -204,7 +208,7 @@ async def get_recommendations(
     return {
         "recommendations": results,
         "total": len(results),
-        "user_tags": user_prefs.interest_tags
+        "user_tags": interest_tags
     }
 
 
@@ -221,11 +225,14 @@ async def refresh_recommendations(
     排除已显示的卡片ID
     """
     # 获取用户偏好
-    user_prefs = db.query(UserPreferences).filter(
-        UserPreferences.user_id == user_id
-    ).first()
+    user_prefs = db.query(UserPreference).filter(
+        UserPreference.user_id == user_id,
+        UserPreference.preference_type == 'tag'
+    ).all()
 
-    if not user_prefs:
+    interest_tags = [pref.preference_value for pref in user_prefs] if user_prefs else []
+
+    if not interest_tags:
         return {"recommendations": [], "message": "请先设置兴趣标签"}
 
     # 获取候选卡片（排除已显示的）
@@ -248,7 +255,7 @@ async def refresh_recommendations(
     for card in candidate_cards:
         score, matched_tags, reason = RecommendationEngine.calculate_recommendation_score(
             card,
-            user_prefs.interest_tags,
+            interest_tags,
             user_behaviors
         )
 

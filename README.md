@@ -10,7 +10,7 @@
 
 <br>
 
-[![Version](https://img.shields.io/badge/version-0.1.8-blue.svg)](https://github.com/yourusername/TechPulse)
+[![Version](https://img.shields.io/badge/version-0.1.8-blue.svg)](https://github.com/WuChengbo-git/TechPulse)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/)
 [![React](https://img.shields.io/badge/react-18-blue.svg)](https://reactjs.org/)
@@ -100,7 +100,7 @@ TechPulse/
 
 ```bash
 # 克隆项目
-git clone https://github.com/yourusername/TechPulse.git
+git clone https://github.com/WuChengbo-git/TechPulse.git
 cd TechPulse
 
 # 启动开发环境（前端 + 后端）
@@ -245,7 +245,7 @@ npm run dev
 
 ### 报告问题
 
-发现 Bug？有功能建议？请通过 [GitHub Issues](https://github.com/yourusername/TechPulse/issues) 告诉我们。
+发现 Bug？有功能建议？请通过 [GitHub Issues](https://github.com/WuChengbo-git/TechPulse/issues) 告诉我们。
 
 ## 📋 待开发功能
 
@@ -276,9 +276,9 @@ npm run dev
 
 ## 📞 联系方式
 
-- **项目主页**: https://github.com/yourusername/TechPulse
-- **Issues**: https://github.com/yourusername/TechPulse/issues
-- **Discussions**: https://github.com/yourusername/TechPulse/discussions
+- **项目主页**: https://github.com/WuChengbo-git/TechPulse
+- **Issues**: https://github.com/WuChengbo-git/TechPulse/issues
+- **Discussions**: https://github.com/WuChengbo-git/TechPulse/discussions
 
 ---
 

@@ -1,0 +1,53 @@
+.smart-search-container {
+  width: 100%;
+  padding: 16px 0;
+}
+
+.search-suggestions {
+  padding: 8px 0;
+}
+
+.ai-mode-hints {
+  background: #f6f8fa;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border-left: 3px solid #1890ff;
+}
+
+/* 搜索框增强样式 */
+.ant-input-search-large .ant-input {
+  font-size: 15px;
+}
+
+.ant-input-search-large .ant-input-search-button {
+  height: 40px;
+}
+
+/* 自动补全下拉样式 */
+.ant-select-dropdown .ant-select-item {
+  padding: 8px 12px;
+}
+
+.ant-select-dropdown .ant-select-item:hover {
+  background-color: #f5f5f5;
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+  .smart-search-container {
+    padding: 12px 0;
+  }
+
+  .ant-segmented {
+    font-size: 12px;
+  }
+
+  .search-suggestions {
+    font-size: 12px;
+  }
+
+  .ai-mode-hints {
+    padding: 10px 12px;
+    font-size: 11px;
+  }
+}

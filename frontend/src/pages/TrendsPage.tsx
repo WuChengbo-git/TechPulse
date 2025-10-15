@@ -555,9 +555,9 @@ const TrendsPage: React.FC = () => {
           <div>
             <Title level={2} style={{ margin: 0 }}>
               <RocketOutlined style={{ marginRight: 8 }} />
-              AI技术趋势洞察
+              {t('trends.aiTrendInsight')}
             </Title>
-            <Text type="secondary">掌握技术发展脉搏，预测下一个崛起方向</Text>
+            <Text type="secondary">{t('trends.subtitle')}</Text>
           </div>
 
           <Space wrap>
