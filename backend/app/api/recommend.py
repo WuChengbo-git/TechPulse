@@ -214,9 +214,9 @@ async def get_recommendations(
 
 @router.post("/recommendations/refresh")
 async def refresh_recommendations(
-    user_id: int,
-    exclude_ids: List[int] = [],
-    limit: int = 10,
+    user_id: int = Query(...),
+    exclude_ids: List[int] = Query(default=[]),
+    limit: int = Query(default=10),
     db: Session = Depends(get_db)
 ):
     """

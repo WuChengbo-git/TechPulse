@@ -1,0 +1,26 @@
+# Testing Dependencies for TechPulse Backend
+
+# Core testing framework
+pytest==8.3.5
+pytest-asyncio==0.24.0
+pytest-cov==6.0.0
+pytest-mock==3.14.0
+
+# HTTP testing
+httpx==0.28.1
+
+# Test coverage
+coverage[toml]==7.6.10
+
+# Fixtures and helpers
+faker==33.1.0
+factory-boy==3.3.1
+
+# Database testing
+pytest-postgresql==6.1.1
+
+# Performance testing
+pytest-benchmark==5.1.0
+
+# Parallel testing
+pytest-xdist==3.6.1

@@ -7,6 +7,7 @@ from ..core.security import (
     verify_password,
     get_password_hash,
     create_access_token,
+    create_refresh_token,
     get_current_user,
     get_current_active_user
 )
@@ -136,6 +137,9 @@ async def login(user_credentials: UserLogin, request: Request, db: Session = Dep
         access_token = create_access_token(
             data={"sub": user.id, "username": user.username}
         )
+        refresh_token = create_refresh_token(
+            data={"sub": user.id, "username": user.username}
+        )
 
         # 记录成功日志
         auth_log = AuthLog(
@@ -149,7 +153,8 @@ async def login(user_credentials: UserLogin, request: Request, db: Session = Dep
         db.commit()
 
         return LoginResponse(
-            token=access_token,
+            access_token=access_token,
+            refresh_token=refresh_token,
             token_type="bearer",
             user=UserResponse.from_orm(user)
         )
