@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Card, Tabs, Form, Input, Button, Switch, Select, Space,
-  message, Divider, Typography, Alert, Tag, Spin
+  message, Divider, Typography, Alert, Tag
 } from 'antd';
 import {
   RobotOutlined, DatabaseOutlined, UserOutlined,
   SettingOutlined, ApiOutlined, CheckCircleOutlined,
-  ExclamationCircleOutlined, HeartOutlined, LoadingOutlined
+  ExclamationCircleOutlined, HeartOutlined
 } from '@ant-design/icons';
 import { useLanguage } from '../contexts/LanguageContext';
 import userSettingsService from '../services/userSettingsService';
@@ -19,7 +19,6 @@ const { Option } = Select;
 const SettingsPage: React.FC = () => {
   const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
-  const [initialLoading, setInitialLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('ai-models');
 
   // AI 模型配置状态
@@ -43,84 +42,6 @@ const SettingsPage: React.FC = () => {
     ollama: null,
     notion: null
   });
-
-  // 加载用户设置
-  useEffect(() => {
-    // 检查是否有token，没有token就不加载设置
-    const token = localStorage.getItem('techpulse_token') || sessionStorage.getItem('techpulse_token');
-    if (token) {
-      loadUserSettings();
-    } else {
-      setInitialLoading(false);
-    }
-  }, []);
-
-  const loadUserSettings = async () => {
-    try {
-      setInitialLoading(true);
-      const settings = await userSettingsService.getSettings();
-
-      // 设置表单初始值
-      if (settings.azure) {
-        azureForm.setFieldsValue({
-          apiKey: settings.azure.api_key,
-          endpoint: settings.azure.endpoint,
-          deploymentName: settings.azure.deployment,
-          apiVersion: settings.azure.api_version || '2024-02-15-preview'
-        });
-      }
-
-      if (settings.openai) {
-        openaiForm.setFieldsValue({
-          apiKey: settings.openai.api_key,
-          model: settings.openai.model || 'gpt-3.5-turbo',
-          baseUrl: settings.openai.base_url,
-          organizationId: settings.openai.organization
-        });
-      }
-
-      if (settings.ollama) {
-        ollamaForm.setFieldsValue({
-          serverUrl: settings.ollama.server_url || 'http://localhost:11434',
-          model: settings.ollama.model || 'llama2'
-        });
-      }
-
-      if (settings.notion) {
-        notionForm.setFieldsValue({
-          apiToken: settings.notion.api_token,
-          databaseId: settings.notion.database_id,
-          syncFrequency: settings.notion.sync_frequency || 'manual'
-        });
-      }
-
-      if (settings.personalization) {
-        personalizationForm.setFieldsValue({
-          enabled: settings.personalization.enable_recommendation,
-          algorithm: settings.personalization.recommendation_algorithm || 'hybrid',
-          tracking: settings.personalization.enable_behavior_tracking,
-          showReason: settings.personalization.show_recommendation_reason,
-          anonymousMode: settings.personalization.anonymous_mode
-        });
-      }
-
-      if (settings.preferences) {
-        preferencesForm.setFieldsValue({
-          language: settings.preferences.preferred_language || 'zh',
-          theme: settings.preferences.theme_mode || 'light',
-          itemsPerPage: settings.preferences.items_per_page || 20
-        });
-      }
-    } catch (error: any) {
-      console.error('Failed to load user settings:', error);
-      // 如果是401错误，不显示错误消息（用户会被重定向到登录页）
-      if (error.response?.status !== 401) {
-        message.error('加载用户设置失败');
-      }
-    } finally {
-      setInitialLoading(false);
-    }
-  };
 
   // 测试 OpenAI 连接
   const testOpenAIConnection = async () => {
@@ -309,17 +230,6 @@ const SettingsPage: React.FC = () => {
     }
     return null;
   };
-
-  if (initialLoading) {
-    return (
-      <div style={{ padding: '24px', textAlign: 'center', paddingTop: '100px' }}>
-        <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
-        <div style={{ marginTop: 16 }}>
-          <Text type="secondary">加载用户设置中...</Text>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div style={{ padding: '24px' }}>
