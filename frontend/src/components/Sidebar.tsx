@@ -70,6 +70,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, selectedKey, onMenuSelect 
       label: t('sidebar.systemManagement'),
       children: [
         { key: 'settings', icon: <SettingOutlined />, label: t('nav.systemSettings') },
+        { key: 'llm-providers', icon: <CloudOutlined />, label: 'LLM模型管理' },
         { key: 'api-config', icon: <ApiOutlined />, label: t('nav.apiConfig') },
         { key: 'tasks', icon: <UnorderedListOutlined />, label: t('nav.taskManagement') },
         { key: 'status', icon: <MonitorOutlined />, label: t('nav.systemStatus') }

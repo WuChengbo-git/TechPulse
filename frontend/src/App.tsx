@@ -24,6 +24,7 @@ import ApiConfigPage from './pages/ApiConfigPage'
 import SettingsPage from './pages/SettingsPage'
 import TaskManagementPage from './pages/TaskManagementPage'
 import SystemStatusPage from './pages/SystemStatusPage'
+import LLMProvidersPage from './pages/LLMProvidersPage'
 import Login from './pages/Login'
 import './App.css'
 import './styles/responsive.css'
@@ -155,6 +156,7 @@ function AppContent() {
       settings: [t('nav.systemManagement'), t('nav.systemSettings')],
       notion: [t('nav.systemManagement'), t('nav.notionIntegration')],
       'api-config': [t('nav.systemManagement'), t('nav.apiConfig')],
+      'llm-providers': [t('nav.systemManagement'), 'LLM模型管理'],
       tasks: [t('nav.systemManagement'), t('nav.taskManagement')],
       status: [t('nav.systemManagement'), t('nav.systemStatus')]
     }
@@ -187,6 +189,8 @@ function AppContent() {
         return <ApiConfigPage />
       case 'settings':
         return <SettingsPage />
+      case 'llm-providers':
+        return <LLMProvidersPage />
       case 'tasks':
         return <TaskManagementPage />
       case 'status':
