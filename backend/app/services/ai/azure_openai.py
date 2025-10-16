@@ -121,6 +121,64 @@ class AzureOpenAIService:
     def is_available(self) -> bool:
         """检查服务是否可用"""
         return self.client is not None
+
+    def test_connection(self) -> Dict[str, Any]:
+        """
+        测试API连接是否正常
+
+        Returns:
+            包含测试结果的字典:
+            {
+                "success": bool,
+                "message": str,
+                "error": str (可选)
+            }
+        """
+        if not self.client:
+            return {
+                "success": False,
+                "message": "AI客户端未初始化",
+                "error": "Client not initialized"
+            }
+
+        try:
+            # 尝试进行一个简单的API调用来验证连接
+            response = self.client.chat.completions.create(
+                model=self.deployment_name or "gpt-4o",
+                messages=[
+                    {"role": "user", "content": "test"}
+                ],
+                max_tokens=5,
+                temperature=0.3
+            )
+
+            return {
+                "success": True,
+                "message": "连接成功，API配置正确",
+                "model": self.deployment_name or "gpt-4o"
+            }
+
+        except Exception as e:
+            error_message = str(e)
+            logger.error(f"Azure OpenAI connection test failed: {error_message}")
+
+            # 提供更友好的错误信息
+            if "401" in error_message or "Unauthorized" in error_message:
+                user_message = "API密钥无效或已过期"
+            elif "404" in error_message or "NotFound" in error_message:
+                user_message = "API端点或部署名称不正确"
+            elif "429" in error_message or "RateLimitExceeded" in error_message:
+                user_message = "API请求频率超限，请稍后再试"
+            elif "timeout" in error_message.lower():
+                user_message = "连接超时，请检查网络或端点地址"
+            else:
+                user_message = "连接失败，请检查配置"
+
+            return {
+                "success": False,
+                "message": user_message,
+                "error": error_message
+            }
     
     async def summarize_content(self, content: str, source_type: str = "github", language: str = "zh") -> Optional[str]:
         """

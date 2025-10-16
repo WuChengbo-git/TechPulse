@@ -9,6 +9,7 @@ from ..models.user import User
 from ..models.user_settings import UserSettings, DataSourceConfig
 from ..api.auth import get_current_user
 from ..services.ai.config_helper import check_user_ai_config, get_active_ai_config
+from ..services.ai.azure_openai import AzureOpenAIService
 
 router = APIRouter(prefix="/api/v1/user-settings", tags=["user-settings"])
 
@@ -158,7 +159,35 @@ async def update_user_settings(
         settings.openai_organization = settings_update.openai.organization
 
     # 更新Azure配置
+    validation_result = None
     if settings_update.azure:
+        # 验证 Azure OpenAI 配置（如果提供了完整的配置）
+        api_key = settings_update.azure.api_key if settings_update.azure.api_key and settings_update.azure.api_key != "****" else settings.azure_api_key
+        endpoint = settings_update.azure.endpoint or settings.azure_endpoint
+        deployment = settings_update.azure.deployment or settings.azure_deployment
+        api_version = settings_update.azure.api_version or settings.azure_api_version
+
+        # 如果提供了 API key 和 endpoint，进行连接测试
+        if api_key and endpoint:
+            test_service = AzureOpenAIService(
+                api_key=api_key,
+                endpoint=endpoint,
+                deployment_name=deployment,
+                api_version=api_version
+            )
+            validation_result = test_service.test_connection()
+
+            # 如果验证失败，返回错误
+            if not validation_result["success"]:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail={
+                        "message": "Azure OpenAI 配置验证失败",
+                        "validation": validation_result
+                    }
+                )
+
+        # 验证成功或未提供完整配置时，保存设置
         if settings_update.azure.api_key and settings_update.azure.api_key != "****":
             settings.azure_api_key = settings_update.azure.api_key  # TODO: 加密存储
         settings.azure_endpoint = settings_update.azure.endpoint
@@ -194,7 +223,11 @@ async def update_user_settings(
     db.commit()
     db.refresh(settings)
 
-    return {"message": "Settings updated successfully"}
+    response = {"message": "Settings updated successfully"}
+    if validation_result:
+        response["validation"] = validation_result
+
+    return response
 
 
 # 获取数据源配置
@@ -354,4 +387,35 @@ async def get_ai_config_status(
             else "未配置AI模型"
         )
     }
+
+
+# 测试 Azure OpenAI 配置
+@router.post("/test-azure-config")
+async def test_azure_config(
+    azure_config: AzureOpenAIConfig,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    测试 Azure OpenAI 配置是否有效（不保存）
+
+    用于在用户保存配置前验证 API 凭据
+    """
+    if not azure_config.api_key or not azure_config.endpoint:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="API密钥和端点地址为必填项"
+        )
+
+    # 创建临时服务实例进行测试
+    test_service = AzureOpenAIService(
+        api_key=azure_config.api_key,
+        endpoint=azure_config.endpoint,
+        deployment_name=azure_config.deployment,
+        api_version=azure_config.api_version
+    )
+
+    # 执行连接测试
+    result = test_service.test_connection()
+
+    return result
 

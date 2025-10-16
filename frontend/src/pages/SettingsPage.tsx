@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Card, Tabs, Form, Input, Button, Switch, Select, Space,
-  message, Divider, Typography, Alert, Tag
+  message, Divider, Typography, Alert, Tag, Spin
 } from 'antd';
 import {
   RobotOutlined, DatabaseOutlined, UserOutlined,
   SettingOutlined, ApiOutlined, CheckCircleOutlined,
-  ExclamationCircleOutlined, HeartOutlined
+  ExclamationCircleOutlined, HeartOutlined, LoadingOutlined
 } from '@ant-design/icons';
 import { useLanguage } from '../contexts/LanguageContext';
+import userSettingsService from '../services/userSettingsService';
 
 const { Title, Text, Paragraph } = Typography;
 const { TabPane } = Tabs;
@@ -18,6 +19,7 @@ const { Option } = Select;
 const SettingsPage: React.FC = () => {
   const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('ai-models');
 
   // AI 模型配置状态
@@ -41,6 +43,75 @@ const SettingsPage: React.FC = () => {
     ollama: null,
     notion: null
   });
+
+  // 加载用户设置
+  useEffect(() => {
+    loadUserSettings();
+  }, []);
+
+  const loadUserSettings = async () => {
+    try {
+      setInitialLoading(true);
+      const settings = await userSettingsService.getSettings();
+
+      // 设置表单初始值
+      if (settings.azure) {
+        azureForm.setFieldsValue({
+          apiKey: settings.azure.api_key,
+          endpoint: settings.azure.endpoint,
+          deploymentName: settings.azure.deployment,
+          apiVersion: settings.azure.api_version || '2024-02-15-preview'
+        });
+      }
+
+      if (settings.openai) {
+        openaiForm.setFieldsValue({
+          apiKey: settings.openai.api_key,
+          model: settings.openai.model || 'gpt-3.5-turbo',
+          baseUrl: settings.openai.base_url,
+          organizationId: settings.openai.organization
+        });
+      }
+
+      if (settings.ollama) {
+        ollamaForm.setFieldsValue({
+          serverUrl: settings.ollama.server_url || 'http://localhost:11434',
+          model: settings.ollama.model || 'llama2'
+        });
+      }
+
+      if (settings.notion) {
+        notionForm.setFieldsValue({
+          apiToken: settings.notion.api_token,
+          databaseId: settings.notion.database_id,
+          syncFrequency: settings.notion.sync_frequency || 'manual'
+        });
+      }
+
+      if (settings.personalization) {
+        personalizationForm.setFieldsValue({
+          enabled: settings.personalization.enable_recommendation,
+          algorithm: settings.personalization.recommendation_algorithm || 'hybrid',
+          tracking: settings.personalization.enable_behavior_tracking,
+          showReason: settings.personalization.show_recommendation_reason,
+          anonymousMode: settings.personalization.anonymous_mode
+        });
+      }
+
+      if (settings.preferences) {
+        preferencesForm.setFieldsValue({
+          language: settings.preferences.preferred_language || 'zh',
+          theme: settings.preferences.theme_mode || 'light',
+          itemsPerPage: settings.preferences.items_per_page || 20
+        });
+      }
+    } catch (error: any) {
+      console.error('Failed to load user settings:', error);
+      message.error('加载用户设置失败');
+    } finally {
+      setInitialLoading(false);
+    }
+  };
 
   // 测试 OpenAI 连接
   const testOpenAIConnection = async () => {
@@ -66,15 +137,26 @@ const SettingsPage: React.FC = () => {
   const testAzureConnection = async () => {
     try {
       setTestStatus({...testStatus, azure: 'testing'});
-      const values = await azureForm.validateFields();
+      const values = await azureForm.validateFields(['apiKey', 'endpoint', 'deploymentName', 'apiVersion']);
 
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const result = await userSettingsService.testAzureConfig({
+        api_key: values.apiKey,
+        endpoint: values.endpoint,
+        deployment: values.deploymentName,
+        api_version: values.apiVersion
+      });
 
-      setTestStatus({...testStatus, azure: 'success'});
-      message.success('Azure OpenAI 连接测试成功！');
-    } catch (error) {
+      if (result.success) {
+        setTestStatus({...testStatus, azure: 'success'});
+        message.success(`连接测试成功！模型：${result.model}`);
+      } else {
+        setTestStatus({...testStatus, azure: 'error'});
+        message.error(result.message);
+      }
+    } catch (error: any) {
       setTestStatus({...testStatus, azure: 'error'});
-      message.error('Azure OpenAI 连接测试失败');
+      const errorMsg = error.response?.data?.detail?.message || error.response?.data?.detail || 'Azure OpenAI 连接测试失败';
+      message.error(errorMsg);
     }
   };
 
@@ -114,36 +196,96 @@ const SettingsPage: React.FC = () => {
   const handleSave = async (formType: string) => {
     setLoading(true);
     try {
-      let values;
+      let updateData: any = {};
+
       switch(formType) {
-        case 'openai':
-          values = await openaiForm.validateFields();
+        case 'openai': {
+          const values = await openaiForm.validateFields();
+          updateData.openai = {
+            api_key: values.apiKey !== '****' ? values.apiKey : undefined,
+            model: values.model,
+            base_url: values.baseUrl,
+            organization: values.organizationId
+          };
           break;
-        case 'azure':
-          values = await azureForm.validateFields();
+        }
+        case 'azure': {
+          const values = await azureForm.validateFields();
+          updateData.azure = {
+            api_key: values.apiKey !== '****' ? values.apiKey : undefined,
+            endpoint: values.endpoint,
+            deployment: values.deploymentName,
+            api_version: values.apiVersion
+          };
           break;
-        case 'ollama':
-          values = await ollamaForm.validateFields();
+        }
+        case 'ollama': {
+          const values = await ollamaForm.validateFields();
+          updateData.ollama = {
+            server_url: values.serverUrl,
+            model: values.model
+          };
           break;
-        case 'notion':
-          values = await notionForm.validateFields();
+        }
+        case 'notion': {
+          const values = await notionForm.validateFields();
+          updateData.notion = {
+            api_token: values.apiToken !== '****' ? values.apiToken : undefined,
+            database_id: values.databaseId,
+            sync_frequency: values.syncFrequency
+          };
           break;
-        case 'personalization':
-          values = await personalizationForm.validateFields();
+        }
+        case 'personalization': {
+          const values = await personalizationForm.validateFields();
+          updateData.personalization = {
+            enable_recommendation: values.enabled,
+            recommendation_algorithm: values.algorithm,
+            enable_behavior_tracking: values.tracking,
+            show_recommendation_reason: values.showReason,
+            anonymous_mode: values.anonymousMode
+          };
           break;
-        case 'preferences':
-          values = await preferencesForm.validateFields();
+        }
+        case 'preferences': {
+          const values = await preferencesForm.validateFields();
+          updateData.preferences = {
+            preferred_language: values.language,
+            theme_mode: values.theme,
+            items_per_page: values.itemsPerPage
+          };
           break;
+        }
       }
 
-      // TODO: 调用后端 API 保存配置
-      console.log('Saving config:', formType, values);
+      const result = await userSettingsService.updateSettings(updateData);
 
-      await new Promise(resolve => setTimeout(resolve, 500));
+      if (result.validation) {
+        if (result.validation.success) {
+          message.success(`配置保存成功！${result.validation.message}`);
+        }
+      } else {
+        message.success('配置保存成功！');
+      }
 
-      message.success('配置保存成功！');
-    } catch (error) {
-      message.error('配置保存失败');
+      // 如果是 Azure 配置，更新测试状态
+      if (formType === 'azure' && result.validation) {
+        setTestStatus({...testStatus, azure: result.validation.success ? 'success' : 'error'});
+      }
+    } catch (error: any) {
+      console.error('Failed to save settings:', error);
+
+      // 处理验证失败错误
+      if (error.response?.data?.detail?.validation) {
+        const validation = error.response.data.detail.validation;
+        message.error(validation.message);
+        if (formType === 'azure') {
+          setTestStatus({...testStatus, azure: 'error'});
+        }
+      } else {
+        const errorMsg = error.response?.data?.detail?.message || error.response?.data?.detail || '配置保存失败';
+        message.error(errorMsg);
+      }
     } finally {
       setLoading(false);
     }
@@ -158,6 +300,17 @@ const SettingsPage: React.FC = () => {
     }
     return null;
   };
+
+  if (initialLoading) {
+    return (
+      <div style={{ padding: '24px', textAlign: 'center', paddingTop: '100px' }}>
+        <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
+        <div style={{ marginTop: 16 }}>
+          <Text type="secondary">加载用户设置中...</Text>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ padding: '24px' }}>
