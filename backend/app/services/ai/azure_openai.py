@@ -9,25 +9,37 @@ logger = logging.getLogger(__name__)
 
 class AzureOpenAIService:
     def __init__(self, api_key: Optional[str] = None, endpoint: Optional[str] = None,
-                 api_version: Optional[str] = None, deployment_name: Optional[str] = None):
+                 api_version: Optional[str] = None, deployment_name: Optional[str] = None,
+                 user_id: Optional[int] = None):
         """
         初始化Azure OpenAI服务
 
         Args:
-            api_key: API密钥（可选，如果不提供则从数据库或配置文件读取）
+            api_key: API密钥（可选）
             endpoint: API端点（可选）
             api_version: API版本（可选）
             deployment_name: 部署名称（可选）
+            user_id: 用户ID（可选，用于获取用户个人配置）
         """
         self.client = None
         self.deployment_name = deployment_name
-        self._initialize_client(api_key, endpoint, api_version, deployment_name)
+        self.user_id = user_id
+        self._initialize_client(api_key, endpoint, api_version, deployment_name, user_id)
 
     def _initialize_client(self, api_key: Optional[str] = None, endpoint: Optional[str] = None,
-                          api_version: Optional[str] = None, deployment_name: Optional[str] = None):
-        """初始化Azure OpenAI客户端 - 优先使用数据库配置"""
+                          api_version: Optional[str] = None, deployment_name: Optional[str] = None,
+                          user_id: Optional[int] = None):
+        """
+        初始化Azure OpenAI客户端
+
+        配置优先级（从高到低）：
+        1. 直接提供的参数（用于测试）
+        2. 用户个人配置（UserSettings）
+        3. 全局AI配置（AIConfig）
+        4. 环境变量配置（.env）
+        """
         try:
-            # 如果提供了参数，直接使用（用于测试）
+            # 1. 如果提供了参数，直接使用（用于测试）
             if api_key and endpoint:
                 self.client = AzureOpenAI(
                     api_key=api_key,
@@ -38,7 +50,32 @@ class AzureOpenAIService:
                 logger.info("Azure OpenAI client initialized with provided credentials")
                 return
 
-            # 尝试从数据库获取配置
+            # 2. 尝试从用户配置获取（最高优先级）
+            if user_id:
+                try:
+                    from ...core.database import SessionLocal
+                    from ...models.user_settings import UserSettings
+
+                    db = SessionLocal()
+                    user_settings = db.query(UserSettings).filter(
+                        UserSettings.user_id == user_id
+                    ).first()
+
+                    if user_settings and user_settings.azure_api_key and user_settings.azure_endpoint:
+                        self.client = AzureOpenAI(
+                            api_key=user_settings.azure_api_key,
+                            api_version=user_settings.azure_api_version or "2024-02-15-preview",
+                            azure_endpoint=user_settings.azure_endpoint
+                        )
+                        self.deployment_name = user_settings.azure_deployment or "gpt-4o"
+                        logger.info(f"Azure OpenAI client initialized from user {user_id} settings")
+                        db.close()
+                        return
+                    db.close()
+                except Exception as user_error:
+                    logger.debug(f"Failed to load config from user settings: {user_error}")
+
+            # 3. 尝试从全局AI配置获取
             try:
                 from ...core.database import SessionLocal
                 from ...models.config import AIConfig
@@ -59,14 +96,14 @@ class AzureOpenAIService:
                         azure_endpoint=db_config.api_endpoint
                     )
                     self.deployment_name = db_config.deployment_name or "gpt-4o"
-                    logger.info("Azure OpenAI client initialized from database config")
+                    logger.info("Azure OpenAI client initialized from global AI config")
                     db.close()
                     return
                 db.close()
             except Exception as db_error:
                 logger.debug(f"Failed to load config from database: {db_error}")
 
-            # 如果数据库没有配置，使用环境变量配置
+            # 4. 如果数据库没有配置，使用环境变量配置
             if settings.azure_openai_api_key and settings.azure_openai_endpoint:
                 self.client = AzureOpenAI(
                     api_key=settings.azure_openai_api_key,
@@ -76,7 +113,7 @@ class AzureOpenAIService:
                 self.deployment_name = settings.azure_openai_deployment_name
                 logger.info("Azure OpenAI client initialized from environment config")
             else:
-                logger.warning("Azure OpenAI credentials not configured in database or environment")
+                logger.warning("Azure OpenAI credentials not configured")
         except Exception as e:
             logger.error(f"Failed to initialize Azure OpenAI client: {e}")
             self.client = None

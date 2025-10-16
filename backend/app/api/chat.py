@@ -5,7 +5,10 @@ import requests
 from bs4 import BeautifulSoup
 import logging
 from ..services.ai.azure_openai import azure_openai_service
+from ..services.ai.config_helper import get_ai_service_for_user
 from ..core.config import settings
+from ..api.auth import get_current_user
+from ..models.user import User
 import re
 import json
 
@@ -183,16 +186,23 @@ web_extractor = WebContentExtractor()
 
 
 @router.post("/analyze-url", response_model=URLAnalysisResponse)
-async def analyze_url(request: URLAnalysisRequest):
+async def analyze_url(
+    request: URLAnalysisRequest,
+    current_user: User = Depends(get_current_user)
+):
     """
     分析网页URL，提取内容并进行AI分析
+    使用当前用户的AI配置（如果有）
     """
     try:
+        # 获取用户的AI服务实例
+        user_ai_service = get_ai_service_for_user(current_user.id)
+
         # 提取网页内容
         extracted_data = web_extractor.extract_content(str(request.url))
-        
-        if not azure_openai_service.is_available():
-            raise HTTPException(status_code=503, detail="AI服务不可用")
+
+        if not user_ai_service.is_available():
+            raise HTTPException(status_code=503, detail="AI服务不可用，请在设置中配置您的AI模型")
         
         # 准备分析内容
         analysis_content = f"""
@@ -227,16 +237,16 @@ async def analyze_url(request: URLAnalysisRequest):
             ⭐ **推荐指数** (1-5星，说明推荐理由)
             """
         
-        # 调用AI分析
-        analysis_result = await azure_openai_service.summarize_content(
-            analysis_prompt, 
-            extracted_data['content_type'], 
+        # 调用AI分析（使用用户的AI服务）
+        analysis_result = await user_ai_service.summarize_content(
+            analysis_prompt,
+            extracted_data['content_type'],
             settings.default_language
         )
-        
+
         # 提取标签
-        tags = await azure_openai_service.extract_tags(
-            analysis_content, 
+        tags = await user_ai_service.extract_tags(
+            analysis_content,
             settings.default_language
         )
         
@@ -282,13 +292,20 @@ async def analyze_url(request: URLAnalysisRequest):
 
 
 @router.post("/chat", response_model=ChatResponse)
-async def chat_with_ai(request: ChatMessage):
+async def chat_with_ai(
+    request: ChatMessage,
+    current_user: User = Depends(get_current_user)
+):
     """
     与AI聊天，支持基于网页内容的问答
+    使用当前用户的AI配置（如果有）
     """
     try:
-        if not azure_openai_service.is_available():
-            raise HTTPException(status_code=503, detail="AI服务不可用")
+        # 获取用户的AI服务实例
+        user_ai_service = get_ai_service_for_user(current_user.id)
+
+        if not user_ai_service.is_available():
+            raise HTTPException(status_code=503, detail="AI服务不可用，请在设置中配置您的AI模型")
         
         # 准备对话上下文
         context = ""
@@ -326,8 +343,8 @@ async def chat_with_ai(request: ChatMessage):
         请根据上下文信息给出准确、有用的回答。如果问题与提供的网页内容相关，请结合内容进行回答。
         """
         
-        # 获取AI回复
-        ai_response = await azure_openai_service.summarize_content(
+        # 获取AI回复（使用用户的AI服务）
+        ai_response = await user_ai_service.summarize_content(
             chat_prompt,
             "chat",
             settings.default_language

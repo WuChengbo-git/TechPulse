@@ -8,6 +8,7 @@ from ..core.database import get_db
 from ..models.user import User
 from ..models.user_settings import UserSettings, DataSourceConfig
 from ..api.auth import get_current_user
+from ..services.ai.config_helper import check_user_ai_config, get_active_ai_config
 
 router = APIRouter(prefix="/api/v1/user-settings", tags=["user-settings"])
 
@@ -328,3 +329,29 @@ async def delete_datasource_config(
     db.commit()
 
     return {"message": "Data source config deleted"}
+
+
+# 检查AI配置状态
+@router.get("/ai-config-status")
+async def get_ai_config_status(
+    current_user: User = Depends(get_current_user)
+):
+    """
+    检查当前用户的 AI 配置状态
+
+    返回配置来源优先级和激活的配置信息
+    """
+    status = check_user_ai_config(current_user.id)
+    active_config = get_active_ai_config(current_user.id)
+
+    return {
+        "status": status,
+        "active_config": active_config,
+        "message": (
+            "使用用户个人配置" if status["active_source"] == "user"
+            else "使用全局AI配置" if status["active_source"] == "global"
+            else "使用环境变量配置" if status["active_source"] == "environment"
+            else "未配置AI模型"
+        )
+    }
+
