@@ -46,7 +46,13 @@ const SettingsPage: React.FC = () => {
 
   // 加载用户设置
   useEffect(() => {
-    loadUserSettings();
+    // 检查是否有token，没有token就不加载设置
+    const token = localStorage.getItem('techpulse_token') || sessionStorage.getItem('techpulse_token');
+    if (token) {
+      loadUserSettings();
+    } else {
+      setInitialLoading(false);
+    }
   }, []);
 
   const loadUserSettings = async () => {
@@ -107,7 +113,10 @@ const SettingsPage: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Failed to load user settings:', error);
-      message.error('加载用户设置失败');
+      // 如果是401错误，不显示错误消息（用户会被重定向到登录页）
+      if (error.response?.status !== 401) {
+        message.error('加载用户设置失败');
+      }
     } finally {
       setInitialLoading(false);
     }
