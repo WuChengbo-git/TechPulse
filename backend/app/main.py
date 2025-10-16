@@ -2,7 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .core.config import settings
 from .core.database import engine, Base
-from .api import cards, sources, ai, notion, chat, auth, translate, user_settings, preferences, ai_config, health, behavior, search, recommend
+from .api import (
+    cards, sources, ai, notion, chat, auth, translate, user_settings,
+    preferences, ai_config, health, behavior, search, recommend,
+    system_config
+)
 from .api import settings as settings_api
 from .services.scheduler import task_scheduler
 import logging
@@ -41,6 +45,7 @@ app.include_router(health.router, prefix="/api/v1")  # 健康检查路由
 app.include_router(behavior.router, prefix="/api/v1")  # 用户行为路由
 app.include_router(search.router, prefix="/api/v1")  # 智能搜索路由
 app.include_router(recommend.router, prefix="/api/v1")  # 推荐系统路由
+app.include_router(system_config.router)  # 系统配置路由
 
 
 @app.on_event("startup")
@@ -50,10 +55,10 @@ async def startup_event():
     """
     try:
         logger.info("Starting TechPulse application...")
-        
+
         # 启动任务调度器
         task_scheduler.start_scheduler()
-        
+
         logger.info("TechPulse application started successfully")
     except Exception as e:
         logger.error(f"Error during application startup: {e}")
@@ -66,10 +71,10 @@ async def shutdown_event():
     """
     try:
         logger.info("Shutting down TechPulse application...")
-        
+
         # 停止任务调度器
         task_scheduler.stop_scheduler()
-        
+
         logger.info("TechPulse application shut down successfully")
     except Exception as e:
         logger.error(f"Error during application shutdown: {e}")
@@ -99,12 +104,11 @@ async def trigger_manual_collection():
     手动触发数据收集
     """
     try:
-        import asyncio
         from .services.data_collector import DataCollector
-        
+
         collector = DataCollector()
         results = await collector.collect_all_sources()
-        
+
         return {
             "message": "Manual collection completed",
             "results": results
