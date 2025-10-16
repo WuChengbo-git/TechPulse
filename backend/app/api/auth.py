@@ -9,7 +9,8 @@ from ..core.security import (
     create_access_token,
     create_refresh_token,
     get_current_user,
-    get_current_active_user
+    get_current_active_user,
+    get_current_user_optional
 )
 from ..models.user import User
 from ..models.auth_log import AuthLog

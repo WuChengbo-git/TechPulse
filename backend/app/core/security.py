@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Header
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from ..core.database import get_db
@@ -14,6 +14,9 @@ pwd_context = CryptContext(schemes=["argon2", "bcrypt"], deprecated="auto")
 
 # OAuth2 密码模式
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+
+# 可选的 OAuth2 密码模式（不强制要求 token）
+oauth2_scheme_optional = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login", auto_error=False)
 
 # JWT 配置
 SECRET_KEY = "your-secret-key-please-change-this-in-production"  # 生产环境请修改
@@ -131,3 +134,29 @@ async def get_current_active_user(
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="用户已被禁用")
     return current_user
+
+
+async def get_current_user_optional(
+    token: Optional[str] = Depends(oauth2_scheme_optional),
+    db: Session = Depends(get_db)
+) -> Optional[User]:
+    """
+    获取当前用户（可选）
+    如果未提供 token 或 token 无效，返回 None 而不是抛出异常
+    用于需要支持匿名访问的端点
+    """
+    if not token:
+        return None
+
+    try:
+        token_data = decode_access_token(token)
+        user = db.query(User).filter(User.id == token_data.user_id).first()
+
+        if user and user.is_active:
+            return user
+        return None
+    except HTTPException:
+        return None
+    except Exception:
+        return None
+

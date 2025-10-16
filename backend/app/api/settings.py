@@ -2,9 +2,12 @@ from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from typing import Optional, List
 from ..services.ai.azure_openai import azure_openai_service
+from ..services.ai.config_helper import get_ai_service_for_user, check_user_ai_config
 from ..core.config import settings
 from ..models.card import TechCard
+from ..models.user import User
 from ..core.database import SessionLocal
+from ..api.auth import get_current_user, get_current_user_optional
 from sqlalchemy.orm import Session
 import logging
 
@@ -204,14 +207,35 @@ async def get_supported_languages():
 
 
 @router.get("/status")
-async def get_service_status():
+async def get_service_status(current_user: Optional[User] = Depends(get_current_user_optional)):
     """
-    获取服务状态
+    获取服务状态 - 检查当前用户的 AI 配置
+
+    如果用户已登录，检查用户配置
+    否则检查全局配置
     """
+    ai_available = False
+    config_source = "none"
+
+    if current_user:
+        # 检查用户的 AI 配置
+        user_ai_service = get_ai_service_for_user(current_user.id)
+        ai_available = user_ai_service.is_available()
+
+        if ai_available:
+            config_status = check_user_ai_config(current_user.id)
+            config_source = config_status.get("active_source", "none")
+    else:
+        # 未登录，使用全局配置
+        ai_available = azure_openai_service.is_available()
+        if ai_available:
+            config_source = "global"
+
     return {
-        "ai_service_available": azure_openai_service.is_available(),
+        "ai_service_available": ai_available,
+        "config_source": config_source,
         "translation_enabled": settings.enable_translation,
         "summarization_enabled": settings.enable_summarization,
         "default_language": settings.default_language,
-        "azure_openai_configured": bool(settings.azure_openai_api_key and settings.azure_openai_endpoint)
+        "env_configured": bool(settings.azure_openai_api_key and settings.azure_openai_endpoint)
     }
