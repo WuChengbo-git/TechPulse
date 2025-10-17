@@ -11,6 +11,7 @@ import {
 import { useLanguage } from '../contexts/LanguageContext'
 import QualityBadge from '../components/QualityBadge'
 
+import CardSkeleton from '../components/CardSkeleton'
 const { Title, Text, Paragraph } = Typography
 const { Search } = Input
 const { TabPane } = Tabs
@@ -355,7 +356,7 @@ const HuggingFacePage: React.FC = () => {
         {/* 模型列表 */}
         <Col xs={24} lg={16}>
           <Card title={`🤖 ${t('huggingface.models')}`} style={{ minHeight: '600px' }}>
-            {loading ? (
+            {loading && models.length === 0 ? (<CardSkeleton count={5} grid={false} />) : filteredModels.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '50px' }}>
                 <span>Loading data...</span>
               </div>

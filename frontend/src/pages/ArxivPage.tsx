@@ -10,6 +10,7 @@ import {
 } from '@ant-design/icons'
 import { useLanguage } from '../contexts/LanguageContext'
 import QualityBadge from '../components/QualityBadge'
+import CardSkeleton from '../components/CardSkeleton'
 
 const { Title, Text, Paragraph } = Typography
 const { Search } = Input
@@ -385,10 +386,8 @@ const ArxivPage: React.FC = () => {
         {/* 论文列表 */}
         <Col xs={24} lg={16}>
           <Card title={`📚 ${t('arxiv.papers')}`} style={{ minHeight: '600px' }}>
-            {loading ? (
-              <div style={{ textAlign: 'center', padding: '50px' }}>
-                <span>{t('common.loading')}</span>
-              </div>
+            {loading && papers.length === 0 ? (
+              <CardSkeleton count={5} grid={false} />
             ) : filteredPapers.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '50px' }}>
                 <span>暂无arXiv论文数据</span>
@@ -402,7 +401,7 @@ const ArxivPage: React.FC = () => {
                       <Button 
                         key="detail" 
                         type="primary"
-                        size="small"
+                        style={{ fontSize: "12px" }}
                         icon={<EyeOutlined />}
                         onClick={() => openDetailModal(paper)}
                       >
@@ -448,12 +447,12 @@ const ArxivPage: React.FC = () => {
                               {paper.title || '无标题'}
                             </Text>
                             {paper.quality_score !== undefined && (
-                              <QualityBadge score={paper.quality_score} size="small" />
+                              <QualityBadge score={paper.quality_score} style={{ fontSize: "12px" }} />
                             )}
                           </div>
                           <div style={{ marginBottom: 8 }}>
                             {(paper.categories || []).map((cat, index) => (
-                              <Tag key={index} color="red" size="small">
+                              <Tag key={index} color="red" style={{ fontSize: "12px" }}>
                                 {categoryNames[cat] || cat}
                               </Tag>
                             ))}
@@ -509,7 +508,7 @@ const ArxivPage: React.FC = () => {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <Progress 
                       percent={Math.round((count / (stats?.total_papers || 1)) * 100)} 
-                      size="small" 
+                      style={{ fontSize: "12px" }} 
                       style={{ width: '60px' }}
                       showInfo={false}
                     />

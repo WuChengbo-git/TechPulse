@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { Card, Row, Col, Typography, Spin, Alert, Button, Tag, Space, Select, Modal, message, Tabs, Input, Badge, Divider, Statistic, List } from 'antd'
+import { Card, Row, Col, Typography, Spin, Alert, Button, Tag, Space, Select, Modal, message, Tabs, Input, Badge, Divider, Statistic, List, Skeleton } from 'antd'
 import { GithubOutlined, FileTextOutlined, RobotOutlined, SyncOutlined, TranslationOutlined, SettingOutlined, SearchOutlined, StarOutlined, ForkOutlined, ExclamationCircleOutlined, EyeOutlined, CloudDownloadOutlined, LinkOutlined, FireOutlined, TrophyOutlined, RiseOutlined } from '@ant-design/icons'
 import { useLanguage } from '../contexts/LanguageContext'
 import QualityBadge from '../components/QualityBadge'
 import SmartSearch from '../components/SmartSearch'
 import RecommendationPanel from '../components/RecommendationPanel'
 import SearchResultList from '../components/SearchResultList'
+import CardSkeleton from '../components/CardSkeleton'
 
 const { Title, Paragraph, Text } = Typography
 const { Search } = Input
@@ -54,6 +55,7 @@ const Dashboard: React.FC = () => {
   const [searchLoading, setSearchLoading] = useState(false)
   const [searchMode, setSearchMode] = useState<'keyword' | 'ai'>('keyword')
 
+  // 使用 React Query 优化数据获取（已注释，改用新的 useCards hook）
   const fetchCards = async (source?: string) => {
     try {
       setLoading(true)
@@ -239,11 +241,44 @@ const Dashboard: React.FC = () => {
     }
   }
 
-  if (loading) {
+  // 初次加载显示骨架屏（更好的用户体验）
+  if (loading && cards.length === 0) {
     return (
-      <div style={{ textAlign: 'center', padding: '50px' }}>
-        <Spin size="large" />
-        <div style={{ marginTop: 16 }}>{t('common.loading')}</div>
+      <div>
+        {/* 头部区域骨架 */}
+        <div style={{ marginBottom: 24 }}>
+          <Skeleton.Input active style={{ width: 200, height: 32, marginBottom: 16 }} />
+          <Skeleton.Input active style={{ width: '100%', height: 40, marginBottom: 16 }} />
+          <Space>
+            <Skeleton.Button active />
+            <Skeleton.Button active />
+          </Space>
+        </div>
+
+        {/* Tab 骨架 */}
+        <div style={{ marginBottom: 24 }}>
+          <Space>
+            <Skeleton.Button active style={{ width: 100 }} />
+            <Skeleton.Button active style={{ width: 100 }} />
+            <Skeleton.Button active style={{ width: 100 }} />
+            <Skeleton.Button active style={{ width: 100 }} />
+          </Space>
+        </div>
+
+        {/* 卡片骨架 */}
+        <Row gutter={24}>
+          <Col xs={24} lg={16}>
+            <CardSkeleton count={6} grid={true} />
+          </Col>
+          <Col xs={24} lg={8}>
+            <Card size="small" style={{ marginBottom: 16 }}>
+              <Skeleton active />
+            </Card>
+            <Card size="small" style={{ marginBottom: 16 }}>
+              <Skeleton active />
+            </Card>
+          </Col>
+        </Row>
       </div>
     )
   }
@@ -408,11 +443,11 @@ const Dashboard: React.FC = () => {
             />
           </Tabs>
 
-      {/* 加载状态 */}
-      {loading && (
-        <div style={{ textAlign: 'center', padding: '50px' }}>
-          <Spin size="large" />
-          <div style={{ marginTop: 16 }}>{t('common.loading')}</div>
+      {/* 加载状态 - 使用骨架屏代替Spinner */}
+      {loading && cards.length > 0 && (
+        <div style={{ marginTop: 16, textAlign: 'center' }}>
+          <Spin size="small" />
+          <Text type="secondary" style={{ marginLeft: 8 }}>{t('common.loading')}</Text>
         </div>
       )}
 

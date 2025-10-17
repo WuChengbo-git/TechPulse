@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import {
   Card, Row, Col, Button, Progress, message, Typography, Space, Badge,
-  Statistic, Timeline, Alert, Modal, List, Tag, Tabs, Input, Select, Divider
+  Statistic, Timeline, Alert, Modal, List, Tag, Tabs, Input, Select, Divider, Skeleton
 } from 'antd'
 import {
   GithubOutlined, SyncOutlined, CheckCircleOutlined, ClockCircleOutlined,
@@ -11,6 +11,7 @@ import {
 } from '@ant-design/icons'
 import { useLanguage } from '../contexts/LanguageContext'
 import QualityBadge from '../components/QualityBadge'
+import CardSkeleton from '../components/CardSkeleton'
 
 const { Title, Text, Paragraph } = Typography
 const { Search } = Input
@@ -331,10 +332,8 @@ const GitHubPage: React.FC = () => {
         {/* 仓库列表 */}
         <Col xs={24} lg={16}>
           <Card title={`📦 ${t('github.repositories')}`} style={{ minHeight: '600px' }}>
-            {loading ? (
-              <div style={{ textAlign: 'center', padding: '50px' }}>
-                <span>{t('common.loading')}</span>
-              </div>
+            {loading && repos.length === 0 ? (
+              <CardSkeleton count={5} grid={false} />
             ) : (
               <List
                 dataSource={filteredRepos}
