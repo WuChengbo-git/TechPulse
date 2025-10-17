@@ -283,14 +283,19 @@ function AppContent() {
                         icon: <GlobalOutlined />,
                         children: [
                           {
-                            key: 'zh',
+                            key: 'zh-CN',
                             label: '简体中文',
-                            onClick: () => setLanguage('zh'),
+                            onClick: () => setLanguage('zh-CN'),
                           },
                           {
-                            key: 'en',
+                            key: 'en-US',
                             label: 'English',
-                            onClick: () => setLanguage('en'),
+                            onClick: () => setLanguage('en-US'),
+                          },
+                          {
+                            key: 'ja-JP',
+                            label: '日本語',
+                            onClick: () => setLanguage('ja-JP'),
                           },
                         ],
                       },
