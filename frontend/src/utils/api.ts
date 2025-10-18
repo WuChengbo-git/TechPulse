@@ -34,15 +34,24 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // 只有在已登录状态下遇到 401 才清除登录状态
+    // 登录接口返回 401 时不应该刷新页面
     if (error.response?.status === 401) {
-      // Token 过期或无效，清除登录状态
-      localStorage.removeItem('techpulse_token');
-      localStorage.removeItem('techpulse_user');
-      sessionStorage.removeItem('techpulse_token');
-      sessionStorage.removeItem('techpulse_user');
+      // 检查是否是登录或注册接口
+      const isAuthEndpoint = error.config?.url?.includes('/auth/login') ||
+                            error.config?.url?.includes('/auth/register');
 
-      // 重定向到登录页（在 App 组件中会自动处理）
-      window.location.reload();
+      if (!isAuthEndpoint) {
+        // 非登录接口的 401 错误：Token 过期或无效，清除登录状态
+        localStorage.removeItem('techpulse_token');
+        localStorage.removeItem('techpulse_user');
+        sessionStorage.removeItem('techpulse_token');
+        sessionStorage.removeItem('techpulse_user');
+
+        // 重定向到登录页（在 App 组件中会自动处理）
+        window.location.reload();
+      }
+      // 登录接口的 401 错误：正常抛出，让 Login 组件处理
     }
     return Promise.reject(error);
   }
