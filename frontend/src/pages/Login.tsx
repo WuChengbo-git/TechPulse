@@ -43,14 +43,14 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
           password: values.password,
         });
 
-        const { token, user } = response.data;
+        const { access_token, user } = response.data;
 
         // 存储 token 和用户信息
         if (values.remember) {
-          localStorage.setItem('techpulse_token', token);
+          localStorage.setItem('techpulse_token', access_token);
           localStorage.setItem('techpulse_user', JSON.stringify(user));
         } else {
-          sessionStorage.setItem('techpulse_token', token);
+          sessionStorage.setItem('techpulse_token', access_token);
           sessionStorage.setItem('techpulse_user', JSON.stringify(user));
         }
 
