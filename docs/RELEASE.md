@@ -1,5 +1,118 @@
 # TechPulse Release Notes
 
+## Version 0.2.1 - TechPulse Refined
+**发布日期**: 2025-10-20
+
+### 🎯 本版本更新概览
+TechPulse 0.2.1 专注于系统优化和bug修复，完善了认证系统、个性化功能和系统管理模块，进一步提升用户体验和系统稳定性。
+
+### 🔧 认证系统修复
+#### 1. Token存储修复
+- **修复登录token存储问题**: Login.tsx中的token字段名称不匹配导致token无法保存
+  - 问题: 前端期望 `token` 字段，但后端返回 `access_token`
+  - 影响: 用户登录后token未保存，访问受保护页面时立即重定向
+  - 修复: 更改为正确的 `access_token` 字段名
+  - 相关文件: `frontend/src/pages/Login.tsx:46`
+
+#### 2. 401错误处理优化
+- **改进401拦截器逻辑**: 区分登录失败和token过期场景
+  - 添加 `isHandling401` 标志防止重复刷新
+  - 增加延迟到500ms减少页面闪烁
+  - 排除登录/注册接口避免错误拦截
+  - 相关文件: `frontend/src/utils/api.ts:34-74`
+
+### 🎨 个性化系统完善
+#### 1. 兴趣问卷保存修复
+- **修复用户偏好设置保存失败**: InterestSurvey组件API调用错误
+  - 问题: 使用fetch()且token键名错误（'token' vs 'techpulse_token'）
+  - 修复: 改用axios实例，自动处理认证头
+  - 优化: 改进错误处理，显示后端详细错误信息
+  - 相关文件: `frontend/src/components/InterestSurvey.tsx:74-85`
+
+### 🔨 系统管理优化
+#### 1. 功能分工明确化
+- **移除Azure OpenAI配置**: 从数据源配置页面移除，将来可添加到LLM管理
+  - 删除 AzureOpenAIConfig 接口和相关状态
+  - 移除 save/load/test 函数和渲染函数
+  - 减少代码214行，简化页面逻辑
+  - 相关文件: `frontend/src/pages/ApiConfigPage.tsx`
+
+#### 2. 菜单命名优化
+- **更新系统管理菜单名称**: 使功能定位更清晰
+  - "API配置" → "数据源配置" (Data Source Config)
+  - "任务管理" → "采集任务" (Collection Tasks)
+  - 同步更新三语言翻译（中英日）
+  - 相关文件: `frontend/src/locales/translations.ts`
+
+### 📋 系统管理模块当前结构
+```
+系统管理/
+├── 系统设置 (settings)
+├── LLM模型管理 (llm-providers)
+├── 数据源配置 (api-config)        ✨ 已优化
+├── 采集任务 (tasks)               ✨ 菜单名已更新
+└── 系统状态 (status)
+```
+
+### 🐛 问题修复汇总
+- ✅ 修复登录后token未保存导致无法访问受保护页面
+- ✅ 修复LLM模型管理页面自动跳转登录
+- ✅ 修复兴趣问卷保存失败（"保存失败，请重试"）
+- ✅ 优化401错误处理，避免重复页面刷新
+- ✅ 移除Azure OpenAI配置标签页，简化页面结构
+- ✅ 更新系统管理菜单名称，提升可理解性
+
+### 📝 修改文件列表
+**前端修改**:
+- `frontend/src/pages/Login.tsx` - Token字段名修复
+- `frontend/src/utils/api.ts` - 401拦截器优化
+- `frontend/src/components/InterestSurvey.tsx` - API调用修复
+- `frontend/src/pages/ApiConfigPage.tsx` - 移除Azure OpenAI配置
+- `frontend/src/locales/translations.ts` - 菜单名称更新
+- `frontend/package.json` - 版本号更新到0.2.1
+
+**后端修改**:
+- `backend/app/main.py` - 版本号更新到0.2.1
+
+**文档和配置**:
+- `scripts/version.json` - 版本信息更新
+- `docs/RELEASE.md` - 发布记录更新
+
+### 📈 用户价值
+- **认证体验**: 登录功能完全正常，token正确保存和使用
+- **个性化设置**: 兴趣问卷可以正常保存，实现个性化推荐
+- **功能清晰**: 系统管理菜单命名更直观，降低使用门槛
+- **系统稳定**: 减少不必要的页面刷新，提升使用流畅度
+
+### 🔄 升级指南
+从 0.2.0 升级到 0.2.1:
+1. **前端升级**:
+   ```bash
+   cd frontend
+   git pull
+   npm install
+   npm run build
+   ```
+2. **后端升级**:
+   ```bash
+   cd backend
+   git pull
+   # 无需新的依赖或数据库变更
+   ```
+3. **用户操作**: 清除浏览器缓存或退出重新登录
+
+### ⚠️ 重要提示
+- **需要重新登录**: 由于token处理逻辑修复，建议所有用户退出后重新登录
+- **历史token失效**: 修复前保存的token可能无法使用，需要重新登录获取
+
+### Git提交记录
+本版本包含以下主要提交:
+- `3a75290` - fix: Use access_token instead of token in login response
+- `bc369f8` - fix: Use axios instead of fetch in InterestSurvey for proper authentication
+- `db062a3` - refactor: Optimize system management pages (Plan 1)
+
+---
+
 ## Version 0.1.9 - TechPulse System Management
 **发布日期**: 2025-10-07
 
