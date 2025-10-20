@@ -67,17 +67,6 @@ interface ScheduleConfig {
   timezone: string
 }
 
-interface AzureOpenAIConfig {
-  service_type: string
-  api_key: string
-  api_endpoint: string
-  api_version: string
-  deployment_name: string
-  embedding_deployment_name: string
-  model_name: string
-  is_enabled: boolean
-}
-
 const ApiConfigPage: React.FC = () => {
   const { t } = useLanguage()
   const [form] = Form.useForm()
@@ -133,17 +122,6 @@ const ApiConfigPage: React.FC = () => {
     frequency: 'daily',
     time: '09:00',
     timezone: 'Asia/Tokyo'
-  })
-
-  const [azureOpenAIConfig, setAzureOpenAIConfig] = useState<AzureOpenAIConfig>({
-    service_type: 'azure_openai',
-    api_key: '',
-    api_endpoint: '',
-    api_version: '2024-02-15-preview',
-    deployment_name: 'gpt-4o',
-    embedding_deployment_name: 'text-embedding-ada-002',
-    model_name: 'gpt-4o',
-    is_enabled: true
   })
 
   // 预定义选项
@@ -223,80 +201,8 @@ const ApiConfigPage: React.FC = () => {
     }
   }
 
-  // 保存Azure OpenAI配置
-  const saveAzureOpenAIConfig = async () => {
-    try {
-      setLoading(true)
-
-      const response = await fetch('/api/v1/ai-config/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(azureOpenAIConfig)
-      })
-
-      if (response.ok) {
-        message.success('Azure OpenAI配置保存成功！')
-      } else {
-        const error = await response.json()
-        throw new Error(error.detail || '保存失败')
-      }
-    } catch (error: any) {
-      message.error(`保存失败: ${error.message}`)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // 加载Azure OpenAI配置
-  const loadAzureOpenAIConfig = async () => {
-    try {
-      const response = await fetch('/api/v1/ai-config/')
-      if (response.ok) {
-        const data = await response.json()
-        setAzureOpenAIConfig({
-          service_type: data.service_type || 'azure_openai',
-          api_key: data.api_key || '',
-          api_endpoint: data.api_endpoint || '',
-          api_version: data.api_version || '2024-02-15-preview',
-          deployment_name: data.deployment_name || 'gpt-4o',
-          embedding_deployment_name: data.embedding_deployment_name || 'text-embedding-ada-002',
-          model_name: data.model_name || 'gpt-4o',
-          is_enabled: data.is_enabled !== undefined ? data.is_enabled : true
-        })
-      }
-    } catch (error) {
-      console.log('No Azure OpenAI config found or error loading:', error)
-    }
-  }
-
-  // 测试Azure OpenAI配置
-  const testAzureOpenAIConfig = async () => {
-    try {
-      setTestLoading(true)
-
-      const response = await fetch('/api/v1/ai-config/test', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(azureOpenAIConfig)
-      })
-
-      const result = await response.json()
-
-      if (result.success) {
-        message.success(result.message)
-      } else {
-        message.error(result.message)
-      }
-    } catch (error: any) {
-      message.error(`测试失败: ${error.message}`)
-    } finally {
-      setTestLoading(false)
-    }
-  }
-
   useEffect(() => {
     loadConfig()
-    loadAzureOpenAIConfig()
   }, [])
 
   // GitHub配置面板
@@ -704,119 +610,6 @@ const ApiConfigPage: React.FC = () => {
     </Card>
   )
 
-  // Azure OpenAI配置面板
-  const renderAzureOpenAIConfig = () => (
-    <Space direction="vertical" style={{ width: '100%' }}>
-      <Alert
-        message="配置Azure OpenAI服务"
-        description="配置后，系统将使用AI自动生成摘要、提取标签和试用建议。如果不配置，将使用基础功能。"
-        type="info"
-        showIcon
-        style={{ marginBottom: 16 }}
-      />
-
-      <Card title="🤖 Azure OpenAI 基础配置" size="small">
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item label="API Key" required>
-              <Input.Password
-                value={azureOpenAIConfig.api_key}
-                onChange={(e) => setAzureOpenAIConfig({...azureOpenAIConfig, api_key: e.target.value})}
-                placeholder="请输入Azure OpenAI API Key"
-              />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label="API Endpoint" required>
-              <Input
-                value={azureOpenAIConfig.api_endpoint}
-                onChange={(e) => setAzureOpenAIConfig({...azureOpenAIConfig, api_endpoint: e.target.value})}
-                placeholder="https://your-resource.openai.azure.com/"
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Row gutter={16}>
-          <Col span={8}>
-            <Form.Item label="API Version">
-              <Input
-                value={azureOpenAIConfig.api_version}
-                onChange={(e) => setAzureOpenAIConfig({...azureOpenAIConfig, api_version: e.target.value})}
-                placeholder="2024-02-15-preview"
-              />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item label="Deployment Name">
-              <Input
-                value={azureOpenAIConfig.deployment_name}
-                onChange={(e) => setAzureOpenAIConfig({...azureOpenAIConfig, deployment_name: e.target.value})}
-                placeholder="gpt-4o"
-              />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item label="Embedding Deployment">
-              <Input
-                value={azureOpenAIConfig.embedding_deployment_name}
-                onChange={(e) => setAzureOpenAIConfig({...azureOpenAIConfig, embedding_deployment_name: e.target.value})}
-                placeholder="text-embedding-ada-002"
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item label="Model Name">
-              <Input
-                value={azureOpenAIConfig.model_name}
-                onChange={(e) => setAzureOpenAIConfig({...azureOpenAIConfig, model_name: e.target.value})}
-                placeholder="gpt-4o"
-              />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label="启用AI功能">
-              <Switch
-                checked={azureOpenAIConfig.is_enabled}
-                onChange={(checked) => setAzureOpenAIConfig({...azureOpenAIConfig, is_enabled: checked})}
-              />
-              <Text type="secondary" style={{ marginLeft: 8, fontSize: 12 }}>
-                关闭后将不使用AI进行内容处理
-              </Text>
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Divider />
-
-        <Row gutter={16}>
-          <Col span={24}>
-            <Space>
-              <Button
-                type="primary"
-                icon={<SaveOutlined />}
-                onClick={saveAzureOpenAIConfig}
-                loading={loading}
-              >
-                保存配置
-              </Button>
-              <Button
-                icon={<ApiOutlined />}
-                onClick={testAzureOpenAIConfig}
-                loading={testLoading}
-              >
-                测试连接
-              </Button>
-            </Space>
-          </Col>
-        </Row>
-      </Card>
-    </Space>
-  )
-
   return (
     <div>
       {/* 头部 */}
@@ -892,13 +685,6 @@ const ApiConfigPage: React.FC = () => {
           key="schedule"
         >
           {renderScheduleConfig()}
-        </TabPane>
-
-        <TabPane
-          tab={<span><RobotOutlined />Azure OpenAI</span>}
-          key="azure-openai"
-        >
-          {renderAzureOpenAIConfig()}
         </TabPane>
       </Tabs>
     </div>
