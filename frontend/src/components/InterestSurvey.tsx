@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Form, Checkbox, Radio, Button, Typography, Space, Divider, message } from 'antd';
 import { RocketOutlined } from '@ant-design/icons';
 import { useLanguage } from '../contexts/LanguageContext';
+import { api } from '../utils/api';
 
 const { Title, Text } = Typography;
 
@@ -70,25 +71,18 @@ const InterestSurvey: React.FC<InterestSurveyProps> = ({ visible, onComplete, on
         onboarding_completed: true,
       };
 
-      // 调用API保存偏好
-      const response = await fetch('/api/v1/preferences/onboarding', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token') || sessionStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(preferences),
-      });
+      // 使用 axios 调用 API 保存偏好（自动添加认证头）
+      await api.post('/api/v1/preferences/onboarding', preferences);
 
-      if (response.ok) {
-        message.success('偏好设置保存成功！');
-        onComplete(preferences);
-      } else {
-        message.error('保存失败，请重试');
-      }
-    } catch (error) {
+      message.success('偏好设置保存成功！');
+      onComplete(preferences);
+    } catch (error: any) {
       console.error('Survey submission error:', error);
-      message.error('提交失败');
+      console.error('Error response:', error.response);
+
+      // 显示详细错误信息
+      const errorMsg = error.response?.data?.detail || '保存失败，请重试';
+      message.error(errorMsg);
     } finally {
       setLoading(false);
     }
