@@ -31,7 +31,7 @@ api.interceptors.request.use(
 );
 
 // 防止重复刷新页面的标志
-let isRedirecting = false;
+let isHandling401 = false;
 
 // 响应拦截器：处理错误
 api.interceptors.response.use(
@@ -44,21 +44,28 @@ api.interceptors.response.use(
       const isAuthEndpoint = error.config?.url?.includes('/auth/login') ||
                             error.config?.url?.includes('/auth/register');
 
-      if (!isAuthEndpoint && !isRedirecting) {
+      if (!isAuthEndpoint && !isHandling401) {
         // 非登录接口的 401 错误：Token 过期或无效，清除登录状态
-        isRedirecting = true; // 设置标志，防止重复刷新
+        isHandling401 = true; // 设置标志，防止重复处理
 
-        console.log('Token expired or invalid, redirecting to login...');
+        console.log('Token expired or invalid, clearing auth state...');
 
+        // 清除登录状态
         localStorage.removeItem('techpulse_token');
         localStorage.removeItem('techpulse_user');
         sessionStorage.removeItem('techpulse_token');
         sessionStorage.removeItem('techpulse_user');
 
-        // 使用 setTimeout 延迟刷新，避免多个401请求同时触发刷新
+        // 延迟刷新，给其他 401 请求一些时间完成
+        // 注意：不要立即刷新，避免页面加载时的闪烁
         setTimeout(() => {
-          window.location.reload();
-        }, 100);
+          // 检查当前页面是否还在应用内部（不是登录页）
+          if (window.location.pathname !== '/login') {
+            console.log('Redirecting to login page...');
+            window.location.reload();
+          }
+          isHandling401 = false; // 重置标志
+        }, 500); // 增加延迟到 500ms
       }
       // 登录接口的 401 错误：正常抛出，让 Login 组件处理
     }
