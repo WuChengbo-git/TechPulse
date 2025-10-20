@@ -1,5 +1,6 @@
 import React from 'react'
 import { Typography, Space } from 'antd'
+import { APP_VERSION, BUILD_DATE } from '../config/version'
 
 const { Text } = Typography
 
@@ -8,16 +9,13 @@ interface VersionInfoProps {
 }
 
 const VersionInfo: React.FC<VersionInfoProps> = ({ style }) => {
-  const version = '0.2.0'
-  const build = '20251015'
-
   return (
     <Space style={style} split={<Text type="secondary">|</Text>}>
       <Text type="secondary" style={{ fontSize: '11px' }}>
-        Version {version}
+        Version {APP_VERSION}
       </Text>
       <Text type="secondary" style={{ fontSize: '11px' }}>
-        Build {build}
+        Build {BUILD_DATE}
       </Text>
     </Space>
   )

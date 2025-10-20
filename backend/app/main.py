@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .core.config import settings
 from .core.database import engine, Base
+from .core.version import APP_VERSION
 from .api import (
     cards, sources, ai, notion, chat, auth, translate, user_settings,
     preferences, ai_config, health, behavior, search, recommend,
@@ -18,7 +19,7 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(
     title=settings.app_name,
     description="TechPulse - 每日技术情报可视化仪表盘",
-    version="0.2.1",
+    version=APP_VERSION,
     debug=settings.debug
 )
 
@@ -83,7 +84,7 @@ async def shutdown_event():
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to TechPulse API", "version": "0.2.1"}
+    return {"message": "Welcome to TechPulse API", "version": APP_VERSION}
 
 
 @app.get("/health")
