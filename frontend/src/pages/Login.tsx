@@ -22,6 +22,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [isRegister, setIsRegister] = useState(false);
   const { language, setLanguage, t } = useLanguage();
+  const [form] = Form.useForm();
 
   const onFinish = async (values: LoginFormValues) => {
     setLoading(true);
@@ -35,6 +36,9 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
           password: values.password,
         });
         message.success(t('login.registerSuccess'));
+        // 清空表单
+        form.resetFields();
+        // 切换到登录模式
         setIsRegister(false);
       } else {
         // 登录
@@ -128,7 +132,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       }}>
         <LanguageSelector
           value={language}
-          onChange={setLanguage}
+          onChange={(lang) => setLanguage(lang as 'zh-CN' | 'en-US' | 'ja-JP')}
           size="large"
         />
       </div>
@@ -170,6 +174,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
 
         {/* 登录/注册表单 */}
         <Form
+          form={form}
           name={isRegister ? "register" : "login"}
           initialValues={{ remember: true }}
           onFinish={onFinish}
