@@ -130,11 +130,11 @@ export const SmartSearch: React.FC<SmartSearchProps> = ({
 
   // 热门搜索词
   const popularSearches = [
-    '深度学习',
-    'Transformer',
-    'FastAPI',
-    '大语言模型',
-    'Agent'
+    t('trends.suggestionDeepLearning'),
+    t('trends.suggestionTransformer'),
+    t('trends.suggestionFastAPI'),
+    t('trends.suggestionLLM'),
+    t('trends.suggestionAgent')
   ]
 
   return (

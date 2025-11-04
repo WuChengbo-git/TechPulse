@@ -61,14 +61,14 @@ const ArxivPage: React.FC = () => {
 
   // arXiv分类映射
   const categoryNames: Record<string, string> = {
-    'cs.AI': 'AI・Machine Learning',
-    'cs.CL': 'Natural Language Processing',
-    'cs.CV': 'Computer Vision',
-    'cs.LG': 'Machine Learning',
-    'cs.RO': 'Robotics',
-    'cs.SE': 'Software Engineering',
-    'stat.ML': 'Statistical Machine Learning',
-    'math.OC': 'Optimization and Control'
+    'cs.AI': t('arxiv.catAI'),
+    'cs.CL': t('arxiv.catNLP'),
+    'cs.CV': t('arxiv.catCV'),
+    'cs.LG': t('arxiv.catML'),
+    'cs.RO': t('arxiv.catRobotics'),
+    'cs.SE': t('arxiv.catSE'),
+    'stat.ML': t('arxiv.catStatML'),
+    'math.OC': t('arxiv.catOptimization')
   }
 
   // 获取arXiv数据
@@ -139,7 +139,7 @@ const ArxivPage: React.FC = () => {
       }
     } catch (error) {
       console.error('Failed to fetch arXiv data:', error)
-      message.error('获取arXiv数据失败')
+      message.error(t('arxiv.fetchDataFailed'))
       // 设置空数据以防止页面崩溃
       setPapers([])
       setStats({
@@ -190,15 +190,15 @@ const ArxivPage: React.FC = () => {
         const data = await response.json()
         setChatHistory(prev => [...prev, {
           user: userMessage,
-          ai: data.response || '抱歉，我无法回答这个问题。'
+          ai: data.response || t('arxiv.cannotAnswer')
         }])
         setChatMessage('')
       } else {
-        message.error('发送消息失败')
+        message.error(t('arxiv.sendMessageFailed'))
       }
     } catch (error) {
       console.error('Chat error:', error)
-      message.error('发送消息失败')
+      message.error(t('arxiv.sendMessageFailed'))
     } finally {
       setChatLoading(false)
     }
@@ -327,8 +327,8 @@ const ArxivPage: React.FC = () => {
             <Statistic
               title={t('arxiv.mainCategory')}
               value={stats?.categories ?
-                (categoryNames[Object.keys(stats.categories)[0]] || Object.keys(stats.categories)[0] || '大语言模型') :
-                '大语言模型'
+                (categoryNames[Object.keys(stats.categories)[0]] || Object.keys(stats.categories)[0] || t('arxiv.defaultCategory')) :
+                t('arxiv.defaultCategory')
               }
               prefix={<CalendarOutlined style={{ color: '#fa8c16' }} />}
               valueStyle={{ color: '#fa8c16', fontSize: '20px' }}
@@ -398,14 +398,14 @@ const ArxivPage: React.FC = () => {
                 renderItem={(paper) => (
                   <List.Item
                     actions={[
-                      <Button 
-                        key="detail" 
+                      <Button
+                        key="detail"
                         type="primary"
                         style={{ fontSize: "12px" }}
                         icon={<EyeOutlined />}
                         onClick={() => openDetailModal(paper)}
                       >
-                        详细查看
+                        {t('arxiv.viewDetails')}
                       </Button>,
                       <Button 
                         key="abstract" 
@@ -416,7 +416,7 @@ const ArxivPage: React.FC = () => {
                           if (paper.original_url) {
                             window.open(paper.original_url, '_blank')
                           } else {
-                            message.warning('摘要链接不可用')
+                            message.warning(t('arxiv.abstractLinkUnavailable'))
                           }
                         }}
                       >
@@ -431,7 +431,7 @@ const ArxivPage: React.FC = () => {
                           if (paper.pdf_url) {
                             window.open(paper.pdf_url, '_blank')
                           } else {
-                            message.warning('PDF链接不可用')
+                            message.warning(t('arxiv.pdfLinkUnavailable'))
                           }
                         }}
                       >
@@ -444,7 +444,7 @@ const ArxivPage: React.FC = () => {
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
                             <Text strong>
-                              {paper.title || '无标题'}
+                              {paper.title || t('arxiv.noTitle')}
                             </Text>
                             {paper.quality_score !== undefined && (
                               <QualityBadge score={paper.quality_score} style={{ fontSize: "12px" }} />
@@ -462,11 +462,11 @@ const ArxivPage: React.FC = () => {
                       description={
                         <div>
                           <Paragraph ellipsis={{ rows: 3 }} style={{ marginBottom: 8 }}>
-                            {paper.abstract || paper.summary || '暂无摘要'}
+                            {paper.abstract || paper.summary || t('arxiv.noAbstract')}
                           </Paragraph>
                           <Space>
                             <Text type="secondary">
-                              <CalendarOutlined /> {t('arxiv.published')}: {paper.created_at ? new Date(paper.created_at).toLocaleDateString() : '未知'}
+                              <CalendarOutlined /> {t('arxiv.published')}: {paper.created_at ? new Date(paper.created_at).toLocaleDateString() : t('arxiv.unknown')}
                             </Text>
                           </Space>
                         </div>
@@ -578,22 +578,22 @@ const ArxivPage: React.FC = () => {
 
               {selectedPaper.authors && (
                 <div style={{ marginBottom: 12 }}>
-                  <Text strong>作者: </Text>
+                  <Text strong>{t('arxiv.author')}</Text>
                   <Text>{selectedPaper.authors.join(', ')}</Text>
                 </div>
               )}
 
               <div style={{ marginBottom: 12 }}>
-                <Text strong>发布时间: </Text>
-                <Text>{selectedPaper.created_at ? new Date(selectedPaper.created_at).toLocaleDateString() : '未知'}</Text>
+                <Text strong>{t('arxiv.publishTime')}</Text>
+                <Text>{selectedPaper.created_at ? new Date(selectedPaper.created_at).toLocaleDateString() : t('arxiv.unknown')}</Text>
               </div>
 
               <Divider />
 
               <div>
-                <Title level={5}>完整摘要</Title>
+                <Title level={5}>{t('arxiv.fullAbstract')}</Title>
                 <Paragraph style={{ whiteSpace: 'pre-wrap', textAlign: 'justify' }}>
-                  {selectedPaper.abstract || selectedPaper.summary || '暂无摘要'}
+                  {selectedPaper.abstract || selectedPaper.summary || t('arxiv.noAbstract')}
                 </Paragraph>
               </div>
 
@@ -671,7 +671,7 @@ const ArxivPage: React.FC = () => {
                 <Input
                   value={chatMessage}
                   onChange={(e) => setChatMessage(e.target.value)}
-                  placeholder="问一下关于这篇论文的问题..."
+                  placeholder={t('arxiv.askQuestionPlaceholder')}
                   onPressEnter={sendChatMessage}
                   disabled={chatLoading}
                 />

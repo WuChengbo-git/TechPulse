@@ -382,12 +382,12 @@ class DataCollector:
                             except Exception as e:
                                 logger.warning(f"Failed to generate trial suggestion for {article['title'][:50]}: {e}")
 
-                        # 构建基础摘要
-                        base_summary = f"作者: {article.get('author', 'Unknown')}"
+                        # 构建基础摘要 (使用英文标签以支持国际化)
+                        base_summary = f"Author: {article.get('author', 'Unknown')}"
                         if article.get('likes'):
-                            base_summary += f", 点赞: {article['likes']}"
+                            base_summary += f", Likes: {article['likes']}"
                         if article.get('keyword'):
-                            base_summary += f", 关键词: {article['keyword']}"
+                            base_summary += f", Keyword: {article['keyword']}"
 
                         # 准备标签
                         tags = chinese_tags if chinese_tags else []

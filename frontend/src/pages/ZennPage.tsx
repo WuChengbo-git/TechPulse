@@ -84,7 +84,7 @@ const ZennPage: React.FC = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          message: `关于这篇Zenn文章 "${selectedArticle.title}"，${userMessage}`,
+          message: `${t('zenn.aboutThisArticle')} "${selectedArticle.title}"，${userMessage}`,
           context: {
             title: selectedArticle.title,
             content_excerpt: selectedArticle.content_excerpt,
@@ -94,20 +94,20 @@ const ZennPage: React.FC = () => {
           }
         }),
       })
-      
+
       if (response.ok) {
         const data = await response.json()
         setChatHistory(prev => [...prev, {
           user: userMessage,
-          ai: data.response || '抱歉，我无法回答这个问题。'
+          ai: data.response || t('zenn.cannotAnswer')
         }])
         setChatMessage('')
       } else {
-        message.error('发送消息失败')
+        message.error(t('zenn.sendMessageFailed'))
       }
     } catch (error) {
       console.error('Chat error:', error)
-      message.error('发送消息失败')
+      message.error(t('zenn.sendMessageFailed'))
     } finally {
       setChatLoading(false)
     }
@@ -129,7 +129,7 @@ const ZennPage: React.FC = () => {
           content_excerpt: article.summary || article.content_excerpt || '',
           tags: article.chinese_tags || article.tags || [],
           // 设置默认值
-          author_name: article.author_name || '匿名',
+          author_name: article.author_name || t('zenn.anonymous'),
           likes_count: article.likes_count || 0,
           comments_count: article.comments_count || 0,
           emoji: article.emoji || '📝',
@@ -141,7 +141,7 @@ const ZennPage: React.FC = () => {
         
         // 模拟统计数据
         const authorCounts = processedArticles.reduce((acc: Record<string, number>, article: any) => {
-          const author = article.author_name || '匿名'
+          const author = article.author_name || t('zenn.anonymous')
           acc[author] = (acc[author] || 0) + 1
           return acc
         }, {})
@@ -344,14 +344,14 @@ const ZennPage: React.FC = () => {
                 renderItem={(article) => (
                   <List.Item
                     actions={[
-                      <Button 
-                        key="detail" 
+                      <Button
+                        key="detail"
                         type="primary"
                         size="small"
                         icon={<EyeOutlined />}
                         onClick={() => openDetailModal(article)}
                       >
-                        详细查看
+                        {t('zenn.viewDetails')}
                       </Button>,
                       <Button 
                         key="view" 
@@ -361,7 +361,7 @@ const ZennPage: React.FC = () => {
                           if (article.url) {
                             window.open(article.url, '_blank')
                           } else {
-                            message.warning('文章链接不可用')
+                            message.warning(t('zenn.articleLinkUnavailable'))
                           }
                         }}
                       >
@@ -383,7 +383,7 @@ const ZennPage: React.FC = () => {
                       title={
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
-                            <Text strong>{article.title || '无标题'}</Text>
+                            <Text strong>{article.title || t('zenn.noTitle')}</Text>
                             {article.quality_score !== undefined && (
                               <QualityBadge score={article.quality_score} size="small" />
                             )}
@@ -408,11 +408,11 @@ const ZennPage: React.FC = () => {
                         <div>
                           <div style={{ marginBottom: 8 }}>
                             <Text type="secondary" style={{ fontSize: '12px' }}>
-                              Author: {article.author_name || '匿名'}
+                              Author: {article.author_name || t('zenn.anonymous')}
                             </Text>
                           </div>
                           <Paragraph ellipsis={{ rows: 2 }} style={{ marginBottom: 8 }}>
-                            {article.content_excerpt || '暂无摘要'}
+                            {article.content_excerpt || t('zenn.noSummary')}
                           </Paragraph>
                           <Space>
                             <Text type="secondary" style={{ fontSize: '12px' }}>
@@ -422,7 +422,7 @@ const ZennPage: React.FC = () => {
                               💬 {article.comments_count || 0} {t('zenn.comments')}
                             </Text>
                             <Text type="secondary" style={{ fontSize: '12px' }}>
-                              <CalendarOutlined /> {article.published_at ? new Date(article.published_at).toLocaleDateString() : '未知'}
+                              <CalendarOutlined /> {article.published_at ? new Date(article.published_at).toLocaleDateString() : t('zenn.unknown')}
                             </Text>
                           </Space>
                         </div>
@@ -462,7 +462,7 @@ const ZennPage: React.FC = () => {
                       <Text style={{ fontSize: '12px' }}>{author.name}</Text>
                     </div>
                     <Text type="secondary" style={{ fontSize: '12px' }}>
-                      {author.articles} articles
+                      {author.articles} {t('zenn.articles')}
                     </Text>
                   </div>
                 </List.Item>
@@ -493,10 +493,10 @@ const ZennPage: React.FC = () => {
             
             <div style={{ marginTop: 16, padding: 16, backgroundColor: '#f6ffed', borderRadius: 6 }}>
               <Title level={5} style={{ color: '#389e0d', margin: 0, marginBottom: 8 }}>
-                💡 About Zenn
+                💡 {t('zenn.aboutZenn')}
               </Title>
               <Text style={{ fontSize: '12px', color: '#52c41a' }}>
-                High-quality technical articles by the Japanese developer community. Features practical content and detailed explanations.
+                {t('zenn.aboutZennDesc')}
               </Text>
             </div>
           </Card>
@@ -523,12 +523,12 @@ const ZennPage: React.FC = () => {
             <Card style={{ marginBottom: 16 }}>
               <Title level={4} style={{ marginBottom: 16 }}>
                 <span style={{ fontSize: '24px', marginRight: 8 }}>{selectedArticle.emoji || '📝'}</span>
-                {selectedArticle.title || '无标题'}
+                {selectedArticle.title || t('zenn.noTitle')}
               </Title>
-              
+
               <div style={{ marginBottom: 12 }}>
                 <Tag color="blue">
-                  {selectedArticle.type === 'article' ? t('zenn.article') : 
+                  {selectedArticle.type === 'article' ? t('zenn.article') :
                    selectedArticle.type === 'book' ? t('zenn.book') : t('zenn.scrap')}
                 </Tag>
                 {selectedArticle.is_premium && (
@@ -542,21 +542,21 @@ const ZennPage: React.FC = () => {
               </div>
 
               <div style={{ marginBottom: 12 }}>
-                <Text strong>作者: </Text>
-                <Text>{selectedArticle.author_name || '匿名'}</Text>
+                <Text strong>{t('zenn.author')}</Text>
+                <Text>{selectedArticle.author_name || t('zenn.anonymous')}</Text>
               </div>
 
               <div style={{ marginBottom: 12 }}>
-                <Text strong>发布时间: </Text>
-                <Text>{selectedArticle.published_at ? new Date(selectedArticle.published_at).toLocaleDateString() : '未知'}</Text>
+                <Text strong>{t('zenn.publishTime')}</Text>
+                <Text>{selectedArticle.published_at ? new Date(selectedArticle.published_at).toLocaleDateString() : t('zenn.unknown')}</Text>
               </div>
 
               <Divider />
 
               <div>
-                <Title level={5}>完整摘要</Title>
+                <Title level={5}>{t('zenn.fullSummary')}</Title>
                 <Paragraph style={{ whiteSpace: 'pre-wrap', textAlign: 'justify' }}>
-                  {selectedArticle.content_excerpt || '暂无摘要'}
+                  {selectedArticle.content_excerpt || t('zenn.noSummary')}
                 </Paragraph>
               </div>
 
@@ -621,7 +621,7 @@ const ZennPage: React.FC = () => {
                 <Input
                   value={chatMessage}
                   onChange={(e) => setChatMessage(e.target.value)}
-                  placeholder="问一下关于这篇文章的问题..."
+                  placeholder={t('zenn.askQuestionPlaceholder')}
                   onPressEnter={sendChatMessage}
                   disabled={chatLoading}
                 />

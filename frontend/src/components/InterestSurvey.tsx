@@ -31,30 +31,30 @@ const InterestSurvey: React.FC<InterestSurveyProps> = ({ visible, onComplete, on
 
   // 兴趣领域选项
   const interestOptions = [
-    { label: '大语言模型 (LLM)', value: 'LLM', emoji: '🤖' },
-    { label: '计算机视觉 (CV)', value: 'CV', emoji: '👁️' },
-    { label: '强化学习 (RL)', value: 'RL', emoji: '🎮' },
-    { label: 'AI Agent', value: 'Agent', emoji: '🤝' },
-    { label: '多模态 (Multimodal)', value: 'Multimodal', emoji: '🎨' },
-    { label: '模型量化 (Quantization)', value: 'Quantization', emoji: '⚡' },
-    { label: '开源工具', value: 'Tools', emoji: '🛠️' },
-    { label: '自然语言处理 (NLP)', value: 'NLP', emoji: '💬' },
+    { label: t('onboarding.interestLLM'), value: 'LLM', emoji: '🤖' },
+    { label: t('onboarding.interestCV'), value: 'CV', emoji: '👁️' },
+    { label: t('onboarding.interestRL'), value: 'RL', emoji: '🎮' },
+    { label: t('onboarding.interestAgent'), value: 'Agent', emoji: '🤝' },
+    { label: t('onboarding.interestMultimodal'), value: 'Multimodal', emoji: '🎨' },
+    { label: t('onboarding.interestQuantization'), value: 'Quantization', emoji: '⚡' },
+    { label: t('onboarding.interestTools'), value: 'Tools', emoji: '🛠️' },
+    { label: t('onboarding.interestNLP'), value: 'NLP', emoji: '💬' },
   ];
 
   // 技术角色选项
   const roleOptions = [
-    { label: '研究员', value: 'researcher', emoji: '🔬' },
-    { label: '工程师', value: 'engineer', emoji: '👨‍💻' },
-    { label: '产品经理', value: 'pm', emoji: '📊' },
-    { label: '学生', value: 'student', emoji: '🎓' },
+    { label: t('onboarding.roleResearcher'), value: 'researcher', emoji: '🔬' },
+    { label: t('onboarding.roleEngineer'), value: 'engineer', emoji: '👨‍💻' },
+    { label: t('onboarding.rolePM'), value: 'pm', emoji: '📊' },
+    { label: t('onboarding.roleStudent'), value: 'student', emoji: '🎓' },
   ];
 
   // 内容类型偏好
   const contentTypeOptions = [
-    { label: '前沿论文', value: 'papers', emoji: '📄' },
-    { label: '开源项目', value: 'projects', emoji: '📦' },
-    { label: '实用工具', value: 'tools', emoji: '🔧' },
-    { label: '行业趋势', value: 'trends', emoji: '📈' },
+    { label: t('onboarding.contentPapers'), value: 'papers', emoji: '📄' },
+    { label: t('onboarding.contentProjects'), value: 'projects', emoji: '📦' },
+    { label: t('onboarding.contentTools'), value: 'tools', emoji: '🔧' },
+    { label: t('onboarding.contentTrends'), value: 'trends', emoji: '📈' },
   ];
 
   const handleSubmit = async () => {
@@ -74,14 +74,14 @@ const InterestSurvey: React.FC<InterestSurveyProps> = ({ visible, onComplete, on
       // 使用 axios 调用 API 保存偏好（自动添加认证头）
       await api.post('/api/v1/preferences/onboarding', preferences);
 
-      message.success('偏好设置保存成功！');
+      message.success(t('onboarding.successMessage'));
       onComplete(preferences);
     } catch (error: any) {
       console.error('Survey submission error:', error);
       console.error('Error response:', error.response);
 
       // 显示详细错误信息
-      const errorMsg = error.response?.data?.detail || '保存失败，请重试';
+      const errorMsg = error.response?.data?.detail || t('onboarding.errorMessage');
       message.error(errorMsg);
     } finally {
       setLoading(false);
@@ -100,7 +100,7 @@ const InterestSurvey: React.FC<InterestSurveyProps> = ({ visible, onComplete, on
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <RocketOutlined style={{ fontSize: '24px', color: '#1890ff' }} />
-          <span>🎯 让 TechPulse 更懂你</span>
+          <span>🎯 {t('onboarding.title')}</span>
         </div>
       }
       width={700}
@@ -110,7 +110,7 @@ const InterestSurvey: React.FC<InterestSurveyProps> = ({ visible, onComplete, on
     >
       <div style={{ padding: '20px 0' }}>
         <Text type="secondary" style={{ fontSize: '14px' }}>
-          花1分钟告诉我们你的兴趣，我们将为你推荐最相关的技术情报 ✨
+          {t('onboarding.subtitle')}
         </Text>
 
         <Form
@@ -128,10 +128,10 @@ const InterestSurvey: React.FC<InterestSurveyProps> = ({ visible, onComplete, on
             name="interests"
             label={
               <Text strong style={{ fontSize: '16px' }}>
-                1️⃣ 你主要关注哪些领域？ <Text type="secondary">(多选)</Text>
+                1️⃣ {t('onboarding.question1')} <Text type="secondary">{t('onboarding.question1Hint')}</Text>
               </Text>
             }
-            rules={[{ required: true, message: '请至少选择一个领域' }]}
+            rules={[{ required: true, message: t('onboarding.requireInterest') }]}
           >
             <Checkbox.Group style={{ width: '100%' }}>
               <Space direction="vertical" style={{ width: '100%' }}>
@@ -162,10 +162,10 @@ const InterestSurvey: React.FC<InterestSurveyProps> = ({ visible, onComplete, on
             name="role"
             label={
               <Text strong style={{ fontSize: '16px' }}>
-                2️⃣ 你的技术角色？
+                2️⃣ {t('onboarding.question2')}
               </Text>
             }
-            rules={[{ required: true, message: '请选择你的角色' }]}
+            rules={[{ required: true, message: t('onboarding.requireRole') }]}
           >
             <Radio.Group style={{ width: '100%' }}>
               <Space direction="vertical" style={{ width: '100%' }}>
@@ -196,10 +196,10 @@ const InterestSurvey: React.FC<InterestSurveyProps> = ({ visible, onComplete, on
             name="content_types"
             label={
               <Text strong style={{ fontSize: '16px' }}>
-                3️⃣ 你更喜欢看？ <Text type="secondary">(多选)</Text>
+                3️⃣ {t('onboarding.question3')} <Text type="secondary">{t('onboarding.question3Hint')}</Text>
               </Text>
             }
-            rules={[{ required: true, message: '请至少选择一种内容类型' }]}
+            rules={[{ required: true, message: t('onboarding.requireContentType') }]}
           >
             <Checkbox.Group style={{ width: '100%' }}>
               <Space direction="vertical" style={{ width: '100%' }}>
@@ -229,7 +229,7 @@ const InterestSurvey: React.FC<InterestSurveyProps> = ({ visible, onComplete, on
           <Form.Item style={{ marginBottom: 0, marginTop: 24 }}>
             <Space style={{ width: '100%', justifyContent: 'space-between' }}>
               <Button onClick={handleSkip}>
-                暂时跳过
+                {t('onboarding.skipButton')}
               </Button>
               <Button
                 type="primary"
@@ -238,7 +238,7 @@ const InterestSurvey: React.FC<InterestSurveyProps> = ({ visible, onComplete, on
                 loading={loading}
                 style={{ minWidth: '120px' }}
               >
-                完成并开始使用 🚀
+                {t('onboarding.submitButton')}
               </Button>
             </Space>
           </Form.Item>
@@ -246,7 +246,7 @@ const InterestSurvey: React.FC<InterestSurveyProps> = ({ visible, onComplete, on
 
         <div style={{ marginTop: 16, textAlign: 'center' }}>
           <Text type="secondary" style={{ fontSize: '12px' }}>
-            💡 你可以随时在「个人中心」修改这些偏好设置
+            💡 {t('onboarding.footerHint')}
           </Text>
         </div>
       </div>

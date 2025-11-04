@@ -56,10 +56,10 @@ const SettingsPage: React.FC = () => {
       await new Promise(resolve => setTimeout(resolve, 1500));
 
       setTestStatus({...testStatus, openai: 'success'});
-      message.success('OpenAI 连接测试成功！');
+      message.success(t('settings.testSuccess').replace('{service}', 'OpenAI'));
     } catch (error) {
       setTestStatus({...testStatus, openai: 'error'});
-      message.error('OpenAI 连接测试失败，请检查配置');
+      message.error(t('settings.testFailedCheck').replace('{service}', 'OpenAI'));
     }
   };
 
@@ -78,14 +78,14 @@ const SettingsPage: React.FC = () => {
 
       if (result.success) {
         setTestStatus({...testStatus, azure: 'success'});
-        message.success(`连接测试成功！模型：${result.model}`);
+        message.success(t('settings.testSuccessWithModel').replace('{model}', result.model));
       } else {
         setTestStatus({...testStatus, azure: 'error'});
         message.error(result.message);
       }
     } catch (error: any) {
       setTestStatus({...testStatus, azure: 'error'});
-      const errorMsg = error.response?.data?.detail?.message || error.response?.data?.detail || 'Azure OpenAI 连接测试失败';
+      const errorMsg = error.response?.data?.detail?.message || error.response?.data?.detail || t('settings.testFailed').replace('{service}', 'Azure OpenAI');
       message.error(errorMsg);
     }
   };
@@ -99,10 +99,10 @@ const SettingsPage: React.FC = () => {
       await new Promise(resolve => setTimeout(resolve, 1500));
 
       setTestStatus({...testStatus, ollama: 'success'});
-      message.success('Ollama 连接测试成功！');
+      message.success(t('settings.testSuccess').replace('{service}', 'Ollama'));
     } catch (error) {
       setTestStatus({...testStatus, ollama: 'error'});
-      message.error('Ollama 连接测试失败');
+      message.error(t('settings.testFailed').replace('{service}', 'Ollama'));
     }
   };
 
@@ -115,10 +115,10 @@ const SettingsPage: React.FC = () => {
       await new Promise(resolve => setTimeout(resolve, 1500));
 
       setTestStatus({...testStatus, notion: 'success'});
-      message.success('Notion 连接测试成功！');
+      message.success(t('settings.testSuccess').replace('{service}', 'Notion'));
     } catch (error) {
       setTestStatus({...testStatus, notion: 'error'});
-      message.error('Notion 连接测试失败');
+      message.error(t('settings.testFailed').replace('{service}', 'Notion'));
     }
   };
 
@@ -192,10 +192,10 @@ const SettingsPage: React.FC = () => {
 
       if (result.validation) {
         if (result.validation.success) {
-          message.success(`配置保存成功！${result.validation.message}`);
+          message.success(t('settings.configSaveSuccessWithMsg').replace('{message}', result.validation.message));
         }
       } else {
-        message.success('配置保存成功！');
+        message.success(t('settings.configSaveSuccess'));
       }
 
       // 如果是 Azure 配置，更新测试状态
@@ -213,7 +213,7 @@ const SettingsPage: React.FC = () => {
           setTestStatus({...testStatus, azure: 'error'});
         }
       } else {
-        const errorMsg = error.response?.data?.detail?.message || error.response?.data?.detail || '配置保存失败';
+        const errorMsg = error.response?.data?.detail?.message || error.response?.data?.detail || t('settings.configSaveFailed');
         message.error(errorMsg);
       }
     } finally {
@@ -234,10 +234,10 @@ const SettingsPage: React.FC = () => {
   return (
     <div style={{ padding: '24px' }}>
       <Title level={2}>
-        <SettingOutlined /> 系统设置
+        <SettingOutlined /> {t('settings.pageTitle')}
       </Title>
       <Paragraph type="secondary">
-        配置 AI 模型、知识库集成、个性化推荐和用户偏好
+        {t('settings.pageDescription')}
       </Paragraph>
 
       <Tabs
@@ -251,12 +251,12 @@ const SettingsPage: React.FC = () => {
           tab={
             <span>
               <RobotOutlined />
-              AI 模型配置
+              {t('settings.aiModelsTab')}
             </span>
           }
           key="ai-models"
         >
-          <Card title="OpenAI 配置" extra={renderStatusIcon(testStatus.openai)}>
+          <Card title={t('settings.openaiConfig')} extra={renderStatusIcon(testStatus.openai)}>
             <Form
               form={openaiForm}
               layout="vertical"
@@ -269,14 +269,14 @@ const SettingsPage: React.FC = () => {
               <Form.Item name="enabled" valuePropName="checked">
                 <Space>
                   <Switch />
-                  <Text>启用 OpenAI 服务</Text>
+                  <Text>{t('settings.enableOpenAI')}</Text>
                 </Space>
               </Form.Item>
 
               <Form.Item
-                label="API Key"
+                label={t('settings.apiKey')}
                 name="apiKey"
-                rules={[{ required: true, message: '请输入 API Key' }]}
+                rules={[{ required: true, message: t('settings.apiKeyRequired') }]}
               >
                 <Input.Password
                   placeholder="sk-..."
@@ -285,7 +285,7 @@ const SettingsPage: React.FC = () => {
               </Form.Item>
 
               <Form.Item
-                label="模型"
+                label={t('settings.model')}
                 name="model"
               >
                 <Select>
@@ -297,15 +297,15 @@ const SettingsPage: React.FC = () => {
               </Form.Item>
 
               <Form.Item
-                label="Base URL（可选）"
+                label={t('settings.baseUrl')}
                 name="baseUrl"
-                extra="自定义 API 地址，用于代理或兼容服务"
+                extra={t('settings.baseUrlExtra')}
               >
                 <Input placeholder="https://api.openai.com/v1" />
               </Form.Item>
 
               <Form.Item
-                label="Organization ID（可选）"
+                label={t('settings.organizationId')}
                 name="organizationId"
               >
                 <Input placeholder="org-..." />
@@ -317,20 +317,20 @@ const SettingsPage: React.FC = () => {
                   onClick={() => handleSave('openai')}
                   loading={loading}
                 >
-                  保存配置
+                  {t('settings.saveConfig')}
                 </Button>
                 <Button
                   onClick={testOpenAIConnection}
                   loading={testStatus.openai === 'testing'}
                 >
-                  测试连接
+                  {t('settings.testConnection')}
                 </Button>
               </Space>
             </Form>
           </Card>
 
           <Card
-            title="Azure OpenAI 配置"
+            title={t('settings.azureConfig')}
             style={{ marginTop: 16 }}
             extra={renderStatusIcon(testStatus.azure)}
           >
@@ -345,36 +345,36 @@ const SettingsPage: React.FC = () => {
               <Form.Item name="enabled" valuePropName="checked">
                 <Space>
                   <Switch />
-                  <Text>启用 Azure OpenAI 服务</Text>
+                  <Text>{t('settings.enableAzure')}</Text>
                 </Space>
               </Form.Item>
 
               <Form.Item
-                label="API Key"
+                label={t('settings.apiKey')}
                 name="apiKey"
-                rules={[{ required: true, message: '请输入 API Key' }]}
+                rules={[{ required: true, message: t('settings.apiKeyRequired') }]}
               >
                 <Input.Password placeholder="Azure API Key" />
               </Form.Item>
 
               <Form.Item
-                label="Endpoint URL"
+                label={t('settings.endpointUrl')}
                 name="endpoint"
-                rules={[{ required: true, message: '请输入 Endpoint' }]}
+                rules={[{ required: true, message: t('settings.endpointRequired') }]}
               >
                 <Input placeholder="https://your-resource.openai.azure.com/" />
               </Form.Item>
 
               <Form.Item
-                label="Deployment Name"
+                label={t('settings.deploymentName')}
                 name="deploymentName"
-                rules={[{ required: true, message: '请输入部署名称' }]}
+                rules={[{ required: true, message: t('settings.deploymentRequired') }]}
               >
                 <Input placeholder="your-deployment-name" />
               </Form.Item>
 
               <Form.Item
-                label="API Version"
+                label={t('settings.apiVersion')}
                 name="apiVersion"
               >
                 <Select>
@@ -390,26 +390,26 @@ const SettingsPage: React.FC = () => {
                   onClick={() => handleSave('azure')}
                   loading={loading}
                 >
-                  保存配置
+                  {t('settings.saveConfig')}
                 </Button>
                 <Button
                   onClick={testAzureConnection}
                   loading={testStatus.azure === 'testing'}
                 >
-                  测试连接
+                  {t('settings.testConnection')}
                 </Button>
               </Space>
             </Form>
           </Card>
 
           <Card
-            title="Ollama（本地 LLM）配置"
+            title={t('settings.ollamaConfig')}
             style={{ marginTop: 16 }}
             extra={renderStatusIcon(testStatus.ollama)}
           >
             <Alert
-              message="本地 LLM 服务"
-              description="Ollama 允许您在本地运行开源大语言模型，无需调用云端 API"
+              message={t('settings.localLLMService')}
+              description={t('settings.localLLMDesc')}
               type="info"
               showIcon
               style={{ marginBottom: 16 }}
@@ -427,22 +427,22 @@ const SettingsPage: React.FC = () => {
               <Form.Item name="enabled" valuePropName="checked">
                 <Space>
                   <Switch />
-                  <Text>启用 Ollama 服务</Text>
+                  <Text>{t('settings.enableOllama')}</Text>
                 </Space>
               </Form.Item>
 
               <Form.Item
-                label="服务地址"
+                label={t('settings.serverUrl')}
                 name="serverUrl"
-                rules={[{ required: true, message: '请输入服务地址' }]}
+                rules={[{ required: true, message: t('settings.serverUrlRequired') }]}
               >
                 <Input placeholder="http://localhost:11434" />
               </Form.Item>
 
               <Form.Item
-                label="模型"
+                label={t('settings.model')}
                 name="model"
-                extra="确保模型已在 Ollama 中下载"
+                extra={t('settings.modelExtra')}
               >
                 <Select>
                   <Option value="llama2">Llama 2</Option>
@@ -459,13 +459,13 @@ const SettingsPage: React.FC = () => {
                   onClick={() => handleSave('ollama')}
                   loading={loading}
                 >
-                  保存配置
+                  {t('settings.saveConfig')}
                 </Button>
                 <Button
                   onClick={testOllamaConnection}
                   loading={testStatus.ollama === 'testing'}
                 >
-                  测试连接
+                  {t('settings.testConnection')}
                 </Button>
               </Space>
             </Form>
@@ -477,18 +477,18 @@ const SettingsPage: React.FC = () => {
           tab={
             <span>
               <DatabaseOutlined />
-              知识库集成
+              {t('settings.integrationsTab')}
             </span>
           }
           key="integrations"
         >
           <Card
-            title="Notion 集成"
+            title={t('settings.notionConfig')}
             extra={renderStatusIcon(testStatus.notion)}
           >
             <Alert
-              message="Notion 数据库同步"
-              description="将技术情报自动同步到您的 Notion 数据库，方便管理和分享"
+              message={t('settings.notionSyncTitle')}
+              description={t('settings.notionSyncDesc')}
               type="info"
               showIcon
               style={{ marginBottom: 16 }}
@@ -505,24 +505,24 @@ const SettingsPage: React.FC = () => {
               <Form.Item name="enabled" valuePropName="checked">
                 <Space>
                   <Switch />
-                  <Text>启用 Notion 同步</Text>
+                  <Text>{t('settings.enableNotion')}</Text>
                 </Space>
               </Form.Item>
 
               <Form.Item
-                label="API Token"
+                label={t('settings.apiToken')}
                 name="apiToken"
-                rules={[{ required: true, message: '请输入 Notion API Token' }]}
+                rules={[{ required: true, message: t('settings.apiTokenRequired') }]}
                 extra={
                   <Text type="secondary">
-                    在 Notion 中创建 Integration 获取 Token
+                    {t('settings.apiTokenExtra')}
                     <a
                       href="https://www.notion.so/my-integrations"
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{ marginLeft: 8 }}
                     >
-                      获取 Token
+                      {t('settings.getToken')}
                     </a>
                   </Text>
                 }
@@ -531,23 +531,23 @@ const SettingsPage: React.FC = () => {
               </Form.Item>
 
               <Form.Item
-                label="数据库 ID"
+                label={t('settings.databaseId')}
                 name="databaseId"
-                rules={[{ required: true, message: '请输入数据库 ID' }]}
-                extra="从 Notion 数据库 URL 中获取 ID"
+                rules={[{ required: true, message: t('settings.databaseIdRequired') }]}
+                extra={t('settings.databaseIdExtra')}
               >
                 <Input placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
               </Form.Item>
 
               <Form.Item
-                label="同步频率"
+                label={t('settings.syncFrequency')}
                 name="syncFrequency"
               >
                 <Select>
-                  <Option value="manual">手动同步</Option>
-                  <Option value="hourly">每小时</Option>
-                  <Option value="daily">每天</Option>
-                  <Option value="weekly">每周</Option>
+                  <Option value="manual">{t('settings.syncManual')}</Option>
+                  <Option value="hourly">{t('settings.syncHourly')}</Option>
+                  <Option value="daily">{t('settings.syncDaily')}</Option>
+                  <Option value="weekly">{t('settings.syncWeekly')}</Option>
                 </Select>
               </Form.Item>
 
@@ -557,24 +557,24 @@ const SettingsPage: React.FC = () => {
                   onClick={() => handleSave('notion')}
                   loading={loading}
                 >
-                  保存配置
+                  {t('settings.saveConfig')}
                 </Button>
                 <Button
                   onClick={testNotionConnection}
                   loading={testStatus.notion === 'testing'}
                 >
-                  测试连接
+                  {t('settings.testConnection')}
                 </Button>
               </Space>
             </Form>
           </Card>
 
-          <Card title="其他知识库（即将支持）" style={{ marginTop: 16 }}>
+          <Card title={t('settings.otherKnowledgeBase')} style={{ marginTop: 16 }}>
             <Space direction="vertical" style={{ width: '100%' }}>
-              <Tag color="default">Obsidian - 开发中</Tag>
-              <Tag color="default">Logseq - 计划中</Tag>
-              <Tag color="default">语雀 - 计划中</Tag>
-              <Tag color="default">飞书文档 - 计划中</Tag>
+              <Tag color="default">{t('settings.obsidianDev')}</Tag>
+              <Tag color="default">{t('settings.logseqPlanned')}</Tag>
+              <Tag color="default">{t('settings.yuquePlanned')}</Tag>
+              <Tag color="default">{t('settings.feishuPlanned')}</Tag>
             </Space>
           </Card>
         </TabPane>
@@ -584,15 +584,15 @@ const SettingsPage: React.FC = () => {
           tab={
             <span>
               <HeartOutlined />
-              个性化推荐
+              {t('settings.personalizationTab')}
             </span>
           }
           key="personalization"
         >
-          <Card title="推荐系统设置">
+          <Card title={t('settings.recommendationSettings')}>
             <Alert
-              message="个性化推荐功能"
-              description="系统会根据您的浏览、收藏等行为，智能推荐您可能感兴趣的技术内容"
+              message={t('settings.personalizationTitle')}
+              description={t('settings.personalizationDesc')}
               type="info"
               showIcon
               style={{ marginBottom: 16 }}
@@ -613,9 +613,9 @@ const SettingsPage: React.FC = () => {
                 <Space>
                   <Switch defaultChecked />
                   <div>
-                    <div><Text strong>启用个性化推荐</Text></div>
+                    <div><Text strong>{t('settings.enableRecommendation')}</Text></div>
                     <Text type="secondary" style={{ fontSize: 12 }}>
-                      根据您的偏好推荐相关内容
+                      {t('settings.enableRecommendationDesc')}
                     </Text>
                   </div>
                 </Space>
@@ -624,13 +624,13 @@ const SettingsPage: React.FC = () => {
               <Divider />
 
               <Form.Item
-                label="推荐算法"
+                label={t('settings.recommendationAlgorithm')}
                 name="algorithm"
               >
                 <Select>
-                  <Option value="content">基于内容推荐</Option>
-                  <Option value="collaborative">协同过滤推荐</Option>
-                  <Option value="hybrid">混合推荐（推荐）</Option>
+                  <Option value="content">{t('settings.contentBased')}</Option>
+                  <Option value="collaborative">{t('settings.collaborative')}</Option>
+                  <Option value="hybrid">{t('settings.hybrid')}</Option>
                 </Select>
               </Form.Item>
 
@@ -638,9 +638,9 @@ const SettingsPage: React.FC = () => {
                 <Space>
                   <Switch defaultChecked />
                   <div>
-                    <div><Text strong>行为追踪</Text></div>
+                    <div><Text strong>{t('settings.behaviorTracking')}</Text></div>
                     <Text type="secondary" style={{ fontSize: 12 }}>
-                      记录浏览、点击等行为以改善推荐质量
+                      {t('settings.behaviorTrackingDesc')}
                     </Text>
                   </div>
                 </Space>
@@ -650,9 +650,9 @@ const SettingsPage: React.FC = () => {
                 <Space>
                   <Switch defaultChecked />
                   <div>
-                    <div><Text strong>显示推荐理由</Text></div>
+                    <div><Text strong>{t('settings.showRecommendationReason')}</Text></div>
                     <Text type="secondary" style={{ fontSize: 12 }}>
-                      在推荐内容上显示推荐原因
+                      {t('settings.showRecommendationReasonDesc')}
                     </Text>
                   </div>
                 </Space>
@@ -662,9 +662,9 @@ const SettingsPage: React.FC = () => {
                 <Space>
                   <Switch />
                   <div>
-                    <div><Text strong>匿名模式</Text></div>
+                    <div><Text strong>{t('settings.anonymousMode')}</Text></div>
                     <Text type="secondary" style={{ fontSize: 12 }}>
-                      不记录详细的行为数据，降低个性化程度
+                      {t('settings.anonymousModeDesc')}
                     </Text>
                   </div>
                 </Space>
@@ -675,7 +675,7 @@ const SettingsPage: React.FC = () => {
                 onClick={() => handleSave('personalization')}
                 loading={loading}
               >
-                保存配置
+                {t('settings.saveConfig')}
               </Button>
             </Form>
           </Card>
@@ -686,12 +686,12 @@ const SettingsPage: React.FC = () => {
           tab={
             <span>
               <UserOutlined />
-              用户偏好
+              {t('settings.preferencesTab')}
             </span>
           }
           key="preferences"
         >
-          <Card title="界面设置">
+          <Card title={t('settings.interfaceSettings')}>
             <Form
               form={preferencesForm}
               layout="vertical"
@@ -702,36 +702,36 @@ const SettingsPage: React.FC = () => {
               }}
             >
               <Form.Item
-                label="界面语言"
+                label={t('settings.interfaceLanguage')}
                 name="language"
               >
                 <Select>
-                  <Option value="zh">中文</Option>
-                  <Option value="en">English</Option>
-                  <Option value="ja">日本語</Option>
+                  <Option value="zh">{t('settings.chinese')}</Option>
+                  <Option value="en">{t('settings.english')}</Option>
+                  <Option value="ja">{t('settings.japanese')}</Option>
                 </Select>
               </Form.Item>
 
               <Form.Item
-                label="主题模式"
+                label={t('settings.themeMode')}
                 name="theme"
               >
                 <Select>
-                  <Option value="light">浅色模式</Option>
-                  <Option value="dark">深色模式</Option>
-                  <Option value="auto">跟随系统</Option>
+                  <Option value="light">{t('settings.lightMode')}</Option>
+                  <Option value="dark">{t('settings.darkMode')}</Option>
+                  <Option value="auto">{t('settings.autoMode')}</Option>
                 </Select>
               </Form.Item>
 
               <Form.Item
-                label="每页显示数量"
+                label={t('settings.itemsPerPage')}
                 name="itemsPerPage"
               >
                 <Select>
-                  <Option value={10}>10 条</Option>
-                  <Option value={20}>20 条</Option>
-                  <Option value={50}>50 条</Option>
-                  <Option value={100}>100 条</Option>
+                  <Option value={10}>10 {t('settings.items').replace('{count}', '')}</Option>
+                  <Option value={20}>20 {t('settings.items').replace('{count}', '')}</Option>
+                  <Option value={50}>50 {t('settings.items').replace('{count}', '')}</Option>
+                  <Option value={100}>100 {t('settings.items').replace('{count}', '')}</Option>
                 </Select>
               </Form.Item>
 
@@ -740,23 +740,23 @@ const SettingsPage: React.FC = () => {
                 onClick={() => handleSave('preferences')}
                 loading={loading}
               >
-                保存配置
+                {t('settings.saveConfig')}
               </Button>
             </Form>
           </Card>
 
-          <Card title="账号信息" style={{ marginTop: 16 }}>
+          <Card title={t('settings.accountInfo')} style={{ marginTop: 16 }}>
             <Form layout="vertical">
-              <Form.Item label="用户名">
+              <Form.Item label={t('settings.username')}>
                 <Input disabled value="w357771580" />
               </Form.Item>
 
-              <Form.Item label="邮箱">
+              <Form.Item label={t('settings.email')}>
                 <Input disabled value="wuchengbo999@gmail.com" />
               </Form.Item>
 
               <Button type="link" danger>
-                修改密码
+                {t('settings.changePassword')}
               </Button>
             </Form>
           </Card>

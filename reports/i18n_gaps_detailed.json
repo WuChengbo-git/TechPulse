@@ -1,0 +1,3669 @@
+{
+  "scan_time": null,
+  "statistics": {
+    "total_files": 42,
+    "files_with_issues": 20,
+    "total_hardcoded": 249,
+    "chinese_texts": 238,
+    "japanese_texts": 38
+  },
+  "findings_by_module": {
+    "pages": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "count": 43,
+        "items": [
+          {
+            "line": 81,
+            "text": "加载配置失败: ${error.message}",
+            "line_content": "message.error(`加载配置失败: ${error.message}`)",
+            "type": "chinese",
+            "length": 24
+          },
+          {
+            "line": 109,
+            "text": "配置验证通过",
+            "line_content": "message.success('配置验证通过')",
+            "type": "chinese",
+            "length": 6
+          },
+          {
+            "line": 111,
+            "text": "配置存在 ${result.errors.length} 个错误",
+            "line_content": "message.warning(`配置存在 ${result.errors.length} 个错误`)",
+            "type": "chinese",
+            "length": 32
+          },
+          {
+            "line": 114,
+            "text": "验证失败: ${error.message}",
+            "line_content": "message.error(`验证失败: ${error.message}`)",
+            "type": "chinese",
+            "length": 22
+          },
+          {
+            "line": 125,
+            "text": "没有修改需要保存",
+            "line_content": "message.info('没有修改需要保存')",
+            "type": "chinese",
+            "length": 8
+          },
+          {
+            "line": 135,
+            "text": "成功更新 ${result.updated_keys.length} 个配置项",
+            "line_content": "message.success(`成功更新 ${result.updated_keys.length} 个配置项`)",
+            "type": "chinese",
+            "length": 39
+          },
+          {
+            "line": 139,
+            "text": "保存失败: ${error.message}",
+            "line_content": "message.error(`保存失败: ${error.message}`)",
+            "type": "chinese",
+            "length": 22
+          },
+          {
+            "line": 153,
+            "text": "配置已重新加载",
+            "line_content": "message.success('配置已重新加载')",
+            "type": "chinese",
+            "length": 7
+          },
+          {
+            "line": 155,
+            "text": "重载失败: ${error.message}",
+            "line_content": "message.error(`重载失败: ${error.message}`)",
+            "type": "chinese",
+            "length": 22
+          },
+          {
+            "line": 169,
+            "text": "已恢复默认配置",
+            "line_content": "message.success('已恢复默认配置')",
+            "type": "chinese",
+            "length": 7
+          },
+          {
+            "line": 171,
+            "text": "恢复失败: ${error.message}",
+            "line_content": "message.error(`恢复失败: ${error.message}`)",
+            "type": "chinese",
+            "length": 22
+          },
+          {
+            "line": 186,
+            "text": "加载备份失败: ${error.message}",
+            "line_content": "message.error(`加载备份失败: ${error.message}`)",
+            "type": "chinese",
+            "length": 24
+          },
+          {
+            "line": 199,
+            "text": "配置已从备份恢复",
+            "line_content": "message.success('配置已从备份恢复')",
+            "type": "chinese",
+            "length": 8
+          },
+          {
+            "line": 201,
+            "text": "恢复失败: ${error.message}",
+            "line_content": "message.error(`恢复失败: ${error.message}`)",
+            "type": "chinese",
+            "length": 22
+          },
+          {
+            "line": 220,
+            "text": "配置已导出",
+            "line_content": "message.success('配置已导出')",
+            "type": "chinese",
+            "length": 5
+          },
+          {
+            "line": 222,
+            "text": "导出失败: ${error.message}",
+            "line_content": "message.error(`导出失败: ${error.message}`)",
+            "type": "chinese",
+            "length": 22
+          },
+          {
+            "line": 253,
+            "text": "配置键",
+            "line_content": "title: '配置键',",
+            "type": "chinese",
+            "length": 3
+          },
+          {
+            "line": 272,
+            "text": "配置值",
+            "line_content": "title: '配置值',",
+            "type": "chinese",
+            "length": 3
+          },
+          {
+            "line": 286,
+            "text": "${record.key} 的值",
+            "line_content": "placeholder={`${record.key} 的值`}",
+            "type": "chinese",
+            "length": 16
+          },
+          {
+            "line": 293,
+            "text": "操作",
+            "line_content": "title: '操作',",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 324,
+            "text": "配置有效",
+            "line_content": "text={validation.valid ? '配置有效' : '配置有误'}",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 324,
+            "text": "配置有误",
+            "line_content": "text={validation.valid ? '配置有效' : '配置有误'}",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 335,
+            "text": "隐藏",
+            "line_content": "{showSensitive ? '隐藏' : '显示'}敏感信息",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 335,
+            "text": "显示",
+            "line_content": "{showSensitive ? '隐藏' : '显示'}敏感信息",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 351,
+            "text": "配置项总数",
+            "line_content": "title=\"配置项总数\"",
+            "type": "chinese",
+            "length": 5
+          },
+          {
+            "line": 358,
+            "text": "已修改项",
+            "line_content": "title=\"已修改项\"",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 365,
+            "text": "验证错误",
+            "line_content": "title=\"验证错误\"",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 372,
+            "text": "验证警告",
+            "line_content": "title=\"验证警告\"",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 382,
+            "text": "配置验证失败",
+            "line_content": "message=\"配置验证失败\"",
+            "type": "chinese",
+            "length": 6
+          },
+          {
+            "line": 400,
+            "text": "配置警告",
+            "line_content": "message=\"配置警告\"",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 446,
+            "text": "确定要恢复默认配置吗？",
+            "line_content": "title=\"确定要恢复默认配置吗？\"",
+            "type": "chinese",
+            "length": 11
+          },
+          {
+            "line": 447,
+            "text": "这将覆盖当前所有配置，无法撤销。",
+            "line_content": "description=\"这将覆盖当前所有配置，无法撤销。\"",
+            "type": "chinese",
+            "length": 16
+          },
+          {
+            "line": 449,
+            "text": "确定",
+            "line_content": "okText=\"确定\"",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 450,
+            "text": "取消",
+            "line_content": "cancelText=\"取消\"",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 470,
+            "text": "共 ${total} 项配置",
+            "line_content": "showTotal: (total) => `共 ${total} 项配置`",
+            "type": "chinese",
+            "length": 14
+          },
+          {
+            "line": 478,
+            "text": "配置备份管理",
+            "line_content": "title=\"配置备份管理\"",
+            "type": "chinese",
+            "length": 6
+          },
+          {
+            "line": 489,
+            "text": "备份文件",
+            "line_content": "title: '备份文件',",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 494,
+            "text": "创建时间",
+            "line_content": "title: '创建时间',",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 501,
+            "text": "文件大小",
+            "line_content": "title: '文件大小',",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 507,
+            "text": "操作",
+            "line_content": "title: '操作',",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 511,
+            "text": "确定要从此备份恢复配置吗？",
+            "line_content": "title=\"确定要从此备份恢复配置吗？\"",
+            "type": "chinese",
+            "length": 13
+          },
+          {
+            "line": 513,
+            "text": "确定",
+            "line_content": "okText=\"确定\"",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 514,
+            "text": "取消",
+            "line_content": "cancelText=\"取消\"",
+            "type": "chinese",
+            "length": 2
+          }
+        ]
+      },
+      {
+        "file": "pages/SystemStatusPage.tsx",
+        "count": 23,
+        "items": [
+          {
+            "line": 133,
+            "text": "正常",
+            "line_content": "healthy: { status: 'success' as const, icon: <CheckCircleOutlined />, text: '正常' },",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 134,
+            "text": "警告",
+            "line_content": "warning: { status: 'warning' as const, icon: <WarningOutlined />, text: '警告' },",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 135,
+            "text": "エラー",
+            "line_content": "error: { status: 'error' as const, icon: <CloseCircleOutlined />, text: 'エラー' }",
+            "type": "japanese",
+            "length": 3
+          },
+          {
+            "line": 143,
+            "text": "サービス名",
+            "line_content": "title: 'サービス名',",
+            "type": "chinese",
+            "length": 5
+          },
+          {
+            "line": 149,
+            "text": "ステータス",
+            "line_content": "title: 'ステータス',",
+            "type": "japanese",
+            "length": 5
+          },
+          {
+            "line": 155,
+            "text": "応答時間",
+            "line_content": "title: '応答時間',",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 164,
+            "text": "稼働率",
+            "line_content": "title: '稼働率',",
+            "type": "chinese",
+            "length": 3
+          },
+          {
+            "line": 183,
+            "text": "最終確認",
+            "line_content": "title: '最終確認',",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 192,
+            "text": "API名",
+            "line_content": "title: 'API名',",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 198,
+            "text": "今日の使用量",
+            "line_content": "title: '今日の使用量',",
+            "type": "chinese",
+            "length": 6
+          },
+          {
+            "line": 213,
+            "text": "最終使用",
+            "line_content": "title: '最終使用',",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 224,
+            "text": "メモリ",
+            "line_content": "{ time: item.time, value: item.memory, category: 'メモリ' },",
+            "type": "japanese",
+            "length": 3
+          },
+          {
+            "line": 225,
+            "text": "ネットワーク",
+            "line_content": "{ time: item.time, value: item.network, category: 'ネットワーク' }",
+            "type": "japanese",
+            "length": 6
+          },
+          {
+            "line": 269,
+            "text": "システムは正常に稼働中",
+            "line_content": "message=\"システムは正常に稼働中\"",
+            "type": "chinese",
+            "length": 11
+          },
+          {
+            "line": 270,
+            "text": "すべてのコアサービスが正常に動作しています。一部の外部APIで軽微な遅延が検出されています。",
+            "line_content": "description=\"すべてのコアサービスが正常に動作しています。一部の外部APIで軽微な遅延が検出されています。\"",
+            "type": "chinese",
+            "length": 46
+          },
+          {
+            "line": 282,
+            "text": "CPU使用率",
+            "line_content": "title=\"CPU使用率\"",
+            "type": "chinese",
+            "length": 6
+          },
+          {
+            "line": 298,
+            "text": "メモリ使用率",
+            "line_content": "title=\"メモリ使用率\"",
+            "type": "chinese",
+            "length": 6
+          },
+          {
+            "line": 314,
+            "text": "ディスク使用率",
+            "line_content": "title=\"ディスク使用率\"",
+            "type": "chinese",
+            "length": 7
+          },
+          {
+            "line": 330,
+            "text": "ネットワーク使用率",
+            "line_content": "title=\"ネットワーク使用率\"",
+            "type": "chinese",
+            "length": 9
+          },
+          {
+            "line": 346,
+            "text": "リソース使用履歴（過去24時間）",
+            "line_content": "<Card title=\"リソース使用履歴（過去24時間）\" style={{ marginBottom: 24 }}>",
+            "type": "chinese",
+            "length": 16
+          },
+          {
+            "line": 351,
+            "text": "サービスステータス",
+            "line_content": "<Card title=\"サービスステータス\" style={{ marginBottom: 24 }}>",
+            "type": "japanese",
+            "length": 9
+          },
+          {
+            "line": 361,
+            "text": "API使用状況",
+            "line_content": "<Card title=\"API使用状況\" style={{ marginBottom: 24 }}>",
+            "type": "chinese",
+            "length": 7
+          },
+          {
+            "line": 371,
+            "text": "最近のシステムイベント",
+            "line_content": "<Card title=\"最近のシステムイベント\">",
+            "type": "chinese",
+            "length": 11
+          }
+        ]
+      },
+      {
+        "file": "pages/ArxivPage.tsx",
+        "count": 23,
+        "items": [
+          {
+            "line": 64,
+            "text": "AI・Machine Learning",
+            "line_content": "'cs.AI': 'AI・Machine Learning',",
+            "type": "japanese",
+            "length": 19
+          },
+          {
+            "line": 142,
+            "text": "获取arXiv数据失败",
+            "line_content": "message.error('获取arXiv数据失败')",
+            "type": "chinese",
+            "length": 11
+          },
+          {
+            "line": 178,
+            "text": "关于这篇arXiv论文 ",
+            "line_content": "message: `关于这篇arXiv论文 \"${selectedPaper.title}\"，${userMessage}`,",
+            "type": "chinese",
+            "length": 12
+          },
+          {
+            "line": 193,
+            "text": "抱歉，我无法回答这个问题。",
+            "line_content": "ai: data.response || '抱歉，我无法回答这个问题。'",
+            "type": "chinese",
+            "length": 13
+          },
+          {
+            "line": 197,
+            "text": "发送消息失败",
+            "line_content": "message.error('发送消息失败')",
+            "type": "chinese",
+            "length": 6
+          },
+          {
+            "line": 201,
+            "text": "发送消息失败",
+            "line_content": "message.error('发送消息失败')",
+            "type": "chinese",
+            "length": 6
+          },
+          {
+            "line": 245,
+            "text": "机器学习",
+            "line_content": "paperCategories.some(cat => cat && (cat.includes('AI') || cat.includes('机器学习') || cat.includes('人工智能')))) ||",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 245,
+            "text": "人工智能",
+            "line_content": "paperCategories.some(cat => cat && (cat.includes('AI') || cat.includes('机器学习') || cat.includes('人工智能')))) ||",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 251,
+            "text": "计算机视觉",
+            "line_content": "paperCategories.some(cat => cat && (cat.includes('计算机视觉') || cat.includes('computer vision') || cat.includes('cv')))) ||",
+            "type": "chinese",
+            "length": 5
+          },
+          {
+            "line": 252,
+            "text": "视觉",
+            "line_content": "(paper.summary && (paper.summary.toLowerCase().includes('vision') || paper.summary.toLowerCase().includes('视觉')))",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 317,
+            "text": "机器学习",
+            "line_content": "cat && (cat.includes('AI') || cat.includes('机器学习') || cat.includes('人工智能'))",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 317,
+            "text": "人工智能",
+            "line_content": "cat && (cat.includes('AI') || cat.includes('机器学习') || cat.includes('人工智能'))",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 330,
+            "text": "大语言模型",
+            "line_content": "(categoryNames[Object.keys(stats.categories)[0]] || Object.keys(stats.categories)[0] || '大语言模型') :",
+            "type": "chinese",
+            "length": 5
+          },
+          {
+            "line": 331,
+            "text": "大语言模型",
+            "line_content": "'大语言模型'",
+            "type": "chinese",
+            "length": 5
+          },
+          {
+            "line": 419,
+            "text": "摘要链接不可用",
+            "line_content": "message.warning('摘要链接不可用')",
+            "type": "chinese",
+            "length": 7
+          },
+          {
+            "line": 434,
+            "text": "PDF链接不可用",
+            "line_content": "message.warning('PDF链接不可用')",
+            "type": "chinese",
+            "length": 8
+          },
+          {
+            "line": 447,
+            "text": "无标题",
+            "line_content": "{paper.title || '无标题'}",
+            "type": "chinese",
+            "length": 3
+          },
+          {
+            "line": 465,
+            "text": "暂无摘要",
+            "line_content": "{paper.abstract || paper.summary || '暂无摘要'}",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 469,
+            "text": "未知",
+            "line_content": "<CalendarOutlined /> {t('arxiv.published')}: {paper.created_at ? new Date(paper.created_at).toLocaleDateString() : '未知'}",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 482,
+            "text": "${range[0]}-${range[1]} / ${total} 篇论文",
+            "line_content": "`${range[0]}-${range[1]} / ${total} 篇论文`",
+            "type": "chinese",
+            "length": 38
+          },
+          {
+            "line": 588,
+            "text": "未知",
+            "line_content": "<Text>{selectedPaper.created_at ? new Date(selectedPaper.created_at).toLocaleDateString() : '未知'}</Text>",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 596,
+            "text": "暂无摘要",
+            "line_content": "{selectedPaper.abstract || selectedPaper.summary || '暂无摘要'}",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 674,
+            "text": "问一下关于这篇论文的问题...",
+            "line_content": "placeholder=\"问一下关于这篇论文的问题...\"",
+            "type": "chinese",
+            "length": 15
+          }
+        ]
+      },
+      {
+        "file": "pages/TrendsPage.tsx",
+        "count": 11,
+        "items": [
+          {
+            "line": 212,
+            "text": "大语言模型",
+            "line_content": "keywords: ['llm', 'gpt', 'chatgpt', 'claude', 'gemini', 'llama', 'qwen', 'transformer', 'bert', 'language model', 'nlp', 'natural language', '大语言模型', '语言模型', 'instruct', 'chat', 'openai', 'anthropic', 'mistral', 'phi', 'qwen2', 'baichuan', 'text-generation', 'chat-completion'],",
+            "type": "chinese",
+            "length": 5
+          },
+          {
+            "line": 212,
+            "text": "语言模型",
+            "line_content": "keywords: ['llm', 'gpt', 'chatgpt', 'claude', 'gemini', 'llama', 'qwen', 'transformer', 'bert', 'language model', 'nlp', 'natural language', '大语言模型', '语言模型', 'instruct', 'chat', 'openai', 'anthropic', 'mistral', 'phi', 'qwen2', 'baichuan', 'text-generation', 'chat-completion'],",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 218,
+            "text": "计算机视觉",
+            "line_content": "keywords: ['computer vision', 'cv', 'opencv', 'yolo', 'object detection', 'image recognition', 'cnn', 'vision', 'stable diffusion', 'midjourney', '计算机视觉', '图像识别', 'image', 'visual', 'resnet', 'vgg', 'efficientnet', 'segmentation', 'face recognition', 'ocr', 'diffusion', 'gan'],",
+            "type": "chinese",
+            "length": 5
+          },
+          {
+            "line": 218,
+            "text": "图像识别",
+            "line_content": "keywords: ['computer vision', 'cv', 'opencv', 'yolo', 'object detection', 'image recognition', 'cnn', 'vision', 'stable diffusion', 'midjourney', '计算机视觉', '图像识别', 'image', 'visual', 'resnet', 'vgg', 'efficientnet', 'segmentation', 'face recognition', 'ocr', 'diffusion', 'gan'],",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 224,
+            "text": "语音",
+            "line_content": "keywords: ['speech', 'voice', 'audio', 'tts', 'stt', 'whisper', 'speech recognition', 'voice synthesis', '语音', '音频', 'asr', 'wav2vec', 'speech-to-text', 'text-to-speech', 'audio-classification', 'speech-processing'],",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 224,
+            "text": "音频",
+            "line_content": "keywords: ['speech', 'voice', 'audio', 'tts', 'stt', 'whisper', 'speech recognition', 'voice synthesis', '语音', '音频', 'asr', 'wav2vec', 'speech-to-text', 'text-to-speech', 'audio-classification', 'speech-processing'],",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 230,
+            "text": "多模态",
+            "line_content": "keywords: ['multimodal', 'vision-language', 'clip', 'dall-e', 'gpt-4v', 'multimodal ai', 'cross-modal', '多模态', 'vision language', 'vilt', 'blip', 'flamingo', 'align', 'vlm'],",
+            "type": "chinese",
+            "length": 3
+          },
+          {
+            "line": 236,
+            "text": "机器学习",
+            "line_content": "keywords: ['machine learning', 'ml', 'scikit-learn', 'xgboost', 'random forest', 'svm', 'clustering', '机器学习', 'sklearn', 'gradient boosting', 'decision tree', 'classification', 'regression', 'ensemble'],",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 242,
+            "text": "深度学习",
+            "line_content": "keywords: ['deep learning', 'neural network', 'pytorch', 'tensorflow', 'keras', 'cnn', 'rnn', 'lstm', '深度学习', '神经网络', 'neural', 'backpropagation', 'gradient descent', 'attention', 'autoencoder', 'gru'],",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 242,
+            "text": "神经网络",
+            "line_content": "keywords: ['deep learning', 'neural network', 'pytorch', 'tensorflow', 'keras', 'cnn', 'rnn', 'lstm', '深度学习', '神经网络', 'neural', 'backpropagation', 'gradient descent', 'attention', 'autoencoder', 'gru'],",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 390,
+            "text": "阿里云",
+            "line_content": "provider: '阿里云',",
+            "type": "chinese",
+            "length": 3
+          }
+        ]
+      },
+      {
+        "file": "pages/LLMProvidersPage.tsx",
+        "count": 1,
+        "items": [
+          {
+            "line": 558,
+            "text": "请输入${field.label}",
+            "line_content": "rules={[{ required: field.required, message: `请输入${field.label}` }]}",
+            "type": "chinese",
+            "length": 17
+          }
+        ]
+      },
+      {
+        "file": "pages/GitHubPage.tsx",
+        "count": 8,
+        "items": [
+          {
+            "line": 83,
+            "text": "关于这个GitHub仓库 ",
+            "line_content": "message: `关于这个GitHub仓库 \"${selectedRepo.title}\"，${userMessage}`,",
+            "type": "chinese",
+            "length": 13
+          },
+          {
+            "line": 99,
+            "text": "抱歉，我无法回答这个问题。",
+            "line_content": "ai: data.response || '抱歉，我无法回答这个问题。'",
+            "type": "chinese",
+            "length": 13
+          },
+          {
+            "line": 103,
+            "text": "发送消息失败",
+            "line_content": "message.error('发送消息失败')",
+            "type": "chinese",
+            "length": 6
+          },
+          {
+            "line": 107,
+            "text": "发送消息失败",
+            "line_content": "message.error('发送消息失败')",
+            "type": "chinese",
+            "length": 6
+          },
+          {
+            "line": 360,
+            "text": "仓库链接不可用",
+            "line_content": "message.warning('仓库链接不可用')",
+            "type": "chinese",
+            "length": 7
+          },
+          {
+            "line": 561,
+            "text": "未知",
+            "line_content": "<Text>{selectedRepo.created_at ? new Date(selectedRepo.created_at).toLocaleDateString() : '未知'}</Text>",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 569,
+            "text": "暂无描述",
+            "line_content": "{selectedRepo.description || selectedRepo.summary || '暂无描述'}",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 634,
+            "text": "问一下关于这个仓库的问题...",
+            "line_content": "placeholder=\"问一下关于这个仓库的问题...\"",
+            "type": "chinese",
+            "length": 15
+          }
+        ]
+      },
+      {
+        "file": "pages/ZennPage.tsx",
+        "count": 16,
+        "items": [
+          {
+            "line": 87,
+            "text": "关于这篇Zenn文章 ",
+            "line_content": "message: `关于这篇Zenn文章 \"${selectedArticle.title}\"，${userMessage}`,",
+            "type": "chinese",
+            "length": 11
+          },
+          {
+            "line": 102,
+            "text": "抱歉，我无法回答这个问题。",
+            "line_content": "ai: data.response || '抱歉，我无法回答这个问题。'",
+            "type": "chinese",
+            "length": 13
+          },
+          {
+            "line": 106,
+            "text": "发送消息失败",
+            "line_content": "message.error('发送消息失败')",
+            "type": "chinese",
+            "length": 6
+          },
+          {
+            "line": 110,
+            "text": "发送消息失败",
+            "line_content": "message.error('发送消息失败')",
+            "type": "chinese",
+            "length": 6
+          },
+          {
+            "line": 132,
+            "text": "匿名",
+            "line_content": "author_name: article.author_name || '匿名',",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 144,
+            "text": "匿名",
+            "line_content": "const author = article.author_name || '匿名'",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 364,
+            "text": "文章链接不可用",
+            "line_content": "message.warning('文章链接不可用')",
+            "type": "chinese",
+            "length": 7
+          },
+          {
+            "line": 386,
+            "text": "无标题",
+            "line_content": "<Text strong>{article.title || '无标题'}</Text>",
+            "type": "chinese",
+            "length": 3
+          },
+          {
+            "line": 411,
+            "text": "匿名",
+            "line_content": "Author: {article.author_name || '匿名'}",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 415,
+            "text": "暂无摘要",
+            "line_content": "{article.content_excerpt || '暂无摘要'}",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 425,
+            "text": "未知",
+            "line_content": "<CalendarOutlined /> {article.published_at ? new Date(article.published_at).toLocaleDateString() : '未知'}",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 526,
+            "text": "无标题",
+            "line_content": "{selectedArticle.title || '无标题'}",
+            "type": "chinese",
+            "length": 3
+          },
+          {
+            "line": 546,
+            "text": "匿名",
+            "line_content": "<Text>{selectedArticle.author_name || '匿名'}</Text>",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 551,
+            "text": "未知",
+            "line_content": "<Text>{selectedArticle.published_at ? new Date(selectedArticle.published_at).toLocaleDateString() : '未知'}</Text>",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 559,
+            "text": "暂无摘要",
+            "line_content": "{selectedArticle.content_excerpt || '暂无摘要'}",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 624,
+            "text": "问一下关于这篇文章的问题...",
+            "line_content": "placeholder=\"问一下关于这篇文章的问题...\"",
+            "type": "chinese",
+            "length": 15
+          }
+        ]
+      },
+      {
+        "file": "pages/Analytics.tsx",
+        "count": 4,
+        "items": [
+          {
+            "line": 229,
+            "text": "数量",
+            "line_content": "count: { alias: '数量' }",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 242,
+            "text": "日付",
+            "line_content": "date: { alias: '日付' },",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 243,
+            "text": "数量",
+            "line_content": "count: { alias: '数量' },",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 322,
+            "text": "人気技術",
+            "line_content": "title=\"人気技術\"",
+            "type": "chinese",
+            "length": 4
+          }
+        ]
+      },
+      {
+        "file": "pages/HuggingFacePage.tsx",
+        "count": 22,
+        "items": [
+          {
+            "line": 68,
+            "text": "文本生成",
+            "line_content": "'text-generation': '文本生成',",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 69,
+            "text": "文本分类",
+            "line_content": "'text-classification': '文本分类',",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 70,
+            "text": "标记分类",
+            "line_content": "'token-classification': '标记分类',",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 71,
+            "text": "问答系统",
+            "line_content": "'question-answering': '问答系统',",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 72,
+            "text": "填充遮罩",
+            "line_content": "'fill-mask': '填充遮罩',",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 73,
+            "text": "文本摘要",
+            "line_content": "'summarization': '文本摘要',",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 74,
+            "text": "机器翻译",
+            "line_content": "'translation': '机器翻译',",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 75,
+            "text": "文本到文本生成",
+            "line_content": "'text2text-generation': '文本到文本生成',",
+            "type": "chinese",
+            "length": 7
+          },
+          {
+            "line": 76,
+            "text": "对话系统",
+            "line_content": "'conversational': '对话系统',",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 77,
+            "text": "图像分类",
+            "line_content": "'image-classification': '图像分类',",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 78,
+            "text": "目标检测",
+            "line_content": "'object-detection': '目标检测',",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 79,
+            "text": "图像分割",
+            "line_content": "'image-segmentation': '图像分割',",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 80,
+            "text": "语音识别",
+            "line_content": "'speech-recognition': '语音识别',",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 81,
+            "text": "文本转语音",
+            "line_content": "'text-to-speech': '文本转语音'",
+            "type": "chinese",
+            "length": 5
+          },
+          {
+            "line": 105,
+            "text": "关于这个HuggingFace模型 ",
+            "line_content": "message: `关于这个HuggingFace模型 \"${selectedModel.title}\"，${userMessage}`,",
+            "type": "chinese",
+            "length": 18
+          },
+          {
+            "line": 121,
+            "text": "抱歉，我无法回答这个问题。",
+            "line_content": "ai: data.response || '抱歉，我无法回答这个问题。'",
+            "type": "chinese",
+            "length": 13
+          },
+          {
+            "line": 125,
+            "text": "发送消息失败",
+            "line_content": "message.error('发送消息失败')",
+            "type": "chinese",
+            "length": 6
+          },
+          {
+            "line": 129,
+            "text": "发送消息失败",
+            "line_content": "message.error('发送消息失败')",
+            "type": "chinese",
+            "length": 6
+          },
+          {
+            "line": 306,
+            "text": "文本生成",
+            "line_content": "pipelineNames[Object.keys(stats.pipeline_distribution)[0]] || '文本生成' :",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 307,
+            "text": "文本生成",
+            "line_content": "'文本生成'",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 555,
+            "text": "暂无描述",
+            "line_content": "{selectedModel.description || '暂无描述'}",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 620,
+            "text": "问一下关于这个模型的问题...",
+            "line_content": "placeholder=\"问一下关于这个模型的问题...\"",
+            "type": "chinese",
+            "length": 15
+          }
+        ]
+      },
+      {
+        "file": "pages/Dashboard.tsx",
+        "count": 3,
+        "items": [
+          {
+            "line": 156,
+            "text": "语言已切换为${languages[language]?.name}",
+            "line_content": "message.success(`语言已切换为${languages[language]?.name}`)",
+            "type": "chinese",
+            "length": 34
+          },
+          {
+            "line": 180,
+            "text": "翻译结果",
+            "line_content": "title: '翻译结果',",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 296,
+            "text": "已保存到Notion！",
+            "line_content": "message.success('已保存到Notion！')",
+            "type": "chinese",
+            "length": 11
+          }
+        ]
+      },
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "count": 47,
+        "items": [
+          {
+            "line": 123,
+            "text": "待機中",
+            "line_content": "pending: { color: 'default', icon: <ClockCircleOutlined />, text: '待機中' },",
+            "type": "chinese",
+            "length": 3
+          },
+          {
+            "line": 124,
+            "text": "実行中",
+            "line_content": "running: { color: 'processing', icon: <SyncOutlined spin />, text: '実行中' },",
+            "type": "chinese",
+            "length": 3
+          },
+          {
+            "line": 125,
+            "text": "完了",
+            "line_content": "completed: { color: 'success', icon: <CheckCircleOutlined />, text: '完了' },",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 126,
+            "text": "失敗",
+            "line_content": "failed: { color: 'error', icon: <CloseCircleOutlined />, text: '失敗' },",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 127,
+            "text": "一時停止",
+            "line_content": "paused: { color: 'warning', icon: <PauseCircleOutlined />, text: '一時停止' }",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 139,
+            "text": "全データ源",
+            "line_content": "all: { color: 'green', text: '全データ源' }",
+            "type": "chinese",
+            "length": 5
+          },
+          {
+            "line": 146,
+            "text": "タスクを実行中...",
+            "line_content": "message.loading({ content: 'タスクを実行中...', key: 'run' })",
+            "type": "chinese",
+            "length": 10
+          },
+          {
+            "line": 149,
+            "text": "タスクを開始しました",
+            "line_content": "message.success({ content: 'タスクを開始しました', key: 'run' })",
+            "type": "chinese",
+            "length": 10
+          },
+          {
+            "line": 156,
+            "text": "タスクを一時停止しました",
+            "line_content": "message.success('タスクを一時停止しました')",
+            "type": "chinese",
+            "length": 12
+          },
+          {
+            "line": 162,
+            "text": "タスクを削除しました",
+            "line_content": "message.success('タスクを削除しました')",
+            "type": "chinese",
+            "length": 10
+          },
+          {
+            "line": 168,
+            "text": "タスクを有効化しました",
+            "line_content": "message.success(enabled ? 'タスクを有効化しました' : 'タスクを無効化しました')",
+            "type": "chinese",
+            "length": 11
+          },
+          {
+            "line": 168,
+            "text": "タスクを無効化しました",
+            "line_content": "message.success(enabled ? 'タスクを有効化しました' : 'タスクを無効化しました')",
+            "type": "chinese",
+            "length": 11
+          },
+          {
+            "line": 191,
+            "text": "タスクを更新しました",
+            "line_content": "message.success(editingTask ? 'タスクを更新しました' : 'タスクを作成しました')",
+            "type": "chinese",
+            "length": 10
+          },
+          {
+            "line": 191,
+            "text": "タスクを作成しました",
+            "line_content": "message.success(editingTask ? 'タスクを更新しました' : 'タスクを作成しました')",
+            "type": "chinese",
+            "length": 10
+          },
+          {
+            "line": 201,
+            "text": "タスク名",
+            "line_content": "title: 'タスク名',",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 215,
+            "text": "データソース",
+            "line_content": "title: 'データソース',",
+            "type": "japanese",
+            "length": 6
+          },
+          {
+            "line": 222,
+            "text": "ステータス",
+            "line_content": "title: 'ステータス',",
+            "type": "japanese",
+            "length": 5
+          },
+          {
+            "line": 229,
+            "text": "スケジュール",
+            "line_content": "title: 'スケジュール',",
+            "type": "japanese",
+            "length": 6
+          },
+          {
+            "line": 235,
+            "text": "手動",
+            "line_content": "manual: '手動',",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 236,
+            "text": "毎時",
+            "line_content": "hourly: '毎時',",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 237,
+            "text": "毎日",
+            "line_content": "daily: '毎日',",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 238,
+            "text": "毎週",
+            "line_content": "weekly: '毎週'",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 244,
+            "text": "次回実行",
+            "line_content": "title: '次回実行',",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 253,
+            "text": "実行統計",
+            "line_content": "title: '実行統計',",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 274,
+            "text": "有効/無効",
+            "line_content": "title: '有効/無効',",
+            "type": "chinese",
+            "length": 5
+          },
+          {
+            "line": 288,
+            "text": "操作",
+            "line_content": "title: '操作',",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 319,
+            "text": "このタスクを削除しますか？",
+            "line_content": "title=\"このタスクを削除しますか？\"",
+            "type": "chinese",
+            "length": 13
+          },
+          {
+            "line": 321,
+            "text": "削除",
+            "line_content": "okText=\"削除\"",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 322,
+            "text": "キャンセル",
+            "line_content": "cancelText=\"キャンセル\"",
+            "type": "japanese",
+            "length": 5
+          },
+          {
+            "line": 380,
+            "text": "総タスク数",
+            "line_content": "title=\"総タスク数\"",
+            "type": "chinese",
+            "length": 5
+          },
+          {
+            "line": 389,
+            "text": "実行中",
+            "line_content": "title=\"実行中\"",
+            "type": "chinese",
+            "length": 3
+          },
+          {
+            "line": 399,
+            "text": "待機中",
+            "line_content": "title=\"待機中\"",
+            "type": "chinese",
+            "length": 3
+          },
+          {
+            "line": 409,
+            "text": "失敗",
+            "line_content": "title=\"失敗\"",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 428,
+            "text": "総数 ${total} 件",
+            "line_content": "showTotal: (total) => `総数 ${total} 件`",
+            "type": "chinese",
+            "length": 13
+          },
+          {
+            "line": 436,
+            "text": "タスク編集",
+            "line_content": "title={editingTask ? 'タスク編集' : '新規タスク作成'}",
+            "type": "chinese",
+            "length": 5
+          },
+          {
+            "line": 436,
+            "text": "新規タスク作成",
+            "line_content": "title={editingTask ? 'タスク編集' : '新規タスク作成'}",
+            "type": "chinese",
+            "length": 7
+          },
+          {
+            "line": 452,
+            "text": "タスク名",
+            "line_content": "label=\"タスク名\"",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 453,
+            "text": "タスク名を入力してください",
+            "line_content": "rules={[{ required: true, message: 'タスク名を入力してください' }]}",
+            "type": "chinese",
+            "length": 13
+          },
+          {
+            "line": 455,
+            "text": "例: GitHub Trending Daily Sync",
+            "line_content": "<Input placeholder=\"例: GitHub Trending Daily Sync\" />",
+            "type": "chinese",
+            "length": 29
+          },
+          {
+            "line": 460,
+            "text": "データソース",
+            "line_content": "label=\"データソース\"",
+            "type": "japanese",
+            "length": 6
+          },
+          {
+            "line": 461,
+            "text": "データソースを選択してください",
+            "line_content": "rules={[{ required: true, message: 'データソースを選択してください' }]}",
+            "type": "chinese",
+            "length": 15
+          },
+          {
+            "line": 463,
+            "text": "データソースを選択",
+            "line_content": "<Select placeholder=\"データソースを選択\">",
+            "type": "chinese",
+            "length": 9
+          },
+          {
+            "line": 474,
+            "text": "実行頻度",
+            "line_content": "label=\"実行頻度\"",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 487,
+            "text": "次回実行時刻",
+            "line_content": "label=\"次回実行時刻\"",
+            "type": "chinese",
+            "length": 6
+          },
+          {
+            "line": 498,
+            "text": "有効化",
+            "line_content": "label=\"有効化\"",
+            "type": "chinese",
+            "length": 3
+          },
+          {
+            "line": 501,
+            "text": "有効",
+            "line_content": "<Switch checkedChildren=\"有効\" unCheckedChildren=\"無効\" />",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 501,
+            "text": "無効",
+            "line_content": "<Switch checkedChildren=\"有効\" unCheckedChildren=\"無効\" />",
+            "type": "chinese",
+            "length": 2
+          }
+        ]
+      },
+      {
+        "file": "pages/Login.tsx",
+        "count": 6,
+        "items": [
+          {
+            "line": 65,
+            "text": "认证错误:",
+            "line_content": "console.error('认证错误:', error);",
+            "type": "chinese",
+            "length": 5
+          },
+          {
+            "line": 66,
+            "text": "错误响应:",
+            "line_content": "console.error('错误响应:', error.response);",
+            "type": "chinese",
+            "length": 5
+          },
+          {
+            "line": 74,
+            "text": "用户名或密码错误",
+            "line_content": "errorMsg = '用户名或密码错误';",
+            "type": "chinese",
+            "length": 8
+          },
+          {
+            "line": 76,
+            "text": "请求参数错误",
+            "line_content": "errorMsg = error.response.data?.detail || '请求参数错误';",
+            "type": "chinese",
+            "length": 6
+          },
+          {
+            "line": 78,
+            "text": "服务器错误，请稍后重试",
+            "line_content": "errorMsg = '服务器错误，请稍后重试';",
+            "type": "chinese",
+            "length": 11
+          },
+          {
+            "line": 80,
+            "text": "网络错误: ${error.message}",
+            "line_content": "errorMsg = `网络错误: ${error.message}`;",
+            "type": "chinese",
+            "length": 22
+          }
+        ]
+      }
+    ],
+    "components": [
+      {
+        "file": "components/SmartSearch.tsx",
+        "count": 10,
+        "items": [
+          {
+            "line": 147,
+            "text": "关键词",
+            "line_content": "{ label: t('search.keywordMode') || '关键词', value: 'keyword', icon: <SearchOutlined /> },",
+            "type": "chinese",
+            "length": 3
+          },
+          {
+            "line": 148,
+            "text": "AI问答",
+            "line_content": "{ label: t('search.aiMode') || 'AI问答', value: 'ai', icon: <RobotOutlined /> }",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 161,
+            "text": "清除历史",
+            "line_content": "{t('search.clearHistory') || '清除历史'}",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 179,
+            "text": "搜索技术内容...",
+            "line_content": "? (t('search.keywordPlaceholder') || '搜索技术内容...')",
+            "type": "chinese",
+            "length": 9
+          },
+          {
+            "line": 180,
+            "text": "问我任何技术问题...",
+            "line_content": ": (t('search.aiPlaceholder') || '问我任何技术问题...'))",
+            "type": "chinese",
+            "length": 11
+          },
+          {
+            "line": 201,
+            "text": "试试这些",
+            "line_content": "💡 {t('search.trySuggestions') || '试试这些'}:",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 224,
+            "text": "AI模式示例",
+            "line_content": "🤖 {t('search.aiHints') || 'AI模式示例'}:",
+            "type": "chinese",
+            "length": 6
+          },
+          {
+            "line": 227,
+            "text": "今天LLM有什么新突破？",
+            "line_content": "• {t('search.aiExample1') || '今天LLM有什么新突破？'}",
+            "type": "chinese",
+            "length": 12
+          },
+          {
+            "line": 230,
+            "text": "推荐一些AI Agent框架",
+            "line_content": "• {t('search.aiExample2') || '推荐一些AI Agent框架'}",
+            "type": "chinese",
+            "length": 14
+          },
+          {
+            "line": 233,
+            "text": "什么是LoRA量化技术？",
+            "line_content": "• {t('search.aiExample3') || '什么是LoRA量化技术？'}",
+            "type": "chinese",
+            "length": 12
+          }
+        ]
+      },
+      {
+        "file": "components/QualityBadge.tsx",
+        "count": 5,
+        "items": [
+          {
+            "line": 22,
+            "text": "优秀",
+            "line_content": "if (score >= 8.5) return '优秀';",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 23,
+            "text": "良好",
+            "line_content": "if (score >= 7.0) return '良好';",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 24,
+            "text": "中等",
+            "line_content": "if (score >= 5.0) return '中等';",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 25,
+            "text": "一般",
+            "line_content": "if (score >= 3.0) return '一般';",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 26,
+            "text": "较低",
+            "line_content": "return '较低';",
+            "type": "chinese",
+            "length": 2
+          }
+        ]
+      },
+      {
+        "file": "components/Sidebar.tsx",
+        "count": 1,
+        "items": [
+          {
+            "line": 73,
+            "text": "LLM模型管理",
+            "line_content": "{ key: 'llm-providers', icon: <CloudOutlined />, label: 'LLM模型管理' },",
+            "type": "chinese",
+            "length": 7
+          }
+        ]
+      },
+      {
+        "file": "components/SearchResultList.tsx",
+        "count": 7,
+        "items": [
+          {
+            "line": 73,
+            "text": "没有找到相关内容",
+            "line_content": "description={t('search.noResults') || '没有找到相关内容'}",
+            "type": "chinese",
+            "length": 8
+          },
+          {
+            "line": 85,
+            "text": "找到",
+            "line_content": "{t('search.foundResults') || '找到'} <strong>{totalCount}</strong> {t('search.results') || '条结果'}",
+            "type": "chinese",
+            "length": 2
+          },
+          {
+            "line": 85,
+            "text": "条结果",
+            "line_content": "{t('search.foundResults') || '找到'} <strong>{totalCount}</strong> {t('search.results') || '条结果'}",
+            "type": "chinese",
+            "length": 3
+          },
+          {
+            "line": 89,
+            "text": "🧠 分析模式",
+            "line_content": "{intent === 'analyze' ? '🧠 分析模式' : '🔍 查询模式'}",
+            "type": "chinese",
+            "length": 6
+          },
+          {
+            "line": 89,
+            "text": "🔍 查询模式",
+            "line_content": "{intent === 'analyze' ? '🧠 分析模式' : '🔍 查询模式'}",
+            "type": "chinese",
+            "length": 6
+          },
+          {
+            "line": 123,
+            "text": "相关度",
+            "line_content": "{t('search.relevance') || '相关度'}: {(result.score * 100).toFixed(0)}%",
+            "type": "chinese",
+            "length": 3
+          },
+          {
+            "line": 144,
+            "text": "更多",
+            "line_content": "ellipsis={{ rows: 2, expandable: true, symbol: t('common.more') || '更多' }}",
+            "type": "chinese",
+            "length": 2
+          }
+        ]
+      },
+      {
+        "file": "components/RecommendationPanel.tsx",
+        "count": 11,
+        "items": [
+          {
+            "line": 83,
+            "text": "加载推荐失败",
+            "line_content": "message.error(t('recommendation.loadError') || '加载推荐失败')",
+            "type": "chinese",
+            "length": 6
+          },
+          {
+            "line": 127,
+            "text": "已收藏",
+            "line_content": "message.success(t('recommendation.favoriteSuccess') || '已收藏')",
+            "type": "chinese",
+            "length": 3
+          },
+          {
+            "line": 130,
+            "text": "收藏失败",
+            "line_content": "message.error(t('recommendation.favoriteError') || '收藏失败')",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 146,
+            "text": "为你推荐",
+            "line_content": "<span>{t('recommendation.title') || '为你推荐'}</span>",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 154,
+            "text": "还没有设置兴趣标签",
+            "line_content": "{t('recommendation.noPreferences') || '还没有设置兴趣标签'}",
+            "type": "chinese",
+            "length": 9
+          },
+          {
+            "line": 162,
+            "text": "请前往设置页面设置兴趣标签",
+            "line_content": "message.info(t('recommendation.goToSettings') || '请前往设置页面设置兴趣标签')",
+            "type": "chinese",
+            "length": 13
+          },
+          {
+            "line": 165,
+            "text": "设置兴趣",
+            "line_content": "{t('recommendation.setPreferences') || '设置兴趣'}",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 180,
+            "text": "为你推荐",
+            "line_content": "<span>{t('recommendation.title') || '为你推荐'}</span>",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 191,
+            "text": "换一批",
+            "line_content": "{t('recommendation.refresh') || '换一批'}",
+            "type": "chinese",
+            "length": 3
+          },
+          {
+            "line": 200,
+            "text": "你的兴趣",
+            "line_content": "🎯 {t('recommendation.yourInterests') || '你的兴趣'}: {userTags.join(', ')}",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 223,
+            "text": "推荐基于你的兴趣标签和历史行为",
+            "line_content": "💡 {t('recommendation.hint') || '推荐基于你的兴趣标签和历史行为'}",
+            "type": "chinese",
+            "length": 15
+          }
+        ]
+      },
+      {
+        "file": "components/LanguageSelector.tsx",
+        "count": 2,
+        "items": [
+          {
+            "line": 17,
+            "text": "简体中文",
+            "line_content": "{ value: 'zh-CN', label: '简体中文', flag: '🇨🇳' },",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 19,
+            "text": "日本語",
+            "line_content": "{ value: 'ja-JP', label: '日本語', flag: '🇯🇵' },",
+            "type": "chinese",
+            "length": 3
+          }
+        ]
+      }
+    ],
+    "services": [],
+    "utils": [
+      {
+        "file": "utils/translateTags.ts",
+        "count": 1,
+        "items": [
+          {
+            "line": 71,
+            "text": "翻译失败:",
+            "line_content": "console.error('翻译失败:', error);",
+            "type": "chinese",
+            "length": 5
+          }
+        ]
+      }
+    ],
+    "others": [
+      {
+        "file": "App.tsx",
+        "count": 5,
+        "items": [
+          {
+            "line": 119,
+            "text": "欢迎使用 TechPulse！我们将根据你的偏好推荐内容 🎉",
+            "line_content": "message.success('欢迎使用 TechPulse！我们将根据你的偏好推荐内容 🎉')",
+            "type": "chinese",
+            "length": 30
+          },
+          {
+            "line": 125,
+            "text": "你可以随时在个人中心完成偏好设置",
+            "line_content": "message.info('你可以随时在个人中心完成偏好设置')",
+            "type": "chinese",
+            "length": 16
+          },
+          {
+            "line": 159,
+            "text": "LLM模型管理",
+            "line_content": "'llm-providers': [t('nav.systemManagement'), 'LLM模型管理'],",
+            "type": "chinese",
+            "length": 7
+          },
+          {
+            "line": 287,
+            "text": "简体中文",
+            "line_content": "label: '简体中文',",
+            "type": "chinese",
+            "length": 4
+          },
+          {
+            "line": 297,
+            "text": "日本語",
+            "line_content": "label: '日本語',",
+            "type": "chinese",
+            "length": 3
+          }
+        ]
+      }
+    ]
+  },
+  "detailed_findings": {
+    "App.tsx": [
+      {
+        "line": 119,
+        "text": "欢迎使用 TechPulse！我们将根据你的偏好推荐内容 🎉",
+        "line_content": "message.success('欢迎使用 TechPulse！我们将根据你的偏好推荐内容 🎉')",
+        "type": "chinese",
+        "length": 30
+      },
+      {
+        "line": 125,
+        "text": "你可以随时在个人中心完成偏好设置",
+        "line_content": "message.info('你可以随时在个人中心完成偏好设置')",
+        "type": "chinese",
+        "length": 16
+      },
+      {
+        "line": 159,
+        "text": "LLM模型管理",
+        "line_content": "'llm-providers': [t('nav.systemManagement'), 'LLM模型管理'],",
+        "type": "chinese",
+        "length": 7
+      },
+      {
+        "line": 287,
+        "text": "简体中文",
+        "line_content": "label: '简体中文',",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 297,
+        "text": "日本語",
+        "line_content": "label: '日本語',",
+        "type": "chinese",
+        "length": 3
+      }
+    ],
+    "components/SmartSearch.tsx": [
+      {
+        "line": 147,
+        "text": "关键词",
+        "line_content": "{ label: t('search.keywordMode') || '关键词', value: 'keyword', icon: <SearchOutlined /> },",
+        "type": "chinese",
+        "length": 3
+      },
+      {
+        "line": 148,
+        "text": "AI问答",
+        "line_content": "{ label: t('search.aiMode') || 'AI问答', value: 'ai', icon: <RobotOutlined /> }",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 161,
+        "text": "清除历史",
+        "line_content": "{t('search.clearHistory') || '清除历史'}",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 179,
+        "text": "搜索技术内容...",
+        "line_content": "? (t('search.keywordPlaceholder') || '搜索技术内容...')",
+        "type": "chinese",
+        "length": 9
+      },
+      {
+        "line": 180,
+        "text": "问我任何技术问题...",
+        "line_content": ": (t('search.aiPlaceholder') || '问我任何技术问题...'))",
+        "type": "chinese",
+        "length": 11
+      },
+      {
+        "line": 201,
+        "text": "试试这些",
+        "line_content": "💡 {t('search.trySuggestions') || '试试这些'}:",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 224,
+        "text": "AI模式示例",
+        "line_content": "🤖 {t('search.aiHints') || 'AI模式示例'}:",
+        "type": "chinese",
+        "length": 6
+      },
+      {
+        "line": 227,
+        "text": "今天LLM有什么新突破？",
+        "line_content": "• {t('search.aiExample1') || '今天LLM有什么新突破？'}",
+        "type": "chinese",
+        "length": 12
+      },
+      {
+        "line": 230,
+        "text": "推荐一些AI Agent框架",
+        "line_content": "• {t('search.aiExample2') || '推荐一些AI Agent框架'}",
+        "type": "chinese",
+        "length": 14
+      },
+      {
+        "line": 233,
+        "text": "什么是LoRA量化技术？",
+        "line_content": "• {t('search.aiExample3') || '什么是LoRA量化技术？'}",
+        "type": "chinese",
+        "length": 12
+      }
+    ],
+    "components/QualityBadge.tsx": [
+      {
+        "line": 22,
+        "text": "优秀",
+        "line_content": "if (score >= 8.5) return '优秀';",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 23,
+        "text": "良好",
+        "line_content": "if (score >= 7.0) return '良好';",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 24,
+        "text": "中等",
+        "line_content": "if (score >= 5.0) return '中等';",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 25,
+        "text": "一般",
+        "line_content": "if (score >= 3.0) return '一般';",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 26,
+        "text": "较低",
+        "line_content": "return '较低';",
+        "type": "chinese",
+        "length": 2
+      }
+    ],
+    "components/Sidebar.tsx": [
+      {
+        "line": 73,
+        "text": "LLM模型管理",
+        "line_content": "{ key: 'llm-providers', icon: <CloudOutlined />, label: 'LLM模型管理' },",
+        "type": "chinese",
+        "length": 7
+      }
+    ],
+    "components/SearchResultList.tsx": [
+      {
+        "line": 73,
+        "text": "没有找到相关内容",
+        "line_content": "description={t('search.noResults') || '没有找到相关内容'}",
+        "type": "chinese",
+        "length": 8
+      },
+      {
+        "line": 85,
+        "text": "找到",
+        "line_content": "{t('search.foundResults') || '找到'} <strong>{totalCount}</strong> {t('search.results') || '条结果'}",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 85,
+        "text": "条结果",
+        "line_content": "{t('search.foundResults') || '找到'} <strong>{totalCount}</strong> {t('search.results') || '条结果'}",
+        "type": "chinese",
+        "length": 3
+      },
+      {
+        "line": 89,
+        "text": "🧠 分析模式",
+        "line_content": "{intent === 'analyze' ? '🧠 分析模式' : '🔍 查询模式'}",
+        "type": "chinese",
+        "length": 6
+      },
+      {
+        "line": 89,
+        "text": "🔍 查询模式",
+        "line_content": "{intent === 'analyze' ? '🧠 分析模式' : '🔍 查询模式'}",
+        "type": "chinese",
+        "length": 6
+      },
+      {
+        "line": 123,
+        "text": "相关度",
+        "line_content": "{t('search.relevance') || '相关度'}: {(result.score * 100).toFixed(0)}%",
+        "type": "chinese",
+        "length": 3
+      },
+      {
+        "line": 144,
+        "text": "更多",
+        "line_content": "ellipsis={{ rows: 2, expandable: true, symbol: t('common.more') || '更多' }}",
+        "type": "chinese",
+        "length": 2
+      }
+    ],
+    "components/RecommendationPanel.tsx": [
+      {
+        "line": 83,
+        "text": "加载推荐失败",
+        "line_content": "message.error(t('recommendation.loadError') || '加载推荐失败')",
+        "type": "chinese",
+        "length": 6
+      },
+      {
+        "line": 127,
+        "text": "已收藏",
+        "line_content": "message.success(t('recommendation.favoriteSuccess') || '已收藏')",
+        "type": "chinese",
+        "length": 3
+      },
+      {
+        "line": 130,
+        "text": "收藏失败",
+        "line_content": "message.error(t('recommendation.favoriteError') || '收藏失败')",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 146,
+        "text": "为你推荐",
+        "line_content": "<span>{t('recommendation.title') || '为你推荐'}</span>",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 154,
+        "text": "还没有设置兴趣标签",
+        "line_content": "{t('recommendation.noPreferences') || '还没有设置兴趣标签'}",
+        "type": "chinese",
+        "length": 9
+      },
+      {
+        "line": 162,
+        "text": "请前往设置页面设置兴趣标签",
+        "line_content": "message.info(t('recommendation.goToSettings') || '请前往设置页面设置兴趣标签')",
+        "type": "chinese",
+        "length": 13
+      },
+      {
+        "line": 165,
+        "text": "设置兴趣",
+        "line_content": "{t('recommendation.setPreferences') || '设置兴趣'}",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 180,
+        "text": "为你推荐",
+        "line_content": "<span>{t('recommendation.title') || '为你推荐'}</span>",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 191,
+        "text": "换一批",
+        "line_content": "{t('recommendation.refresh') || '换一批'}",
+        "type": "chinese",
+        "length": 3
+      },
+      {
+        "line": 200,
+        "text": "你的兴趣",
+        "line_content": "🎯 {t('recommendation.yourInterests') || '你的兴趣'}: {userTags.join(', ')}",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 223,
+        "text": "推荐基于你的兴趣标签和历史行为",
+        "line_content": "💡 {t('recommendation.hint') || '推荐基于你的兴趣标签和历史行为'}",
+        "type": "chinese",
+        "length": 15
+      }
+    ],
+    "components/LanguageSelector.tsx": [
+      {
+        "line": 17,
+        "text": "简体中文",
+        "line_content": "{ value: 'zh-CN', label: '简体中文', flag: '🇨🇳' },",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 19,
+        "text": "日本語",
+        "line_content": "{ value: 'ja-JP', label: '日本語', flag: '🇯🇵' },",
+        "type": "chinese",
+        "length": 3
+      }
+    ],
+    "pages/SystemConfig.tsx": [
+      {
+        "line": 81,
+        "text": "加载配置失败: ${error.message}",
+        "line_content": "message.error(`加载配置失败: ${error.message}`)",
+        "type": "chinese",
+        "length": 24
+      },
+      {
+        "line": 109,
+        "text": "配置验证通过",
+        "line_content": "message.success('配置验证通过')",
+        "type": "chinese",
+        "length": 6
+      },
+      {
+        "line": 111,
+        "text": "配置存在 ${result.errors.length} 个错误",
+        "line_content": "message.warning(`配置存在 ${result.errors.length} 个错误`)",
+        "type": "chinese",
+        "length": 32
+      },
+      {
+        "line": 114,
+        "text": "验证失败: ${error.message}",
+        "line_content": "message.error(`验证失败: ${error.message}`)",
+        "type": "chinese",
+        "length": 22
+      },
+      {
+        "line": 125,
+        "text": "没有修改需要保存",
+        "line_content": "message.info('没有修改需要保存')",
+        "type": "chinese",
+        "length": 8
+      },
+      {
+        "line": 135,
+        "text": "成功更新 ${result.updated_keys.length} 个配置项",
+        "line_content": "message.success(`成功更新 ${result.updated_keys.length} 个配置项`)",
+        "type": "chinese",
+        "length": 39
+      },
+      {
+        "line": 139,
+        "text": "保存失败: ${error.message}",
+        "line_content": "message.error(`保存失败: ${error.message}`)",
+        "type": "chinese",
+        "length": 22
+      },
+      {
+        "line": 153,
+        "text": "配置已重新加载",
+        "line_content": "message.success('配置已重新加载')",
+        "type": "chinese",
+        "length": 7
+      },
+      {
+        "line": 155,
+        "text": "重载失败: ${error.message}",
+        "line_content": "message.error(`重载失败: ${error.message}`)",
+        "type": "chinese",
+        "length": 22
+      },
+      {
+        "line": 169,
+        "text": "已恢复默认配置",
+        "line_content": "message.success('已恢复默认配置')",
+        "type": "chinese",
+        "length": 7
+      },
+      {
+        "line": 171,
+        "text": "恢复失败: ${error.message}",
+        "line_content": "message.error(`恢复失败: ${error.message}`)",
+        "type": "chinese",
+        "length": 22
+      },
+      {
+        "line": 186,
+        "text": "加载备份失败: ${error.message}",
+        "line_content": "message.error(`加载备份失败: ${error.message}`)",
+        "type": "chinese",
+        "length": 24
+      },
+      {
+        "line": 199,
+        "text": "配置已从备份恢复",
+        "line_content": "message.success('配置已从备份恢复')",
+        "type": "chinese",
+        "length": 8
+      },
+      {
+        "line": 201,
+        "text": "恢复失败: ${error.message}",
+        "line_content": "message.error(`恢复失败: ${error.message}`)",
+        "type": "chinese",
+        "length": 22
+      },
+      {
+        "line": 220,
+        "text": "配置已导出",
+        "line_content": "message.success('配置已导出')",
+        "type": "chinese",
+        "length": 5
+      },
+      {
+        "line": 222,
+        "text": "导出失败: ${error.message}",
+        "line_content": "message.error(`导出失败: ${error.message}`)",
+        "type": "chinese",
+        "length": 22
+      },
+      {
+        "line": 253,
+        "text": "配置键",
+        "line_content": "title: '配置键',",
+        "type": "chinese",
+        "length": 3
+      },
+      {
+        "line": 272,
+        "text": "配置值",
+        "line_content": "title: '配置值',",
+        "type": "chinese",
+        "length": 3
+      },
+      {
+        "line": 286,
+        "text": "${record.key} 的值",
+        "line_content": "placeholder={`${record.key} 的值`}",
+        "type": "chinese",
+        "length": 16
+      },
+      {
+        "line": 293,
+        "text": "操作",
+        "line_content": "title: '操作',",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 324,
+        "text": "配置有效",
+        "line_content": "text={validation.valid ? '配置有效' : '配置有误'}",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 324,
+        "text": "配置有误",
+        "line_content": "text={validation.valid ? '配置有效' : '配置有误'}",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 335,
+        "text": "隐藏",
+        "line_content": "{showSensitive ? '隐藏' : '显示'}敏感信息",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 335,
+        "text": "显示",
+        "line_content": "{showSensitive ? '隐藏' : '显示'}敏感信息",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 351,
+        "text": "配置项总数",
+        "line_content": "title=\"配置项总数\"",
+        "type": "chinese",
+        "length": 5
+      },
+      {
+        "line": 358,
+        "text": "已修改项",
+        "line_content": "title=\"已修改项\"",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 365,
+        "text": "验证错误",
+        "line_content": "title=\"验证错误\"",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 372,
+        "text": "验证警告",
+        "line_content": "title=\"验证警告\"",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 382,
+        "text": "配置验证失败",
+        "line_content": "message=\"配置验证失败\"",
+        "type": "chinese",
+        "length": 6
+      },
+      {
+        "line": 400,
+        "text": "配置警告",
+        "line_content": "message=\"配置警告\"",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 446,
+        "text": "确定要恢复默认配置吗？",
+        "line_content": "title=\"确定要恢复默认配置吗？\"",
+        "type": "chinese",
+        "length": 11
+      },
+      {
+        "line": 447,
+        "text": "这将覆盖当前所有配置，无法撤销。",
+        "line_content": "description=\"这将覆盖当前所有配置，无法撤销。\"",
+        "type": "chinese",
+        "length": 16
+      },
+      {
+        "line": 449,
+        "text": "确定",
+        "line_content": "okText=\"确定\"",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 450,
+        "text": "取消",
+        "line_content": "cancelText=\"取消\"",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 470,
+        "text": "共 ${total} 项配置",
+        "line_content": "showTotal: (total) => `共 ${total} 项配置`",
+        "type": "chinese",
+        "length": 14
+      },
+      {
+        "line": 478,
+        "text": "配置备份管理",
+        "line_content": "title=\"配置备份管理\"",
+        "type": "chinese",
+        "length": 6
+      },
+      {
+        "line": 489,
+        "text": "备份文件",
+        "line_content": "title: '备份文件',",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 494,
+        "text": "创建时间",
+        "line_content": "title: '创建时间',",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 501,
+        "text": "文件大小",
+        "line_content": "title: '文件大小',",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 507,
+        "text": "操作",
+        "line_content": "title: '操作',",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 511,
+        "text": "确定要从此备份恢复配置吗？",
+        "line_content": "title=\"确定要从此备份恢复配置吗？\"",
+        "type": "chinese",
+        "length": 13
+      },
+      {
+        "line": 513,
+        "text": "确定",
+        "line_content": "okText=\"确定\"",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 514,
+        "text": "取消",
+        "line_content": "cancelText=\"取消\"",
+        "type": "chinese",
+        "length": 2
+      }
+    ],
+    "pages/SystemStatusPage.tsx": [
+      {
+        "line": 133,
+        "text": "正常",
+        "line_content": "healthy: { status: 'success' as const, icon: <CheckCircleOutlined />, text: '正常' },",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 134,
+        "text": "警告",
+        "line_content": "warning: { status: 'warning' as const, icon: <WarningOutlined />, text: '警告' },",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 135,
+        "text": "エラー",
+        "line_content": "error: { status: 'error' as const, icon: <CloseCircleOutlined />, text: 'エラー' }",
+        "type": "japanese",
+        "length": 3
+      },
+      {
+        "line": 143,
+        "text": "サービス名",
+        "line_content": "title: 'サービス名',",
+        "type": "chinese",
+        "length": 5
+      },
+      {
+        "line": 149,
+        "text": "ステータス",
+        "line_content": "title: 'ステータス',",
+        "type": "japanese",
+        "length": 5
+      },
+      {
+        "line": 155,
+        "text": "応答時間",
+        "line_content": "title: '応答時間',",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 164,
+        "text": "稼働率",
+        "line_content": "title: '稼働率',",
+        "type": "chinese",
+        "length": 3
+      },
+      {
+        "line": 183,
+        "text": "最終確認",
+        "line_content": "title: '最終確認',",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 192,
+        "text": "API名",
+        "line_content": "title: 'API名',",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 198,
+        "text": "今日の使用量",
+        "line_content": "title: '今日の使用量',",
+        "type": "chinese",
+        "length": 6
+      },
+      {
+        "line": 213,
+        "text": "最終使用",
+        "line_content": "title: '最終使用',",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 224,
+        "text": "メモリ",
+        "line_content": "{ time: item.time, value: item.memory, category: 'メモリ' },",
+        "type": "japanese",
+        "length": 3
+      },
+      {
+        "line": 225,
+        "text": "ネットワーク",
+        "line_content": "{ time: item.time, value: item.network, category: 'ネットワーク' }",
+        "type": "japanese",
+        "length": 6
+      },
+      {
+        "line": 269,
+        "text": "システムは正常に稼働中",
+        "line_content": "message=\"システムは正常に稼働中\"",
+        "type": "chinese",
+        "length": 11
+      },
+      {
+        "line": 270,
+        "text": "すべてのコアサービスが正常に動作しています。一部の外部APIで軽微な遅延が検出されています。",
+        "line_content": "description=\"すべてのコアサービスが正常に動作しています。一部の外部APIで軽微な遅延が検出されています。\"",
+        "type": "chinese",
+        "length": 46
+      },
+      {
+        "line": 282,
+        "text": "CPU使用率",
+        "line_content": "title=\"CPU使用率\"",
+        "type": "chinese",
+        "length": 6
+      },
+      {
+        "line": 298,
+        "text": "メモリ使用率",
+        "line_content": "title=\"メモリ使用率\"",
+        "type": "chinese",
+        "length": 6
+      },
+      {
+        "line": 314,
+        "text": "ディスク使用率",
+        "line_content": "title=\"ディスク使用率\"",
+        "type": "chinese",
+        "length": 7
+      },
+      {
+        "line": 330,
+        "text": "ネットワーク使用率",
+        "line_content": "title=\"ネットワーク使用率\"",
+        "type": "chinese",
+        "length": 9
+      },
+      {
+        "line": 346,
+        "text": "リソース使用履歴（過去24時間）",
+        "line_content": "<Card title=\"リソース使用履歴（過去24時間）\" style={{ marginBottom: 24 }}>",
+        "type": "chinese",
+        "length": 16
+      },
+      {
+        "line": 351,
+        "text": "サービスステータス",
+        "line_content": "<Card title=\"サービスステータス\" style={{ marginBottom: 24 }}>",
+        "type": "japanese",
+        "length": 9
+      },
+      {
+        "line": 361,
+        "text": "API使用状況",
+        "line_content": "<Card title=\"API使用状況\" style={{ marginBottom: 24 }}>",
+        "type": "chinese",
+        "length": 7
+      },
+      {
+        "line": 371,
+        "text": "最近のシステムイベント",
+        "line_content": "<Card title=\"最近のシステムイベント\">",
+        "type": "chinese",
+        "length": 11
+      }
+    ],
+    "pages/ArxivPage.tsx": [
+      {
+        "line": 64,
+        "text": "AI・Machine Learning",
+        "line_content": "'cs.AI': 'AI・Machine Learning',",
+        "type": "japanese",
+        "length": 19
+      },
+      {
+        "line": 142,
+        "text": "获取arXiv数据失败",
+        "line_content": "message.error('获取arXiv数据失败')",
+        "type": "chinese",
+        "length": 11
+      },
+      {
+        "line": 178,
+        "text": "关于这篇arXiv论文 ",
+        "line_content": "message: `关于这篇arXiv论文 \"${selectedPaper.title}\"，${userMessage}`,",
+        "type": "chinese",
+        "length": 12
+      },
+      {
+        "line": 193,
+        "text": "抱歉，我无法回答这个问题。",
+        "line_content": "ai: data.response || '抱歉，我无法回答这个问题。'",
+        "type": "chinese",
+        "length": 13
+      },
+      {
+        "line": 197,
+        "text": "发送消息失败",
+        "line_content": "message.error('发送消息失败')",
+        "type": "chinese",
+        "length": 6
+      },
+      {
+        "line": 201,
+        "text": "发送消息失败",
+        "line_content": "message.error('发送消息失败')",
+        "type": "chinese",
+        "length": 6
+      },
+      {
+        "line": 245,
+        "text": "机器学习",
+        "line_content": "paperCategories.some(cat => cat && (cat.includes('AI') || cat.includes('机器学习') || cat.includes('人工智能')))) ||",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 245,
+        "text": "人工智能",
+        "line_content": "paperCategories.some(cat => cat && (cat.includes('AI') || cat.includes('机器学习') || cat.includes('人工智能')))) ||",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 251,
+        "text": "计算机视觉",
+        "line_content": "paperCategories.some(cat => cat && (cat.includes('计算机视觉') || cat.includes('computer vision') || cat.includes('cv')))) ||",
+        "type": "chinese",
+        "length": 5
+      },
+      {
+        "line": 252,
+        "text": "视觉",
+        "line_content": "(paper.summary && (paper.summary.toLowerCase().includes('vision') || paper.summary.toLowerCase().includes('视觉')))",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 317,
+        "text": "机器学习",
+        "line_content": "cat && (cat.includes('AI') || cat.includes('机器学习') || cat.includes('人工智能'))",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 317,
+        "text": "人工智能",
+        "line_content": "cat && (cat.includes('AI') || cat.includes('机器学习') || cat.includes('人工智能'))",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 330,
+        "text": "大语言模型",
+        "line_content": "(categoryNames[Object.keys(stats.categories)[0]] || Object.keys(stats.categories)[0] || '大语言模型') :",
+        "type": "chinese",
+        "length": 5
+      },
+      {
+        "line": 331,
+        "text": "大语言模型",
+        "line_content": "'大语言模型'",
+        "type": "chinese",
+        "length": 5
+      },
+      {
+        "line": 419,
+        "text": "摘要链接不可用",
+        "line_content": "message.warning('摘要链接不可用')",
+        "type": "chinese",
+        "length": 7
+      },
+      {
+        "line": 434,
+        "text": "PDF链接不可用",
+        "line_content": "message.warning('PDF链接不可用')",
+        "type": "chinese",
+        "length": 8
+      },
+      {
+        "line": 447,
+        "text": "无标题",
+        "line_content": "{paper.title || '无标题'}",
+        "type": "chinese",
+        "length": 3
+      },
+      {
+        "line": 465,
+        "text": "暂无摘要",
+        "line_content": "{paper.abstract || paper.summary || '暂无摘要'}",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 469,
+        "text": "未知",
+        "line_content": "<CalendarOutlined /> {t('arxiv.published')}: {paper.created_at ? new Date(paper.created_at).toLocaleDateString() : '未知'}",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 482,
+        "text": "${range[0]}-${range[1]} / ${total} 篇论文",
+        "line_content": "`${range[0]}-${range[1]} / ${total} 篇论文`",
+        "type": "chinese",
+        "length": 38
+      },
+      {
+        "line": 588,
+        "text": "未知",
+        "line_content": "<Text>{selectedPaper.created_at ? new Date(selectedPaper.created_at).toLocaleDateString() : '未知'}</Text>",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 596,
+        "text": "暂无摘要",
+        "line_content": "{selectedPaper.abstract || selectedPaper.summary || '暂无摘要'}",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 674,
+        "text": "问一下关于这篇论文的问题...",
+        "line_content": "placeholder=\"问一下关于这篇论文的问题...\"",
+        "type": "chinese",
+        "length": 15
+      }
+    ],
+    "pages/TrendsPage.tsx": [
+      {
+        "line": 212,
+        "text": "大语言模型",
+        "line_content": "keywords: ['llm', 'gpt', 'chatgpt', 'claude', 'gemini', 'llama', 'qwen', 'transformer', 'bert', 'language model', 'nlp', 'natural language', '大语言模型', '语言模型', 'instruct', 'chat', 'openai', 'anthropic', 'mistral', 'phi', 'qwen2', 'baichuan', 'text-generation', 'chat-completion'],",
+        "type": "chinese",
+        "length": 5
+      },
+      {
+        "line": 212,
+        "text": "语言模型",
+        "line_content": "keywords: ['llm', 'gpt', 'chatgpt', 'claude', 'gemini', 'llama', 'qwen', 'transformer', 'bert', 'language model', 'nlp', 'natural language', '大语言模型', '语言模型', 'instruct', 'chat', 'openai', 'anthropic', 'mistral', 'phi', 'qwen2', 'baichuan', 'text-generation', 'chat-completion'],",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 218,
+        "text": "计算机视觉",
+        "line_content": "keywords: ['computer vision', 'cv', 'opencv', 'yolo', 'object detection', 'image recognition', 'cnn', 'vision', 'stable diffusion', 'midjourney', '计算机视觉', '图像识别', 'image', 'visual', 'resnet', 'vgg', 'efficientnet', 'segmentation', 'face recognition', 'ocr', 'diffusion', 'gan'],",
+        "type": "chinese",
+        "length": 5
+      },
+      {
+        "line": 218,
+        "text": "图像识别",
+        "line_content": "keywords: ['computer vision', 'cv', 'opencv', 'yolo', 'object detection', 'image recognition', 'cnn', 'vision', 'stable diffusion', 'midjourney', '计算机视觉', '图像识别', 'image', 'visual', 'resnet', 'vgg', 'efficientnet', 'segmentation', 'face recognition', 'ocr', 'diffusion', 'gan'],",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 224,
+        "text": "语音",
+        "line_content": "keywords: ['speech', 'voice', 'audio', 'tts', 'stt', 'whisper', 'speech recognition', 'voice synthesis', '语音', '音频', 'asr', 'wav2vec', 'speech-to-text', 'text-to-speech', 'audio-classification', 'speech-processing'],",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 224,
+        "text": "音频",
+        "line_content": "keywords: ['speech', 'voice', 'audio', 'tts', 'stt', 'whisper', 'speech recognition', 'voice synthesis', '语音', '音频', 'asr', 'wav2vec', 'speech-to-text', 'text-to-speech', 'audio-classification', 'speech-processing'],",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 230,
+        "text": "多模态",
+        "line_content": "keywords: ['multimodal', 'vision-language', 'clip', 'dall-e', 'gpt-4v', 'multimodal ai', 'cross-modal', '多模态', 'vision language', 'vilt', 'blip', 'flamingo', 'align', 'vlm'],",
+        "type": "chinese",
+        "length": 3
+      },
+      {
+        "line": 236,
+        "text": "机器学习",
+        "line_content": "keywords: ['machine learning', 'ml', 'scikit-learn', 'xgboost', 'random forest', 'svm', 'clustering', '机器学习', 'sklearn', 'gradient boosting', 'decision tree', 'classification', 'regression', 'ensemble'],",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 242,
+        "text": "深度学习",
+        "line_content": "keywords: ['deep learning', 'neural network', 'pytorch', 'tensorflow', 'keras', 'cnn', 'rnn', 'lstm', '深度学习', '神经网络', 'neural', 'backpropagation', 'gradient descent', 'attention', 'autoencoder', 'gru'],",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 242,
+        "text": "神经网络",
+        "line_content": "keywords: ['deep learning', 'neural network', 'pytorch', 'tensorflow', 'keras', 'cnn', 'rnn', 'lstm', '深度学习', '神经网络', 'neural', 'backpropagation', 'gradient descent', 'attention', 'autoencoder', 'gru'],",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 390,
+        "text": "阿里云",
+        "line_content": "provider: '阿里云',",
+        "type": "chinese",
+        "length": 3
+      }
+    ],
+    "pages/LLMProvidersPage.tsx": [
+      {
+        "line": 558,
+        "text": "请输入${field.label}",
+        "line_content": "rules={[{ required: field.required, message: `请输入${field.label}` }]}",
+        "type": "chinese",
+        "length": 17
+      }
+    ],
+    "pages/GitHubPage.tsx": [
+      {
+        "line": 83,
+        "text": "关于这个GitHub仓库 ",
+        "line_content": "message: `关于这个GitHub仓库 \"${selectedRepo.title}\"，${userMessage}`,",
+        "type": "chinese",
+        "length": 13
+      },
+      {
+        "line": 99,
+        "text": "抱歉，我无法回答这个问题。",
+        "line_content": "ai: data.response || '抱歉，我无法回答这个问题。'",
+        "type": "chinese",
+        "length": 13
+      },
+      {
+        "line": 103,
+        "text": "发送消息失败",
+        "line_content": "message.error('发送消息失败')",
+        "type": "chinese",
+        "length": 6
+      },
+      {
+        "line": 107,
+        "text": "发送消息失败",
+        "line_content": "message.error('发送消息失败')",
+        "type": "chinese",
+        "length": 6
+      },
+      {
+        "line": 360,
+        "text": "仓库链接不可用",
+        "line_content": "message.warning('仓库链接不可用')",
+        "type": "chinese",
+        "length": 7
+      },
+      {
+        "line": 561,
+        "text": "未知",
+        "line_content": "<Text>{selectedRepo.created_at ? new Date(selectedRepo.created_at).toLocaleDateString() : '未知'}</Text>",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 569,
+        "text": "暂无描述",
+        "line_content": "{selectedRepo.description || selectedRepo.summary || '暂无描述'}",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 634,
+        "text": "问一下关于这个仓库的问题...",
+        "line_content": "placeholder=\"问一下关于这个仓库的问题...\"",
+        "type": "chinese",
+        "length": 15
+      }
+    ],
+    "pages/ZennPage.tsx": [
+      {
+        "line": 87,
+        "text": "关于这篇Zenn文章 ",
+        "line_content": "message: `关于这篇Zenn文章 \"${selectedArticle.title}\"，${userMessage}`,",
+        "type": "chinese",
+        "length": 11
+      },
+      {
+        "line": 102,
+        "text": "抱歉，我无法回答这个问题。",
+        "line_content": "ai: data.response || '抱歉，我无法回答这个问题。'",
+        "type": "chinese",
+        "length": 13
+      },
+      {
+        "line": 106,
+        "text": "发送消息失败",
+        "line_content": "message.error('发送消息失败')",
+        "type": "chinese",
+        "length": 6
+      },
+      {
+        "line": 110,
+        "text": "发送消息失败",
+        "line_content": "message.error('发送消息失败')",
+        "type": "chinese",
+        "length": 6
+      },
+      {
+        "line": 132,
+        "text": "匿名",
+        "line_content": "author_name: article.author_name || '匿名',",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 144,
+        "text": "匿名",
+        "line_content": "const author = article.author_name || '匿名'",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 364,
+        "text": "文章链接不可用",
+        "line_content": "message.warning('文章链接不可用')",
+        "type": "chinese",
+        "length": 7
+      },
+      {
+        "line": 386,
+        "text": "无标题",
+        "line_content": "<Text strong>{article.title || '无标题'}</Text>",
+        "type": "chinese",
+        "length": 3
+      },
+      {
+        "line": 411,
+        "text": "匿名",
+        "line_content": "Author: {article.author_name || '匿名'}",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 415,
+        "text": "暂无摘要",
+        "line_content": "{article.content_excerpt || '暂无摘要'}",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 425,
+        "text": "未知",
+        "line_content": "<CalendarOutlined /> {article.published_at ? new Date(article.published_at).toLocaleDateString() : '未知'}",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 526,
+        "text": "无标题",
+        "line_content": "{selectedArticle.title || '无标题'}",
+        "type": "chinese",
+        "length": 3
+      },
+      {
+        "line": 546,
+        "text": "匿名",
+        "line_content": "<Text>{selectedArticle.author_name || '匿名'}</Text>",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 551,
+        "text": "未知",
+        "line_content": "<Text>{selectedArticle.published_at ? new Date(selectedArticle.published_at).toLocaleDateString() : '未知'}</Text>",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 559,
+        "text": "暂无摘要",
+        "line_content": "{selectedArticle.content_excerpt || '暂无摘要'}",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 624,
+        "text": "问一下关于这篇文章的问题...",
+        "line_content": "placeholder=\"问一下关于这篇文章的问题...\"",
+        "type": "chinese",
+        "length": 15
+      }
+    ],
+    "pages/Analytics.tsx": [
+      {
+        "line": 229,
+        "text": "数量",
+        "line_content": "count: { alias: '数量' }",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 242,
+        "text": "日付",
+        "line_content": "date: { alias: '日付' },",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 243,
+        "text": "数量",
+        "line_content": "count: { alias: '数量' },",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 322,
+        "text": "人気技術",
+        "line_content": "title=\"人気技術\"",
+        "type": "chinese",
+        "length": 4
+      }
+    ],
+    "pages/HuggingFacePage.tsx": [
+      {
+        "line": 68,
+        "text": "文本生成",
+        "line_content": "'text-generation': '文本生成',",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 69,
+        "text": "文本分类",
+        "line_content": "'text-classification': '文本分类',",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 70,
+        "text": "标记分类",
+        "line_content": "'token-classification': '标记分类',",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 71,
+        "text": "问答系统",
+        "line_content": "'question-answering': '问答系统',",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 72,
+        "text": "填充遮罩",
+        "line_content": "'fill-mask': '填充遮罩',",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 73,
+        "text": "文本摘要",
+        "line_content": "'summarization': '文本摘要',",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 74,
+        "text": "机器翻译",
+        "line_content": "'translation': '机器翻译',",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 75,
+        "text": "文本到文本生成",
+        "line_content": "'text2text-generation': '文本到文本生成',",
+        "type": "chinese",
+        "length": 7
+      },
+      {
+        "line": 76,
+        "text": "对话系统",
+        "line_content": "'conversational': '对话系统',",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 77,
+        "text": "图像分类",
+        "line_content": "'image-classification': '图像分类',",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 78,
+        "text": "目标检测",
+        "line_content": "'object-detection': '目标检测',",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 79,
+        "text": "图像分割",
+        "line_content": "'image-segmentation': '图像分割',",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 80,
+        "text": "语音识别",
+        "line_content": "'speech-recognition': '语音识别',",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 81,
+        "text": "文本转语音",
+        "line_content": "'text-to-speech': '文本转语音'",
+        "type": "chinese",
+        "length": 5
+      },
+      {
+        "line": 105,
+        "text": "关于这个HuggingFace模型 ",
+        "line_content": "message: `关于这个HuggingFace模型 \"${selectedModel.title}\"，${userMessage}`,",
+        "type": "chinese",
+        "length": 18
+      },
+      {
+        "line": 121,
+        "text": "抱歉，我无法回答这个问题。",
+        "line_content": "ai: data.response || '抱歉，我无法回答这个问题。'",
+        "type": "chinese",
+        "length": 13
+      },
+      {
+        "line": 125,
+        "text": "发送消息失败",
+        "line_content": "message.error('发送消息失败')",
+        "type": "chinese",
+        "length": 6
+      },
+      {
+        "line": 129,
+        "text": "发送消息失败",
+        "line_content": "message.error('发送消息失败')",
+        "type": "chinese",
+        "length": 6
+      },
+      {
+        "line": 306,
+        "text": "文本生成",
+        "line_content": "pipelineNames[Object.keys(stats.pipeline_distribution)[0]] || '文本生成' :",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 307,
+        "text": "文本生成",
+        "line_content": "'文本生成'",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 555,
+        "text": "暂无描述",
+        "line_content": "{selectedModel.description || '暂无描述'}",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 620,
+        "text": "问一下关于这个模型的问题...",
+        "line_content": "placeholder=\"问一下关于这个模型的问题...\"",
+        "type": "chinese",
+        "length": 15
+      }
+    ],
+    "pages/Dashboard.tsx": [
+      {
+        "line": 156,
+        "text": "语言已切换为${languages[language]?.name}",
+        "line_content": "message.success(`语言已切换为${languages[language]?.name}`)",
+        "type": "chinese",
+        "length": 34
+      },
+      {
+        "line": 180,
+        "text": "翻译结果",
+        "line_content": "title: '翻译结果',",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 296,
+        "text": "已保存到Notion！",
+        "line_content": "message.success('已保存到Notion！')",
+        "type": "chinese",
+        "length": 11
+      }
+    ],
+    "pages/TaskManagementPage.tsx": [
+      {
+        "line": 123,
+        "text": "待機中",
+        "line_content": "pending: { color: 'default', icon: <ClockCircleOutlined />, text: '待機中' },",
+        "type": "chinese",
+        "length": 3
+      },
+      {
+        "line": 124,
+        "text": "実行中",
+        "line_content": "running: { color: 'processing', icon: <SyncOutlined spin />, text: '実行中' },",
+        "type": "chinese",
+        "length": 3
+      },
+      {
+        "line": 125,
+        "text": "完了",
+        "line_content": "completed: { color: 'success', icon: <CheckCircleOutlined />, text: '完了' },",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 126,
+        "text": "失敗",
+        "line_content": "failed: { color: 'error', icon: <CloseCircleOutlined />, text: '失敗' },",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 127,
+        "text": "一時停止",
+        "line_content": "paused: { color: 'warning', icon: <PauseCircleOutlined />, text: '一時停止' }",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 139,
+        "text": "全データ源",
+        "line_content": "all: { color: 'green', text: '全データ源' }",
+        "type": "chinese",
+        "length": 5
+      },
+      {
+        "line": 146,
+        "text": "タスクを実行中...",
+        "line_content": "message.loading({ content: 'タスクを実行中...', key: 'run' })",
+        "type": "chinese",
+        "length": 10
+      },
+      {
+        "line": 149,
+        "text": "タスクを開始しました",
+        "line_content": "message.success({ content: 'タスクを開始しました', key: 'run' })",
+        "type": "chinese",
+        "length": 10
+      },
+      {
+        "line": 156,
+        "text": "タスクを一時停止しました",
+        "line_content": "message.success('タスクを一時停止しました')",
+        "type": "chinese",
+        "length": 12
+      },
+      {
+        "line": 162,
+        "text": "タスクを削除しました",
+        "line_content": "message.success('タスクを削除しました')",
+        "type": "chinese",
+        "length": 10
+      },
+      {
+        "line": 168,
+        "text": "タスクを有効化しました",
+        "line_content": "message.success(enabled ? 'タスクを有効化しました' : 'タスクを無効化しました')",
+        "type": "chinese",
+        "length": 11
+      },
+      {
+        "line": 168,
+        "text": "タスクを無効化しました",
+        "line_content": "message.success(enabled ? 'タスクを有効化しました' : 'タスクを無効化しました')",
+        "type": "chinese",
+        "length": 11
+      },
+      {
+        "line": 191,
+        "text": "タスクを更新しました",
+        "line_content": "message.success(editingTask ? 'タスクを更新しました' : 'タスクを作成しました')",
+        "type": "chinese",
+        "length": 10
+      },
+      {
+        "line": 191,
+        "text": "タスクを作成しました",
+        "line_content": "message.success(editingTask ? 'タスクを更新しました' : 'タスクを作成しました')",
+        "type": "chinese",
+        "length": 10
+      },
+      {
+        "line": 201,
+        "text": "タスク名",
+        "line_content": "title: 'タスク名',",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 215,
+        "text": "データソース",
+        "line_content": "title: 'データソース',",
+        "type": "japanese",
+        "length": 6
+      },
+      {
+        "line": 222,
+        "text": "ステータス",
+        "line_content": "title: 'ステータス',",
+        "type": "japanese",
+        "length": 5
+      },
+      {
+        "line": 229,
+        "text": "スケジュール",
+        "line_content": "title: 'スケジュール',",
+        "type": "japanese",
+        "length": 6
+      },
+      {
+        "line": 235,
+        "text": "手動",
+        "line_content": "manual: '手動',",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 236,
+        "text": "毎時",
+        "line_content": "hourly: '毎時',",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 237,
+        "text": "毎日",
+        "line_content": "daily: '毎日',",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 238,
+        "text": "毎週",
+        "line_content": "weekly: '毎週'",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 244,
+        "text": "次回実行",
+        "line_content": "title: '次回実行',",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 253,
+        "text": "実行統計",
+        "line_content": "title: '実行統計',",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 274,
+        "text": "有効/無効",
+        "line_content": "title: '有効/無効',",
+        "type": "chinese",
+        "length": 5
+      },
+      {
+        "line": 288,
+        "text": "操作",
+        "line_content": "title: '操作',",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 319,
+        "text": "このタスクを削除しますか？",
+        "line_content": "title=\"このタスクを削除しますか？\"",
+        "type": "chinese",
+        "length": 13
+      },
+      {
+        "line": 321,
+        "text": "削除",
+        "line_content": "okText=\"削除\"",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 322,
+        "text": "キャンセル",
+        "line_content": "cancelText=\"キャンセル\"",
+        "type": "japanese",
+        "length": 5
+      },
+      {
+        "line": 380,
+        "text": "総タスク数",
+        "line_content": "title=\"総タスク数\"",
+        "type": "chinese",
+        "length": 5
+      },
+      {
+        "line": 389,
+        "text": "実行中",
+        "line_content": "title=\"実行中\"",
+        "type": "chinese",
+        "length": 3
+      },
+      {
+        "line": 399,
+        "text": "待機中",
+        "line_content": "title=\"待機中\"",
+        "type": "chinese",
+        "length": 3
+      },
+      {
+        "line": 409,
+        "text": "失敗",
+        "line_content": "title=\"失敗\"",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 428,
+        "text": "総数 ${total} 件",
+        "line_content": "showTotal: (total) => `総数 ${total} 件`",
+        "type": "chinese",
+        "length": 13
+      },
+      {
+        "line": 436,
+        "text": "タスク編集",
+        "line_content": "title={editingTask ? 'タスク編集' : '新規タスク作成'}",
+        "type": "chinese",
+        "length": 5
+      },
+      {
+        "line": 436,
+        "text": "新規タスク作成",
+        "line_content": "title={editingTask ? 'タスク編集' : '新規タスク作成'}",
+        "type": "chinese",
+        "length": 7
+      },
+      {
+        "line": 452,
+        "text": "タスク名",
+        "line_content": "label=\"タスク名\"",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 453,
+        "text": "タスク名を入力してください",
+        "line_content": "rules={[{ required: true, message: 'タスク名を入力してください' }]}",
+        "type": "chinese",
+        "length": 13
+      },
+      {
+        "line": 455,
+        "text": "例: GitHub Trending Daily Sync",
+        "line_content": "<Input placeholder=\"例: GitHub Trending Daily Sync\" />",
+        "type": "chinese",
+        "length": 29
+      },
+      {
+        "line": 460,
+        "text": "データソース",
+        "line_content": "label=\"データソース\"",
+        "type": "japanese",
+        "length": 6
+      },
+      {
+        "line": 461,
+        "text": "データソースを選択してください",
+        "line_content": "rules={[{ required: true, message: 'データソースを選択してください' }]}",
+        "type": "chinese",
+        "length": 15
+      },
+      {
+        "line": 463,
+        "text": "データソースを選択",
+        "line_content": "<Select placeholder=\"データソースを選択\">",
+        "type": "chinese",
+        "length": 9
+      },
+      {
+        "line": 474,
+        "text": "実行頻度",
+        "line_content": "label=\"実行頻度\"",
+        "type": "chinese",
+        "length": 4
+      },
+      {
+        "line": 487,
+        "text": "次回実行時刻",
+        "line_content": "label=\"次回実行時刻\"",
+        "type": "chinese",
+        "length": 6
+      },
+      {
+        "line": 498,
+        "text": "有効化",
+        "line_content": "label=\"有効化\"",
+        "type": "chinese",
+        "length": 3
+      },
+      {
+        "line": 501,
+        "text": "有効",
+        "line_content": "<Switch checkedChildren=\"有効\" unCheckedChildren=\"無効\" />",
+        "type": "chinese",
+        "length": 2
+      },
+      {
+        "line": 501,
+        "text": "無効",
+        "line_content": "<Switch checkedChildren=\"有効\" unCheckedChildren=\"無効\" />",
+        "type": "chinese",
+        "length": 2
+      }
+    ],
+    "pages/Login.tsx": [
+      {
+        "line": 65,
+        "text": "认证错误:",
+        "line_content": "console.error('认证错误:', error);",
+        "type": "chinese",
+        "length": 5
+      },
+      {
+        "line": 66,
+        "text": "错误响应:",
+        "line_content": "console.error('错误响应:', error.response);",
+        "type": "chinese",
+        "length": 5
+      },
+      {
+        "line": 74,
+        "text": "用户名或密码错误",
+        "line_content": "errorMsg = '用户名或密码错误';",
+        "type": "chinese",
+        "length": 8
+      },
+      {
+        "line": 76,
+        "text": "请求参数错误",
+        "line_content": "errorMsg = error.response.data?.detail || '请求参数错误';",
+        "type": "chinese",
+        "length": 6
+      },
+      {
+        "line": 78,
+        "text": "服务器错误，请稍后重试",
+        "line_content": "errorMsg = '服务器错误，请稍后重试';",
+        "type": "chinese",
+        "length": 11
+      },
+      {
+        "line": 80,
+        "text": "网络错误: ${error.message}",
+        "line_content": "errorMsg = `网络错误: ${error.message}`;",
+        "type": "chinese",
+        "length": 22
+      }
+    ],
+    "utils/translateTags.ts": [
+      {
+        "line": 71,
+        "text": "翻译失败:",
+        "line_content": "console.error('翻译失败:', error);",
+        "type": "chinese",
+        "length": 5
+      }
+    ]
+  }
+}

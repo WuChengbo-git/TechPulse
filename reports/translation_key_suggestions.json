@@ -1,0 +1,2210 @@
+{
+  "欢迎使用 TechPulse！我们将根据你的偏好推荐内容 🎉": {
+    "suggested_key": "common.欢迎使用techpulse我们将根据你的",
+    "occurrences": [
+      {
+        "file": "App.tsx",
+        "line": 119
+      }
+    ],
+    "chinese_text": "欢迎使用 TechPulse！我们将根据你的偏好推荐内容 🎉"
+  },
+  "你可以随时在个人中心完成偏好设置": {
+    "suggested_key": "common.你可以随时在个人中心完成偏好设置",
+    "occurrences": [
+      {
+        "file": "App.tsx",
+        "line": 125
+      }
+    ],
+    "chinese_text": "你可以随时在个人中心完成偏好设置"
+  },
+  "LLM模型管理": {
+    "suggested_key": "common.llm模型管理",
+    "occurrences": [
+      {
+        "file": "App.tsx",
+        "line": 159
+      },
+      {
+        "file": "components/Sidebar.tsx",
+        "line": 73
+      }
+    ],
+    "chinese_text": "LLM模型管理"
+  },
+  "简体中文": {
+    "suggested_key": "common.简体中文",
+    "occurrences": [
+      {
+        "file": "App.tsx",
+        "line": 287
+      },
+      {
+        "file": "components/LanguageSelector.tsx",
+        "line": 17
+      }
+    ],
+    "chinese_text": "简体中文"
+  },
+  "日本語": {
+    "suggested_key": "common.日本語",
+    "occurrences": [
+      {
+        "file": "App.tsx",
+        "line": 297
+      },
+      {
+        "file": "components/LanguageSelector.tsx",
+        "line": 19
+      }
+    ],
+    "chinese_text": "日本語"
+  },
+  "关键词": {
+    "suggested_key": "smartsearch.关键词",
+    "occurrences": [
+      {
+        "file": "components/SmartSearch.tsx",
+        "line": 147
+      }
+    ],
+    "chinese_text": "关键词"
+  },
+  "AI问答": {
+    "suggested_key": "smartsearch.ai问答",
+    "occurrences": [
+      {
+        "file": "components/SmartSearch.tsx",
+        "line": 148
+      }
+    ],
+    "chinese_text": "AI问答"
+  },
+  "清除历史": {
+    "suggested_key": "smartsearch.清除历史",
+    "occurrences": [
+      {
+        "file": "components/SmartSearch.tsx",
+        "line": 161
+      }
+    ],
+    "chinese_text": "清除历史"
+  },
+  "搜索技术内容...": {
+    "suggested_key": "smartsearch.搜索技术内容",
+    "occurrences": [
+      {
+        "file": "components/SmartSearch.tsx",
+        "line": 179
+      }
+    ],
+    "chinese_text": "搜索技术内容..."
+  },
+  "问我任何技术问题...": {
+    "suggested_key": "smartsearch.问我任何技术问题",
+    "occurrences": [
+      {
+        "file": "components/SmartSearch.tsx",
+        "line": 180
+      }
+    ],
+    "chinese_text": "问我任何技术问题..."
+  },
+  "试试这些": {
+    "suggested_key": "smartsearch.试试这些",
+    "occurrences": [
+      {
+        "file": "components/SmartSearch.tsx",
+        "line": 201
+      }
+    ],
+    "chinese_text": "试试这些"
+  },
+  "AI模式示例": {
+    "suggested_key": "smartsearch.ai模式示例",
+    "occurrences": [
+      {
+        "file": "components/SmartSearch.tsx",
+        "line": 224
+      }
+    ],
+    "chinese_text": "AI模式示例"
+  },
+  "今天LLM有什么新突破？": {
+    "suggested_key": "smartsearch.今天llm有什么新突破",
+    "occurrences": [
+      {
+        "file": "components/SmartSearch.tsx",
+        "line": 227
+      }
+    ],
+    "chinese_text": "今天LLM有什么新突破？"
+  },
+  "推荐一些AI Agent框架": {
+    "suggested_key": "smartsearch.推荐一些aiagent框架",
+    "occurrences": [
+      {
+        "file": "components/SmartSearch.tsx",
+        "line": 230
+      }
+    ],
+    "chinese_text": "推荐一些AI Agent框架"
+  },
+  "什么是LoRA量化技术？": {
+    "suggested_key": "smartsearch.什么是lora量化技术",
+    "occurrences": [
+      {
+        "file": "components/SmartSearch.tsx",
+        "line": 233
+      }
+    ],
+    "chinese_text": "什么是LoRA量化技术？"
+  },
+  "优秀": {
+    "suggested_key": "qualitybadge.优秀",
+    "occurrences": [
+      {
+        "file": "components/QualityBadge.tsx",
+        "line": 22
+      }
+    ],
+    "chinese_text": "优秀"
+  },
+  "良好": {
+    "suggested_key": "qualitybadge.良好",
+    "occurrences": [
+      {
+        "file": "components/QualityBadge.tsx",
+        "line": 23
+      }
+    ],
+    "chinese_text": "良好"
+  },
+  "中等": {
+    "suggested_key": "qualitybadge.中等",
+    "occurrences": [
+      {
+        "file": "components/QualityBadge.tsx",
+        "line": 24
+      }
+    ],
+    "chinese_text": "中等"
+  },
+  "一般": {
+    "suggested_key": "qualitybadge.一般",
+    "occurrences": [
+      {
+        "file": "components/QualityBadge.tsx",
+        "line": 25
+      }
+    ],
+    "chinese_text": "一般"
+  },
+  "较低": {
+    "suggested_key": "qualitybadge.较低",
+    "occurrences": [
+      {
+        "file": "components/QualityBadge.tsx",
+        "line": 26
+      }
+    ],
+    "chinese_text": "较低"
+  },
+  "没有找到相关内容": {
+    "suggested_key": "searchresultlist.没有找到相关内容",
+    "occurrences": [
+      {
+        "file": "components/SearchResultList.tsx",
+        "line": 73
+      }
+    ],
+    "chinese_text": "没有找到相关内容"
+  },
+  "找到": {
+    "suggested_key": "searchresultlist.找到",
+    "occurrences": [
+      {
+        "file": "components/SearchResultList.tsx",
+        "line": 85
+      }
+    ],
+    "chinese_text": "找到"
+  },
+  "条结果": {
+    "suggested_key": "searchresultlist.条结果",
+    "occurrences": [
+      {
+        "file": "components/SearchResultList.tsx",
+        "line": 85
+      }
+    ],
+    "chinese_text": "条结果"
+  },
+  "🧠 分析模式": {
+    "suggested_key": "searchresultlist.分析模式",
+    "occurrences": [
+      {
+        "file": "components/SearchResultList.tsx",
+        "line": 89
+      }
+    ],
+    "chinese_text": "🧠 分析模式"
+  },
+  "🔍 查询模式": {
+    "suggested_key": "searchresultlist.查询模式",
+    "occurrences": [
+      {
+        "file": "components/SearchResultList.tsx",
+        "line": 89
+      }
+    ],
+    "chinese_text": "🔍 查询模式"
+  },
+  "相关度": {
+    "suggested_key": "searchresultlist.相关度",
+    "occurrences": [
+      {
+        "file": "components/SearchResultList.tsx",
+        "line": 123
+      }
+    ],
+    "chinese_text": "相关度"
+  },
+  "更多": {
+    "suggested_key": "searchresultlist.更多",
+    "occurrences": [
+      {
+        "file": "components/SearchResultList.tsx",
+        "line": 144
+      }
+    ],
+    "chinese_text": "更多"
+  },
+  "加载推荐失败": {
+    "suggested_key": "recommendationpanel.加载推荐失败",
+    "occurrences": [
+      {
+        "file": "components/RecommendationPanel.tsx",
+        "line": 83
+      }
+    ],
+    "chinese_text": "加载推荐失败"
+  },
+  "已收藏": {
+    "suggested_key": "recommendationpanel.已收藏",
+    "occurrences": [
+      {
+        "file": "components/RecommendationPanel.tsx",
+        "line": 127
+      }
+    ],
+    "chinese_text": "已收藏"
+  },
+  "收藏失败": {
+    "suggested_key": "recommendationpanel.收藏失败",
+    "occurrences": [
+      {
+        "file": "components/RecommendationPanel.tsx",
+        "line": 130
+      }
+    ],
+    "chinese_text": "收藏失败"
+  },
+  "为你推荐": {
+    "suggested_key": "recommendationpanel.为你推荐",
+    "occurrences": [
+      {
+        "file": "components/RecommendationPanel.tsx",
+        "line": 146
+      },
+      {
+        "file": "components/RecommendationPanel.tsx",
+        "line": 180
+      }
+    ],
+    "chinese_text": "为你推荐"
+  },
+  "还没有设置兴趣标签": {
+    "suggested_key": "recommendationpanel.还没有设置兴趣标签",
+    "occurrences": [
+      {
+        "file": "components/RecommendationPanel.tsx",
+        "line": 154
+      }
+    ],
+    "chinese_text": "还没有设置兴趣标签"
+  },
+  "请前往设置页面设置兴趣标签": {
+    "suggested_key": "recommendationpanel.请前往设置页面设置兴趣标签",
+    "occurrences": [
+      {
+        "file": "components/RecommendationPanel.tsx",
+        "line": 162
+      }
+    ],
+    "chinese_text": "请前往设置页面设置兴趣标签"
+  },
+  "设置兴趣": {
+    "suggested_key": "recommendationpanel.设置兴趣",
+    "occurrences": [
+      {
+        "file": "components/RecommendationPanel.tsx",
+        "line": 165
+      }
+    ],
+    "chinese_text": "设置兴趣"
+  },
+  "换一批": {
+    "suggested_key": "recommendationpanel.换一批",
+    "occurrences": [
+      {
+        "file": "components/RecommendationPanel.tsx",
+        "line": 191
+      }
+    ],
+    "chinese_text": "换一批"
+  },
+  "你的兴趣": {
+    "suggested_key": "recommendationpanel.你的兴趣",
+    "occurrences": [
+      {
+        "file": "components/RecommendationPanel.tsx",
+        "line": 200
+      }
+    ],
+    "chinese_text": "你的兴趣"
+  },
+  "推荐基于你的兴趣标签和历史行为": {
+    "suggested_key": "recommendationpanel.推荐基于你的兴趣标签和历史行为",
+    "occurrences": [
+      {
+        "file": "components/RecommendationPanel.tsx",
+        "line": 223
+      }
+    ],
+    "chinese_text": "推荐基于你的兴趣标签和历史行为"
+  },
+  "加载配置失败: ${error.message}": {
+    "suggested_key": "systemconfig.加载配置失败errormessage",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 81
+      }
+    ],
+    "chinese_text": "加载配置失败: ${error.message}"
+  },
+  "配置验证通过": {
+    "suggested_key": "systemconfig.配置验证通过",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 109
+      }
+    ],
+    "chinese_text": "配置验证通过"
+  },
+  "配置存在 ${result.errors.length} 个错误": {
+    "suggested_key": "systemconfig.配置存在resulterrorsleng",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 111
+      }
+    ],
+    "chinese_text": "配置存在 ${result.errors.length} 个错误"
+  },
+  "验证失败: ${error.message}": {
+    "suggested_key": "systemconfig.验证失败errormessage",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 114
+      }
+    ],
+    "chinese_text": "验证失败: ${error.message}"
+  },
+  "没有修改需要保存": {
+    "suggested_key": "systemconfig.没有修改需要保存",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 125
+      }
+    ],
+    "chinese_text": "没有修改需要保存"
+  },
+  "成功更新 ${result.updated_keys.length} 个配置项": {
+    "suggested_key": "systemconfig.成功更新resultupdated_ke",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 135
+      }
+    ],
+    "chinese_text": "成功更新 ${result.updated_keys.length} 个配置项"
+  },
+  "保存失败: ${error.message}": {
+    "suggested_key": "systemconfig.保存失败errormessage",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 139
+      }
+    ],
+    "chinese_text": "保存失败: ${error.message}"
+  },
+  "配置已重新加载": {
+    "suggested_key": "systemconfig.配置已重新加载",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 153
+      }
+    ],
+    "chinese_text": "配置已重新加载"
+  },
+  "重载失败: ${error.message}": {
+    "suggested_key": "systemconfig.重载失败errormessage",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 155
+      }
+    ],
+    "chinese_text": "重载失败: ${error.message}"
+  },
+  "已恢复默认配置": {
+    "suggested_key": "systemconfig.已恢复默认配置",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 169
+      }
+    ],
+    "chinese_text": "已恢复默认配置"
+  },
+  "恢复失败: ${error.message}": {
+    "suggested_key": "systemconfig.恢复失败errormessage",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 171
+      },
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 201
+      }
+    ],
+    "chinese_text": "恢复失败: ${error.message}"
+  },
+  "加载备份失败: ${error.message}": {
+    "suggested_key": "systemconfig.加载备份失败errormessage",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 186
+      }
+    ],
+    "chinese_text": "加载备份失败: ${error.message}"
+  },
+  "配置已从备份恢复": {
+    "suggested_key": "systemconfig.配置已从备份恢复",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 199
+      }
+    ],
+    "chinese_text": "配置已从备份恢复"
+  },
+  "配置已导出": {
+    "suggested_key": "systemconfig.配置已导出",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 220
+      }
+    ],
+    "chinese_text": "配置已导出"
+  },
+  "导出失败: ${error.message}": {
+    "suggested_key": "systemconfig.导出失败errormessage",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 222
+      }
+    ],
+    "chinese_text": "导出失败: ${error.message}"
+  },
+  "配置键": {
+    "suggested_key": "systemconfig.配置键",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 253
+      }
+    ],
+    "chinese_text": "配置键"
+  },
+  "配置值": {
+    "suggested_key": "systemconfig.配置值",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 272
+      }
+    ],
+    "chinese_text": "配置值"
+  },
+  "${record.key} 的值": {
+    "suggested_key": "systemconfig.recordkey的值",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 286
+      }
+    ],
+    "chinese_text": "${record.key} 的值"
+  },
+  "操作": {
+    "suggested_key": "systemconfig.操作",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 293
+      },
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 507
+      },
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 288
+      }
+    ],
+    "chinese_text": "操作"
+  },
+  "配置有效": {
+    "suggested_key": "systemconfig.配置有效",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 324
+      }
+    ],
+    "chinese_text": "配置有效"
+  },
+  "配置有误": {
+    "suggested_key": "systemconfig.配置有误",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 324
+      }
+    ],
+    "chinese_text": "配置有误"
+  },
+  "隐藏": {
+    "suggested_key": "systemconfig.隐藏",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 335
+      }
+    ],
+    "chinese_text": "隐藏"
+  },
+  "显示": {
+    "suggested_key": "systemconfig.显示",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 335
+      }
+    ],
+    "chinese_text": "显示"
+  },
+  "配置项总数": {
+    "suggested_key": "systemconfig.配置项总数",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 351
+      }
+    ],
+    "chinese_text": "配置项总数"
+  },
+  "已修改项": {
+    "suggested_key": "systemconfig.已修改项",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 358
+      }
+    ],
+    "chinese_text": "已修改项"
+  },
+  "验证错误": {
+    "suggested_key": "systemconfig.验证错误",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 365
+      }
+    ],
+    "chinese_text": "验证错误"
+  },
+  "验证警告": {
+    "suggested_key": "systemconfig.验证警告",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 372
+      }
+    ],
+    "chinese_text": "验证警告"
+  },
+  "配置验证失败": {
+    "suggested_key": "systemconfig.配置验证失败",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 382
+      }
+    ],
+    "chinese_text": "配置验证失败"
+  },
+  "配置警告": {
+    "suggested_key": "systemconfig.配置警告",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 400
+      }
+    ],
+    "chinese_text": "配置警告"
+  },
+  "确定要恢复默认配置吗？": {
+    "suggested_key": "systemconfig.确定要恢复默认配置吗",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 446
+      }
+    ],
+    "chinese_text": "确定要恢复默认配置吗？"
+  },
+  "这将覆盖当前所有配置，无法撤销。": {
+    "suggested_key": "systemconfig.这将覆盖当前所有配置无法撤销",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 447
+      }
+    ],
+    "chinese_text": "这将覆盖当前所有配置，无法撤销。"
+  },
+  "确定": {
+    "suggested_key": "systemconfig.确定",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 449
+      },
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 513
+      }
+    ],
+    "chinese_text": "确定"
+  },
+  "取消": {
+    "suggested_key": "systemconfig.取消",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 450
+      },
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 514
+      }
+    ],
+    "chinese_text": "取消"
+  },
+  "共 ${total} 项配置": {
+    "suggested_key": "systemconfig.共total项配置",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 470
+      }
+    ],
+    "chinese_text": "共 ${total} 项配置"
+  },
+  "配置备份管理": {
+    "suggested_key": "systemconfig.配置备份管理",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 478
+      }
+    ],
+    "chinese_text": "配置备份管理"
+  },
+  "备份文件": {
+    "suggested_key": "systemconfig.备份文件",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 489
+      }
+    ],
+    "chinese_text": "备份文件"
+  },
+  "创建时间": {
+    "suggested_key": "systemconfig.创建时间",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 494
+      }
+    ],
+    "chinese_text": "创建时间"
+  },
+  "文件大小": {
+    "suggested_key": "systemconfig.文件大小",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 501
+      }
+    ],
+    "chinese_text": "文件大小"
+  },
+  "确定要从此备份恢复配置吗？": {
+    "suggested_key": "systemconfig.确定要从此备份恢复配置吗",
+    "occurrences": [
+      {
+        "file": "pages/SystemConfig.tsx",
+        "line": 511
+      }
+    ],
+    "chinese_text": "确定要从此备份恢复配置吗？"
+  },
+  "正常": {
+    "suggested_key": "systemstatus.正常",
+    "occurrences": [
+      {
+        "file": "pages/SystemStatusPage.tsx",
+        "line": 133
+      }
+    ],
+    "chinese_text": "正常"
+  },
+  "警告": {
+    "suggested_key": "systemstatus.警告",
+    "occurrences": [
+      {
+        "file": "pages/SystemStatusPage.tsx",
+        "line": 134
+      }
+    ],
+    "chinese_text": "警告"
+  },
+  "エラー": {
+    "suggested_key": "systemstatus.エラー",
+    "occurrences": [
+      {
+        "file": "pages/SystemStatusPage.tsx",
+        "line": 135
+      }
+    ],
+    "chinese_text": "エラー"
+  },
+  "サービス名": {
+    "suggested_key": "systemstatus.サービス名",
+    "occurrences": [
+      {
+        "file": "pages/SystemStatusPage.tsx",
+        "line": 143
+      }
+    ],
+    "chinese_text": "サービス名"
+  },
+  "ステータス": {
+    "suggested_key": "systemstatus.ステータス",
+    "occurrences": [
+      {
+        "file": "pages/SystemStatusPage.tsx",
+        "line": 149
+      },
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 222
+      }
+    ],
+    "chinese_text": "ステータス"
+  },
+  "応答時間": {
+    "suggested_key": "systemstatus.応答時間",
+    "occurrences": [
+      {
+        "file": "pages/SystemStatusPage.tsx",
+        "line": 155
+      }
+    ],
+    "chinese_text": "応答時間"
+  },
+  "稼働率": {
+    "suggested_key": "systemstatus.稼働率",
+    "occurrences": [
+      {
+        "file": "pages/SystemStatusPage.tsx",
+        "line": 164
+      }
+    ],
+    "chinese_text": "稼働率"
+  },
+  "最終確認": {
+    "suggested_key": "systemstatus.最終確認",
+    "occurrences": [
+      {
+        "file": "pages/SystemStatusPage.tsx",
+        "line": 183
+      }
+    ],
+    "chinese_text": "最終確認"
+  },
+  "API名": {
+    "suggested_key": "systemstatus.api名",
+    "occurrences": [
+      {
+        "file": "pages/SystemStatusPage.tsx",
+        "line": 192
+      }
+    ],
+    "chinese_text": "API名"
+  },
+  "今日の使用量": {
+    "suggested_key": "systemstatus.今日の使用量",
+    "occurrences": [
+      {
+        "file": "pages/SystemStatusPage.tsx",
+        "line": 198
+      }
+    ],
+    "chinese_text": "今日の使用量"
+  },
+  "最終使用": {
+    "suggested_key": "systemstatus.最終使用",
+    "occurrences": [
+      {
+        "file": "pages/SystemStatusPage.tsx",
+        "line": 213
+      }
+    ],
+    "chinese_text": "最終使用"
+  },
+  "メモリ": {
+    "suggested_key": "systemstatus.メモリ",
+    "occurrences": [
+      {
+        "file": "pages/SystemStatusPage.tsx",
+        "line": 224
+      }
+    ],
+    "chinese_text": "メモリ"
+  },
+  "ネットワーク": {
+    "suggested_key": "systemstatus.ネットワーク",
+    "occurrences": [
+      {
+        "file": "pages/SystemStatusPage.tsx",
+        "line": 225
+      }
+    ],
+    "chinese_text": "ネットワーク"
+  },
+  "システムは正常に稼働中": {
+    "suggested_key": "systemstatus.システムは正常に稼働中",
+    "occurrences": [
+      {
+        "file": "pages/SystemStatusPage.tsx",
+        "line": 269
+      }
+    ],
+    "chinese_text": "システムは正常に稼働中"
+  },
+  "すべてのコアサービスが正常に動作しています。一部の外部APIで軽微な遅延が検出されています。": {
+    "suggested_key": "systemstatus.すべてのコアサービスが正常に動作していま",
+    "occurrences": [
+      {
+        "file": "pages/SystemStatusPage.tsx",
+        "line": 270
+      }
+    ],
+    "chinese_text": "すべてのコアサービスが正常に動作しています。一部の外部APIで軽微な遅延が検出されています。"
+  },
+  "CPU使用率": {
+    "suggested_key": "systemstatus.cpu使用率",
+    "occurrences": [
+      {
+        "file": "pages/SystemStatusPage.tsx",
+        "line": 282
+      }
+    ],
+    "chinese_text": "CPU使用率"
+  },
+  "メモリ使用率": {
+    "suggested_key": "systemstatus.メモリ使用率",
+    "occurrences": [
+      {
+        "file": "pages/SystemStatusPage.tsx",
+        "line": 298
+      }
+    ],
+    "chinese_text": "メモリ使用率"
+  },
+  "ディスク使用率": {
+    "suggested_key": "systemstatus.ディスク使用率",
+    "occurrences": [
+      {
+        "file": "pages/SystemStatusPage.tsx",
+        "line": 314
+      }
+    ],
+    "chinese_text": "ディスク使用率"
+  },
+  "ネットワーク使用率": {
+    "suggested_key": "systemstatus.ネットワーク使用率",
+    "occurrences": [
+      {
+        "file": "pages/SystemStatusPage.tsx",
+        "line": 330
+      }
+    ],
+    "chinese_text": "ネットワーク使用率"
+  },
+  "リソース使用履歴（過去24時間）": {
+    "suggested_key": "systemstatus.リソース使用履歴過去24時間",
+    "occurrences": [
+      {
+        "file": "pages/SystemStatusPage.tsx",
+        "line": 346
+      }
+    ],
+    "chinese_text": "リソース使用履歴（過去24時間）"
+  },
+  "サービスステータス": {
+    "suggested_key": "systemstatus.サービスステータス",
+    "occurrences": [
+      {
+        "file": "pages/SystemStatusPage.tsx",
+        "line": 351
+      }
+    ],
+    "chinese_text": "サービスステータス"
+  },
+  "API使用状況": {
+    "suggested_key": "systemstatus.api使用状況",
+    "occurrences": [
+      {
+        "file": "pages/SystemStatusPage.tsx",
+        "line": 361
+      }
+    ],
+    "chinese_text": "API使用状況"
+  },
+  "最近のシステムイベント": {
+    "suggested_key": "systemstatus.最近のシステムイベント",
+    "occurrences": [
+      {
+        "file": "pages/SystemStatusPage.tsx",
+        "line": 371
+      }
+    ],
+    "chinese_text": "最近のシステムイベント"
+  },
+  "AI・Machine Learning": {
+    "suggested_key": "arxiv.aimachinelearning",
+    "occurrences": [
+      {
+        "file": "pages/ArxivPage.tsx",
+        "line": 64
+      }
+    ],
+    "chinese_text": "AI・Machine Learning"
+  },
+  "获取arXiv数据失败": {
+    "suggested_key": "arxiv.获取arxiv数据失败",
+    "occurrences": [
+      {
+        "file": "pages/ArxivPage.tsx",
+        "line": 142
+      }
+    ],
+    "chinese_text": "获取arXiv数据失败"
+  },
+  "关于这篇arXiv论文 ": {
+    "suggested_key": "arxiv.关于这篇arxiv论文",
+    "occurrences": [
+      {
+        "file": "pages/ArxivPage.tsx",
+        "line": 178
+      }
+    ],
+    "chinese_text": "关于这篇arXiv论文 "
+  },
+  "抱歉，我无法回答这个问题。": {
+    "suggested_key": "arxiv.抱歉我无法回答这个问题",
+    "occurrences": [
+      {
+        "file": "pages/ArxivPage.tsx",
+        "line": 193
+      },
+      {
+        "file": "pages/GitHubPage.tsx",
+        "line": 99
+      },
+      {
+        "file": "pages/ZennPage.tsx",
+        "line": 102
+      },
+      {
+        "file": "pages/HuggingFacePage.tsx",
+        "line": 121
+      }
+    ],
+    "chinese_text": "抱歉，我无法回答这个问题。"
+  },
+  "发送消息失败": {
+    "suggested_key": "arxiv.发送消息失败",
+    "occurrences": [
+      {
+        "file": "pages/ArxivPage.tsx",
+        "line": 197
+      },
+      {
+        "file": "pages/ArxivPage.tsx",
+        "line": 201
+      },
+      {
+        "file": "pages/GitHubPage.tsx",
+        "line": 103
+      },
+      {
+        "file": "pages/GitHubPage.tsx",
+        "line": 107
+      },
+      {
+        "file": "pages/ZennPage.tsx",
+        "line": 106
+      },
+      {
+        "file": "pages/ZennPage.tsx",
+        "line": 110
+      },
+      {
+        "file": "pages/HuggingFacePage.tsx",
+        "line": 125
+      },
+      {
+        "file": "pages/HuggingFacePage.tsx",
+        "line": 129
+      }
+    ],
+    "chinese_text": "发送消息失败"
+  },
+  "机器学习": {
+    "suggested_key": "arxiv.机器学习",
+    "occurrences": [
+      {
+        "file": "pages/ArxivPage.tsx",
+        "line": 245
+      },
+      {
+        "file": "pages/ArxivPage.tsx",
+        "line": 317
+      },
+      {
+        "file": "pages/TrendsPage.tsx",
+        "line": 236
+      }
+    ],
+    "chinese_text": "机器学习"
+  },
+  "人工智能": {
+    "suggested_key": "arxiv.人工智能",
+    "occurrences": [
+      {
+        "file": "pages/ArxivPage.tsx",
+        "line": 245
+      },
+      {
+        "file": "pages/ArxivPage.tsx",
+        "line": 317
+      }
+    ],
+    "chinese_text": "人工智能"
+  },
+  "计算机视觉": {
+    "suggested_key": "arxiv.计算机视觉",
+    "occurrences": [
+      {
+        "file": "pages/ArxivPage.tsx",
+        "line": 251
+      },
+      {
+        "file": "pages/TrendsPage.tsx",
+        "line": 218
+      }
+    ],
+    "chinese_text": "计算机视觉"
+  },
+  "视觉": {
+    "suggested_key": "arxiv.视觉",
+    "occurrences": [
+      {
+        "file": "pages/ArxivPage.tsx",
+        "line": 252
+      }
+    ],
+    "chinese_text": "视觉"
+  },
+  "大语言模型": {
+    "suggested_key": "arxiv.大语言模型",
+    "occurrences": [
+      {
+        "file": "pages/ArxivPage.tsx",
+        "line": 330
+      },
+      {
+        "file": "pages/ArxivPage.tsx",
+        "line": 331
+      },
+      {
+        "file": "pages/TrendsPage.tsx",
+        "line": 212
+      }
+    ],
+    "chinese_text": "大语言模型"
+  },
+  "摘要链接不可用": {
+    "suggested_key": "arxiv.摘要链接不可用",
+    "occurrences": [
+      {
+        "file": "pages/ArxivPage.tsx",
+        "line": 419
+      }
+    ],
+    "chinese_text": "摘要链接不可用"
+  },
+  "PDF链接不可用": {
+    "suggested_key": "arxiv.pdf链接不可用",
+    "occurrences": [
+      {
+        "file": "pages/ArxivPage.tsx",
+        "line": 434
+      }
+    ],
+    "chinese_text": "PDF链接不可用"
+  },
+  "无标题": {
+    "suggested_key": "arxiv.无标题",
+    "occurrences": [
+      {
+        "file": "pages/ArxivPage.tsx",
+        "line": 447
+      },
+      {
+        "file": "pages/ZennPage.tsx",
+        "line": 386
+      },
+      {
+        "file": "pages/ZennPage.tsx",
+        "line": 526
+      }
+    ],
+    "chinese_text": "无标题"
+  },
+  "暂无摘要": {
+    "suggested_key": "arxiv.暂无摘要",
+    "occurrences": [
+      {
+        "file": "pages/ArxivPage.tsx",
+        "line": 465
+      },
+      {
+        "file": "pages/ArxivPage.tsx",
+        "line": 596
+      },
+      {
+        "file": "pages/ZennPage.tsx",
+        "line": 415
+      },
+      {
+        "file": "pages/ZennPage.tsx",
+        "line": 559
+      }
+    ],
+    "chinese_text": "暂无摘要"
+  },
+  "未知": {
+    "suggested_key": "arxiv.未知",
+    "occurrences": [
+      {
+        "file": "pages/ArxivPage.tsx",
+        "line": 469
+      },
+      {
+        "file": "pages/ArxivPage.tsx",
+        "line": 588
+      },
+      {
+        "file": "pages/GitHubPage.tsx",
+        "line": 561
+      },
+      {
+        "file": "pages/ZennPage.tsx",
+        "line": 425
+      },
+      {
+        "file": "pages/ZennPage.tsx",
+        "line": 551
+      }
+    ],
+    "chinese_text": "未知"
+  },
+  "${range[0]}-${range[1]} / ${total} 篇论文": {
+    "suggested_key": "arxiv.range0range1total篇论文",
+    "occurrences": [
+      {
+        "file": "pages/ArxivPage.tsx",
+        "line": 482
+      }
+    ],
+    "chinese_text": "${range[0]}-${range[1]} / ${total} 篇论文"
+  },
+  "问一下关于这篇论文的问题...": {
+    "suggested_key": "arxiv.问一下关于这篇论文的问题",
+    "occurrences": [
+      {
+        "file": "pages/ArxivPage.tsx",
+        "line": 674
+      }
+    ],
+    "chinese_text": "问一下关于这篇论文的问题..."
+  },
+  "语言模型": {
+    "suggested_key": "trends.语言模型",
+    "occurrences": [
+      {
+        "file": "pages/TrendsPage.tsx",
+        "line": 212
+      }
+    ],
+    "chinese_text": "语言模型"
+  },
+  "图像识别": {
+    "suggested_key": "trends.图像识别",
+    "occurrences": [
+      {
+        "file": "pages/TrendsPage.tsx",
+        "line": 218
+      }
+    ],
+    "chinese_text": "图像识别"
+  },
+  "语音": {
+    "suggested_key": "trends.语音",
+    "occurrences": [
+      {
+        "file": "pages/TrendsPage.tsx",
+        "line": 224
+      }
+    ],
+    "chinese_text": "语音"
+  },
+  "音频": {
+    "suggested_key": "trends.音频",
+    "occurrences": [
+      {
+        "file": "pages/TrendsPage.tsx",
+        "line": 224
+      }
+    ],
+    "chinese_text": "音频"
+  },
+  "多模态": {
+    "suggested_key": "trends.多模态",
+    "occurrences": [
+      {
+        "file": "pages/TrendsPage.tsx",
+        "line": 230
+      }
+    ],
+    "chinese_text": "多模态"
+  },
+  "深度学习": {
+    "suggested_key": "trends.深度学习",
+    "occurrences": [
+      {
+        "file": "pages/TrendsPage.tsx",
+        "line": 242
+      }
+    ],
+    "chinese_text": "深度学习"
+  },
+  "神经网络": {
+    "suggested_key": "trends.神经网络",
+    "occurrences": [
+      {
+        "file": "pages/TrendsPage.tsx",
+        "line": 242
+      }
+    ],
+    "chinese_text": "神经网络"
+  },
+  "阿里云": {
+    "suggested_key": "trends.阿里云",
+    "occurrences": [
+      {
+        "file": "pages/TrendsPage.tsx",
+        "line": 390
+      }
+    ],
+    "chinese_text": "阿里云"
+  },
+  "请输入${field.label}": {
+    "suggested_key": "llmproviders.请输入fieldlabel",
+    "occurrences": [
+      {
+        "file": "pages/LLMProvidersPage.tsx",
+        "line": 558
+      }
+    ],
+    "chinese_text": "请输入${field.label}"
+  },
+  "关于这个GitHub仓库 ": {
+    "suggested_key": "github.关于这个github仓库",
+    "occurrences": [
+      {
+        "file": "pages/GitHubPage.tsx",
+        "line": 83
+      }
+    ],
+    "chinese_text": "关于这个GitHub仓库 "
+  },
+  "仓库链接不可用": {
+    "suggested_key": "github.仓库链接不可用",
+    "occurrences": [
+      {
+        "file": "pages/GitHubPage.tsx",
+        "line": 360
+      }
+    ],
+    "chinese_text": "仓库链接不可用"
+  },
+  "暂无描述": {
+    "suggested_key": "github.暂无描述",
+    "occurrences": [
+      {
+        "file": "pages/GitHubPage.tsx",
+        "line": 569
+      },
+      {
+        "file": "pages/HuggingFacePage.tsx",
+        "line": 555
+      }
+    ],
+    "chinese_text": "暂无描述"
+  },
+  "问一下关于这个仓库的问题...": {
+    "suggested_key": "github.问一下关于这个仓库的问题",
+    "occurrences": [
+      {
+        "file": "pages/GitHubPage.tsx",
+        "line": 634
+      }
+    ],
+    "chinese_text": "问一下关于这个仓库的问题..."
+  },
+  "关于这篇Zenn文章 ": {
+    "suggested_key": "zenn.关于这篇zenn文章",
+    "occurrences": [
+      {
+        "file": "pages/ZennPage.tsx",
+        "line": 87
+      }
+    ],
+    "chinese_text": "关于这篇Zenn文章 "
+  },
+  "匿名": {
+    "suggested_key": "zenn.匿名",
+    "occurrences": [
+      {
+        "file": "pages/ZennPage.tsx",
+        "line": 132
+      },
+      {
+        "file": "pages/ZennPage.tsx",
+        "line": 144
+      },
+      {
+        "file": "pages/ZennPage.tsx",
+        "line": 411
+      },
+      {
+        "file": "pages/ZennPage.tsx",
+        "line": 546
+      }
+    ],
+    "chinese_text": "匿名"
+  },
+  "文章链接不可用": {
+    "suggested_key": "zenn.文章链接不可用",
+    "occurrences": [
+      {
+        "file": "pages/ZennPage.tsx",
+        "line": 364
+      }
+    ],
+    "chinese_text": "文章链接不可用"
+  },
+  "问一下关于这篇文章的问题...": {
+    "suggested_key": "zenn.问一下关于这篇文章的问题",
+    "occurrences": [
+      {
+        "file": "pages/ZennPage.tsx",
+        "line": 624
+      }
+    ],
+    "chinese_text": "问一下关于这篇文章的问题..."
+  },
+  "数量": {
+    "suggested_key": "analytics.数量",
+    "occurrences": [
+      {
+        "file": "pages/Analytics.tsx",
+        "line": 229
+      },
+      {
+        "file": "pages/Analytics.tsx",
+        "line": 243
+      }
+    ],
+    "chinese_text": "数量"
+  },
+  "日付": {
+    "suggested_key": "analytics.日付",
+    "occurrences": [
+      {
+        "file": "pages/Analytics.tsx",
+        "line": 242
+      }
+    ],
+    "chinese_text": "日付"
+  },
+  "人気技術": {
+    "suggested_key": "analytics.人気技術",
+    "occurrences": [
+      {
+        "file": "pages/Analytics.tsx",
+        "line": 322
+      }
+    ],
+    "chinese_text": "人気技術"
+  },
+  "文本生成": {
+    "suggested_key": "huggingface.文本生成",
+    "occurrences": [
+      {
+        "file": "pages/HuggingFacePage.tsx",
+        "line": 68
+      },
+      {
+        "file": "pages/HuggingFacePage.tsx",
+        "line": 306
+      },
+      {
+        "file": "pages/HuggingFacePage.tsx",
+        "line": 307
+      }
+    ],
+    "chinese_text": "文本生成"
+  },
+  "文本分类": {
+    "suggested_key": "huggingface.文本分类",
+    "occurrences": [
+      {
+        "file": "pages/HuggingFacePage.tsx",
+        "line": 69
+      }
+    ],
+    "chinese_text": "文本分类"
+  },
+  "标记分类": {
+    "suggested_key": "huggingface.标记分类",
+    "occurrences": [
+      {
+        "file": "pages/HuggingFacePage.tsx",
+        "line": 70
+      }
+    ],
+    "chinese_text": "标记分类"
+  },
+  "问答系统": {
+    "suggested_key": "huggingface.问答系统",
+    "occurrences": [
+      {
+        "file": "pages/HuggingFacePage.tsx",
+        "line": 71
+      }
+    ],
+    "chinese_text": "问答系统"
+  },
+  "填充遮罩": {
+    "suggested_key": "huggingface.填充遮罩",
+    "occurrences": [
+      {
+        "file": "pages/HuggingFacePage.tsx",
+        "line": 72
+      }
+    ],
+    "chinese_text": "填充遮罩"
+  },
+  "文本摘要": {
+    "suggested_key": "huggingface.文本摘要",
+    "occurrences": [
+      {
+        "file": "pages/HuggingFacePage.tsx",
+        "line": 73
+      }
+    ],
+    "chinese_text": "文本摘要"
+  },
+  "机器翻译": {
+    "suggested_key": "huggingface.机器翻译",
+    "occurrences": [
+      {
+        "file": "pages/HuggingFacePage.tsx",
+        "line": 74
+      }
+    ],
+    "chinese_text": "机器翻译"
+  },
+  "文本到文本生成": {
+    "suggested_key": "huggingface.文本到文本生成",
+    "occurrences": [
+      {
+        "file": "pages/HuggingFacePage.tsx",
+        "line": 75
+      }
+    ],
+    "chinese_text": "文本到文本生成"
+  },
+  "对话系统": {
+    "suggested_key": "huggingface.对话系统",
+    "occurrences": [
+      {
+        "file": "pages/HuggingFacePage.tsx",
+        "line": 76
+      }
+    ],
+    "chinese_text": "对话系统"
+  },
+  "图像分类": {
+    "suggested_key": "huggingface.图像分类",
+    "occurrences": [
+      {
+        "file": "pages/HuggingFacePage.tsx",
+        "line": 77
+      }
+    ],
+    "chinese_text": "图像分类"
+  },
+  "目标检测": {
+    "suggested_key": "huggingface.目标检测",
+    "occurrences": [
+      {
+        "file": "pages/HuggingFacePage.tsx",
+        "line": 78
+      }
+    ],
+    "chinese_text": "目标检测"
+  },
+  "图像分割": {
+    "suggested_key": "huggingface.图像分割",
+    "occurrences": [
+      {
+        "file": "pages/HuggingFacePage.tsx",
+        "line": 79
+      }
+    ],
+    "chinese_text": "图像分割"
+  },
+  "语音识别": {
+    "suggested_key": "huggingface.语音识别",
+    "occurrences": [
+      {
+        "file": "pages/HuggingFacePage.tsx",
+        "line": 80
+      }
+    ],
+    "chinese_text": "语音识别"
+  },
+  "文本转语音": {
+    "suggested_key": "huggingface.文本转语音",
+    "occurrences": [
+      {
+        "file": "pages/HuggingFacePage.tsx",
+        "line": 81
+      }
+    ],
+    "chinese_text": "文本转语音"
+  },
+  "关于这个HuggingFace模型 ": {
+    "suggested_key": "huggingface.关于这个huggingface模型",
+    "occurrences": [
+      {
+        "file": "pages/HuggingFacePage.tsx",
+        "line": 105
+      }
+    ],
+    "chinese_text": "关于这个HuggingFace模型 "
+  },
+  "问一下关于这个模型的问题...": {
+    "suggested_key": "huggingface.问一下关于这个模型的问题",
+    "occurrences": [
+      {
+        "file": "pages/HuggingFacePage.tsx",
+        "line": 620
+      }
+    ],
+    "chinese_text": "问一下关于这个模型的问题..."
+  },
+  "语言已切换为${languages[language]?.name}": {
+    "suggested_key": "dashboard.语言已切换为languageslangu",
+    "occurrences": [
+      {
+        "file": "pages/Dashboard.tsx",
+        "line": 156
+      }
+    ],
+    "chinese_text": "语言已切换为${languages[language]?.name}"
+  },
+  "翻译结果": {
+    "suggested_key": "dashboard.翻译结果",
+    "occurrences": [
+      {
+        "file": "pages/Dashboard.tsx",
+        "line": 180
+      }
+    ],
+    "chinese_text": "翻译结果"
+  },
+  "已保存到Notion！": {
+    "suggested_key": "dashboard.已保存到notion",
+    "occurrences": [
+      {
+        "file": "pages/Dashboard.tsx",
+        "line": 296
+      }
+    ],
+    "chinese_text": "已保存到Notion！"
+  },
+  "待機中": {
+    "suggested_key": "taskmanagement.待機中",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 123
+      },
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 399
+      }
+    ],
+    "chinese_text": "待機中"
+  },
+  "実行中": {
+    "suggested_key": "taskmanagement.実行中",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 124
+      },
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 389
+      }
+    ],
+    "chinese_text": "実行中"
+  },
+  "完了": {
+    "suggested_key": "taskmanagement.完了",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 125
+      }
+    ],
+    "chinese_text": "完了"
+  },
+  "失敗": {
+    "suggested_key": "taskmanagement.失敗",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 126
+      },
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 409
+      }
+    ],
+    "chinese_text": "失敗"
+  },
+  "一時停止": {
+    "suggested_key": "taskmanagement.一時停止",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 127
+      }
+    ],
+    "chinese_text": "一時停止"
+  },
+  "全データ源": {
+    "suggested_key": "taskmanagement.全データ源",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 139
+      }
+    ],
+    "chinese_text": "全データ源"
+  },
+  "タスクを実行中...": {
+    "suggested_key": "taskmanagement.タスクを実行中",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 146
+      }
+    ],
+    "chinese_text": "タスクを実行中..."
+  },
+  "タスクを開始しました": {
+    "suggested_key": "taskmanagement.タスクを開始しました",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 149
+      }
+    ],
+    "chinese_text": "タスクを開始しました"
+  },
+  "タスクを一時停止しました": {
+    "suggested_key": "taskmanagement.タスクを一時停止しました",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 156
+      }
+    ],
+    "chinese_text": "タスクを一時停止しました"
+  },
+  "タスクを削除しました": {
+    "suggested_key": "taskmanagement.タスクを削除しました",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 162
+      }
+    ],
+    "chinese_text": "タスクを削除しました"
+  },
+  "タスクを有効化しました": {
+    "suggested_key": "taskmanagement.タスクを有効化しました",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 168
+      }
+    ],
+    "chinese_text": "タスクを有効化しました"
+  },
+  "タスクを無効化しました": {
+    "suggested_key": "taskmanagement.タスクを無効化しました",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 168
+      }
+    ],
+    "chinese_text": "タスクを無効化しました"
+  },
+  "タスクを更新しました": {
+    "suggested_key": "taskmanagement.タスクを更新しました",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 191
+      }
+    ],
+    "chinese_text": "タスクを更新しました"
+  },
+  "タスクを作成しました": {
+    "suggested_key": "taskmanagement.タスクを作成しました",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 191
+      }
+    ],
+    "chinese_text": "タスクを作成しました"
+  },
+  "タスク名": {
+    "suggested_key": "taskmanagement.タスク名",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 201
+      },
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 452
+      }
+    ],
+    "chinese_text": "タスク名"
+  },
+  "データソース": {
+    "suggested_key": "taskmanagement.データソース",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 215
+      },
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 460
+      }
+    ],
+    "chinese_text": "データソース"
+  },
+  "スケジュール": {
+    "suggested_key": "taskmanagement.スケジュール",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 229
+      }
+    ],
+    "chinese_text": "スケジュール"
+  },
+  "手動": {
+    "suggested_key": "taskmanagement.手動",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 235
+      }
+    ],
+    "chinese_text": "手動"
+  },
+  "毎時": {
+    "suggested_key": "taskmanagement.毎時",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 236
+      }
+    ],
+    "chinese_text": "毎時"
+  },
+  "毎日": {
+    "suggested_key": "taskmanagement.毎日",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 237
+      }
+    ],
+    "chinese_text": "毎日"
+  },
+  "毎週": {
+    "suggested_key": "taskmanagement.毎週",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 238
+      }
+    ],
+    "chinese_text": "毎週"
+  },
+  "次回実行": {
+    "suggested_key": "taskmanagement.次回実行",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 244
+      }
+    ],
+    "chinese_text": "次回実行"
+  },
+  "実行統計": {
+    "suggested_key": "taskmanagement.実行統計",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 253
+      }
+    ],
+    "chinese_text": "実行統計"
+  },
+  "有効/無効": {
+    "suggested_key": "taskmanagement.有効無効",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 274
+      }
+    ],
+    "chinese_text": "有効/無効"
+  },
+  "このタスクを削除しますか？": {
+    "suggested_key": "taskmanagement.このタスクを削除しますか",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 319
+      }
+    ],
+    "chinese_text": "このタスクを削除しますか？"
+  },
+  "削除": {
+    "suggested_key": "taskmanagement.削除",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 321
+      }
+    ],
+    "chinese_text": "削除"
+  },
+  "キャンセル": {
+    "suggested_key": "taskmanagement.キャンセル",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 322
+      }
+    ],
+    "chinese_text": "キャンセル"
+  },
+  "総タスク数": {
+    "suggested_key": "taskmanagement.総タスク数",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 380
+      }
+    ],
+    "chinese_text": "総タスク数"
+  },
+  "総数 ${total} 件": {
+    "suggested_key": "taskmanagement.総数total件",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 428
+      }
+    ],
+    "chinese_text": "総数 ${total} 件"
+  },
+  "タスク編集": {
+    "suggested_key": "taskmanagement.タスク編集",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 436
+      }
+    ],
+    "chinese_text": "タスク編集"
+  },
+  "新規タスク作成": {
+    "suggested_key": "taskmanagement.新規タスク作成",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 436
+      }
+    ],
+    "chinese_text": "新規タスク作成"
+  },
+  "タスク名を入力してください": {
+    "suggested_key": "taskmanagement.タスク名を入力してください",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 453
+      }
+    ],
+    "chinese_text": "タスク名を入力してください"
+  },
+  "例: GitHub Trending Daily Sync": {
+    "suggested_key": "taskmanagement.例githubtrendingdaily",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 455
+      }
+    ],
+    "chinese_text": "例: GitHub Trending Daily Sync"
+  },
+  "データソースを選択してください": {
+    "suggested_key": "taskmanagement.データソースを選択してください",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 461
+      }
+    ],
+    "chinese_text": "データソースを選択してください"
+  },
+  "データソースを選択": {
+    "suggested_key": "taskmanagement.データソースを選択",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 463
+      }
+    ],
+    "chinese_text": "データソースを選択"
+  },
+  "実行頻度": {
+    "suggested_key": "taskmanagement.実行頻度",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 474
+      }
+    ],
+    "chinese_text": "実行頻度"
+  },
+  "次回実行時刻": {
+    "suggested_key": "taskmanagement.次回実行時刻",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 487
+      }
+    ],
+    "chinese_text": "次回実行時刻"
+  },
+  "有効化": {
+    "suggested_key": "taskmanagement.有効化",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 498
+      }
+    ],
+    "chinese_text": "有効化"
+  },
+  "有効": {
+    "suggested_key": "taskmanagement.有効",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 501
+      }
+    ],
+    "chinese_text": "有効"
+  },
+  "無効": {
+    "suggested_key": "taskmanagement.無効",
+    "occurrences": [
+      {
+        "file": "pages/TaskManagementPage.tsx",
+        "line": 501
+      }
+    ],
+    "chinese_text": "無効"
+  },
+  "认证错误:": {
+    "suggested_key": "login.认证错误",
+    "occurrences": [
+      {
+        "file": "pages/Login.tsx",
+        "line": 65
+      }
+    ],
+    "chinese_text": "认证错误:"
+  },
+  "错误响应:": {
+    "suggested_key": "login.错误响应",
+    "occurrences": [
+      {
+        "file": "pages/Login.tsx",
+        "line": 66
+      }
+    ],
+    "chinese_text": "错误响应:"
+  },
+  "用户名或密码错误": {
+    "suggested_key": "login.用户名或密码错误",
+    "occurrences": [
+      {
+        "file": "pages/Login.tsx",
+        "line": 74
+      }
+    ],
+    "chinese_text": "用户名或密码错误"
+  },
+  "请求参数错误": {
+    "suggested_key": "login.请求参数错误",
+    "occurrences": [
+      {
+        "file": "pages/Login.tsx",
+        "line": 76
+      }
+    ],
+    "chinese_text": "请求参数错误"
+  },
+  "服务器错误，请稍后重试": {
+    "suggested_key": "login.服务器错误请稍后重试",
+    "occurrences": [
+      {
+        "file": "pages/Login.tsx",
+        "line": 78
+      }
+    ],
+    "chinese_text": "服务器错误，请稍后重试"
+  },
+  "网络错误: ${error.message}": {
+    "suggested_key": "login.网络错误errormessage",
+    "occurrences": [
+      {
+        "file": "pages/Login.tsx",
+        "line": 80
+      }
+    ],
+    "chinese_text": "网络错误: ${error.message}"
+  },
+  "翻译失败:": {
+    "suggested_key": "common.翻译失败",
+    "occurrences": [
+      {
+        "file": "utils/translateTags.ts",
+        "line": 71
+      }
+    ],
+    "chinese_text": "翻译失败:"
+  }
+}

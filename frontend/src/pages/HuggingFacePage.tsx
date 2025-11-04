@@ -65,20 +65,20 @@ const HuggingFacePage: React.FC = () => {
 
   // Pipeline类型映射
   const pipelineNames: Record<string, string> = {
-    'text-generation': '文本生成',
-    'text-classification': '文本分类',
-    'token-classification': '标记分类',
-    'question-answering': '问答系统',
-    'fill-mask': '填充遮罩',
-    'summarization': '文本摘要',
-    'translation': '机器翻译',
-    'text2text-generation': '文本到文本生成',
-    'conversational': '对话系统',
-    'image-classification': '图像分类',
-    'object-detection': '目标检测',
-    'image-segmentation': '图像分割',
-    'speech-recognition': '语音识别',
-    'text-to-speech': '文本转语音'
+    'text-generation': t('huggingface.taskTextGeneration'),
+    'text-classification': t('huggingface.taskTextClassification'),
+    'token-classification': t('huggingface.taskTokenClassification'),
+    'question-answering': t('huggingface.taskQuestionAnswering'),
+    'fill-mask': t('huggingface.taskFillMask'),
+    'summarization': t('huggingface.taskSummarization'),
+    'translation': t('huggingface.taskTranslation'),
+    'text2text-generation': t('huggingface.taskText2Text'),
+    'conversational': t('huggingface.taskConversational'),
+    'image-classification': t('huggingface.taskImageClassification'),
+    'object-detection': t('huggingface.taskObjectDetection'),
+    'image-segmentation': t('huggingface.taskImageSegmentation'),
+    'image-to-text': t('huggingface.taskImageToText'),
+    'text-to-speech': t('huggingface.taskTextToSpeech')
   }
 
   // 打开详细信息Modal
@@ -118,15 +118,15 @@ const HuggingFacePage: React.FC = () => {
         const data = await response.json()
         setChatHistory(prev => [...prev, {
           user: userMessage,
-          ai: data.response || '抱歉，我无法回答这个问题。'
+          ai: data.response || t('huggingface.cannotAnswer')
         }])
         setChatMessage('')
       } else {
-        message.error('发送消息失败')
+        message.error(t('huggingface.sendMessageFailed'))
       }
     } catch (error) {
       console.error('Chat error:', error)
-      message.error('发送消息失败')
+      message.error(t('huggingface.sendMessageFailed'))
     } finally {
       setChatLoading(false)
     }
@@ -303,8 +303,8 @@ const HuggingFacePage: React.FC = () => {
             <Statistic
               title={t('huggingface.popularTask')}
               value={stats?.pipeline_distribution ?
-                pipelineNames[Object.keys(stats.pipeline_distribution)[0]] || '文本生成' :
-                '文本生成'
+                pipelineNames[Object.keys(stats.pipeline_distribution)[0]] || t('huggingface.taskTextGeneration') :
+                t('huggingface.taskTextGeneration')
               }
               prefix={<SearchOutlined style={{ color: '#722ed1' }} />}
               valueStyle={{ color: '#722ed1', fontSize: '20px' }}
@@ -366,14 +366,14 @@ const HuggingFacePage: React.FC = () => {
                 renderItem={(model) => (
                   <List.Item
                     actions={[
-                      <Button 
-                        key="detail" 
+                      <Button
+                        key="detail"
                         type="primary"
                         size="small"
                         icon={<EyeOutlined />}
                         onClick={() => openDetailModal(model)}
                       >
-                        详细查看
+                        {t('huggingface.viewDetails')}
                       </Button>,
                       <Button 
                         key="view" 
@@ -538,21 +538,21 @@ const HuggingFacePage: React.FC = () => {
               </div>
 
               <div style={{ marginBottom: 12 }}>
-                <Text strong>作者: </Text>
+                <Text strong>{t('huggingface.author')}</Text>
                 <Text>{selectedModel.author}</Text>
               </div>
 
               <div style={{ marginBottom: 12 }}>
-                <Text strong>下载量: </Text>
+                <Text strong>{t('huggingface.downloadCount')}</Text>
                 <Text>{formatNumber(selectedModel.downloads || 0)}</Text>
               </div>
 
               <Divider />
 
               <div>
-                <Title level={5}>完整描述</Title>
+                <Title level={5}>{t('huggingface.fullDescription')}</Title>
                 <Paragraph style={{ whiteSpace: 'pre-wrap', textAlign: 'justify' }}>
-                  {selectedModel.description || '暂无描述'}
+                  {selectedModel.description || t('huggingface.noDescription')}
                 </Paragraph>
               </div>
 
@@ -617,7 +617,7 @@ const HuggingFacePage: React.FC = () => {
                 <Input
                   value={chatMessage}
                   onChange={(e) => setChatMessage(e.target.value)}
-                  placeholder="问一下关于这个模型的问题..."
+                  placeholder={t('huggingface.askQuestionPlaceholder')}
                   onPressEnter={sendChatMessage}
                   disabled={chatLoading}
                 />

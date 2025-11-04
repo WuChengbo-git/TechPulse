@@ -1,6 +1,7 @@
 import React from 'react';
 import { Tag, Tooltip } from 'antd';
 import { StarFilled } from '@ant-design/icons';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface QualityBadgeProps {
   score: number;  // 0-10分
@@ -17,13 +18,15 @@ const QualityBadge: React.FC<QualityBadgeProps> = ({
   showLabel = true,
   size = 'default'
 }) => {
+  const { t } = useLanguage();
+
   // 获取质量等级
   const getQualityLevel = (score: number): string => {
-    if (score >= 8.5) return '优秀';
-    if (score >= 7.0) return '良好';
-    if (score >= 5.0) return '中等';
-    if (score >= 3.0) return '一般';
-    return '较低';
+    if (score >= 8.5) return t('common.excellent');
+    if (score >= 7.0) return t('common.good');
+    if (score >= 5.0) return t('common.moderate');
+    if (score >= 3.0) return t('common.average');
+    return t('common.low');
   };
 
   // 获取标签颜色
@@ -47,13 +50,13 @@ const QualityBadge: React.FC<QualityBadgeProps> = ({
   // 获取详细说明
   const getTooltip = (score: number): string => {
     const level = getQualityLevel(score);
-    return `质量评分: ${score.toFixed(1)}/10 (${level})
+    return `${t('common.qualityScore')}: ${score.toFixed(1)}/10 (${level})
 
-评分依据:
-• GitHub: Star数、活跃度、文档质量
-• arXiv: 作者声誉、主题热度、完整性
-• HuggingFace: 下载量、社区互动
-• Zenn: 点赞数、评论数、Premium标识`;
+${t('common.scoringCriteria')}:
+• ${t('common.githubCriteria')}
+• ${t('common.arxivCriteria')}
+• ${t('common.huggingfaceCriteria')}
+• ${t('common.zennCriteria')}`;
   };
 
   const stars = getStarRating(score);

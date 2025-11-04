@@ -80,7 +80,7 @@ const GitHubPage: React.FC = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          message: `关于这个GitHub仓库 "${selectedRepo.title}"，${userMessage}`,
+          message: `${t('github.aboutThisRepo')} "${selectedRepo.title}"，${userMessage}`,
           context: {
             title: selectedRepo.title,
             description: selectedRepo.description || selectedRepo.summary,
@@ -91,20 +91,20 @@ const GitHubPage: React.FC = () => {
           }
         }),
       })
-      
+
       if (response.ok) {
         const data = await response.json()
         setChatHistory(prev => [...prev, {
           user: userMessage,
-          ai: data.response || '抱歉，我无法回答这个问题。'
+          ai: data.response || t('github.cannotAnswer')
         }])
         setChatMessage('')
       } else {
-        message.error('发送消息失败')
+        message.error(t('github.sendMessageFailed'))
       }
     } catch (error) {
       console.error('Chat error:', error)
-      message.error('发送消息失败')
+      message.error(t('github.sendMessageFailed'))
     } finally {
       setChatLoading(false)
     }
@@ -340,14 +340,14 @@ const GitHubPage: React.FC = () => {
                 renderItem={(repo) => (
                   <List.Item
                     actions={[
-                      <Button 
-                        key="detail" 
+                      <Button
+                        key="detail"
                         type="primary"
                         size="small"
                         icon={<EyeOutlined />}
                         onClick={() => openDetailModal(repo)}
                       >
-                        详细查看
+                        {t('github.viewDetails')}
                       </Button>,
                       <Button 
                         key="view" 
@@ -357,7 +357,7 @@ const GitHubPage: React.FC = () => {
                           if (repo.url) {
                             window.open(repo.url, '_blank')
                           } else {
-                            message.warning('仓库链接不可用')
+                            message.warning(t('github.repoLinkUnavailable'))
                           }
                         }}
                       >
@@ -557,16 +557,16 @@ const GitHubPage: React.FC = () => {
               </div>
 
               <div style={{ marginBottom: 12 }}>
-                <Text strong>创建时间: </Text>
-                <Text>{selectedRepo.created_at ? new Date(selectedRepo.created_at).toLocaleDateString() : '未知'}</Text>
+                <Text strong>{t('github.createTime')}</Text>
+                <Text>{selectedRepo.created_at ? new Date(selectedRepo.created_at).toLocaleDateString() : t('zenn.unknown')}</Text>
               </div>
 
               <Divider />
 
               <div>
-                <Title level={5}>完整描述</Title>
+                <Title level={5}>{t('github.fullDescription')}</Title>
                 <Paragraph style={{ whiteSpace: 'pre-wrap', textAlign: 'justify' }}>
-                  {selectedRepo.description || selectedRepo.summary || '暂无描述'}
+                  {selectedRepo.description || selectedRepo.summary || t('github.noDescription')}
                 </Paragraph>
               </div>
 
@@ -631,7 +631,7 @@ const GitHubPage: React.FC = () => {
                 <Input
                   value={chatMessage}
                   onChange={(e) => setChatMessage(e.target.value)}
-                  placeholder="问一下关于这个仓库的问题..."
+                  placeholder={t('github.askAboutRepo')}
                   onPressEnter={sendChatMessage}
                   disabled={chatLoading}
                 />

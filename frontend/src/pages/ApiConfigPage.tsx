@@ -208,15 +208,15 @@ const ApiConfigPage: React.FC = () => {
   // GitHub配置面板
   const renderGitHubConfig = () => (
     <Space direction="vertical" style={{ width: '100%' }}>
-      <Card title="🔍 Search Criteria" size="small">
+      <Card title={`🔍 ${t('apiConfig.searchCriteria')}`} size="small">
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item label="Programming Languages">
+            <Form.Item label={t('apiConfig.programmingLanguages')}>
               <Select
                 mode="multiple"
                 value={githubConfig.languages}
                 onChange={(value) => setGithubConfig({...githubConfig, languages: value})}
-                placeholder="Select languages"
+                placeholder={t('apiConfig.selectLanguages')}
               >
                 {githubLanguages.map(lang => (
                   <Option key={lang} value={lang}>{lang}</Option>
@@ -225,12 +225,12 @@ const ApiConfigPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label="Topics">
+            <Form.Item label={t('apiConfig.topics')}>
               <Select
                 mode="multiple"
                 value={githubConfig.topics}
                 onChange={(value) => setGithubConfig({...githubConfig, topics: value})}
-                placeholder="Select topics"
+                placeholder={t('apiConfig.selectTopics')}
               >
                 {githubTopics.map(topic => (
                   <Option key={topic} value={topic}>{topic}</Option>
@@ -241,10 +241,10 @@ const ApiConfigPage: React.FC = () => {
         </Row>
       </Card>
 
-      <Card title="⭐ Filter Conditions" size="small">
+      <Card title={`⭐ ${t('apiConfig.filterConditions')}`} size="small">
         <Row gutter={16}>
           <Col span={8}>
-            <Form.Item label="Minimum Stars">
+            <Form.Item label={t('apiConfig.minimumStars')}>
               <InputNumber
                 min={0}
                 value={githubConfig.min_stars}
@@ -254,7 +254,7 @@ const ApiConfigPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="Period (Days)">
+            <Form.Item label={t('apiConfig.periodDays')}>
               <Select
                 value={githubConfig.max_age_days}
                 onChange={(value) => setGithubConfig({...githubConfig, max_age_days: value})}
@@ -267,7 +267,7 @@ const ApiConfigPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="Fetch Count">
+            <Form.Item label={t('apiConfig.fetchCount')}>
               <InputNumber
                 min={10}
                 max={100}
@@ -281,19 +281,19 @@ const ApiConfigPage: React.FC = () => {
 
         <Row gutter={16}>
           <Col span={8}>
-            <Form.Item label="Sort By">
+            <Form.Item label={t('apiConfig.sortBy')}>
               <Select
                 value={githubConfig.sort_by}
                 onChange={(value) => setGithubConfig({...githubConfig, sort_by: value})}
               >
-                <Option value="stars">Stars</Option>
-                <Option value="updated">Updated</Option>
-                <Option value="created">Created</Option>
+                <Option value="stars">{t('apiConfig.sortStars')}</Option>
+                <Option value="updated">{t('apiConfig.sortUpdated')}</Option>
+                <Option value="created">{t('apiConfig.sortCreated')}</Option>
               </Select>
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="Exclude Forks">
+            <Form.Item label={t('apiConfig.excludeForks')}>
               <Switch
                 checked={githubConfig.exclude_forks}
                 onChange={(checked) => setGithubConfig({...githubConfig, exclude_forks: checked})}
@@ -301,7 +301,7 @@ const ApiConfigPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="Include Archived">
+            <Form.Item label={t('apiConfig.includeArchived')}>
               <Switch
                 checked={githubConfig.include_archived}
                 onChange={(checked) => setGithubConfig({...githubConfig, include_archived: checked})}
@@ -316,8 +316,8 @@ const ApiConfigPage: React.FC = () => {
   // arXiv配置面板
   const renderArxivConfig = () => (
     <Space direction="vertical" style={{ width: '100%' }}>
-      <Card title="📚 Research Fields" size="small">
-        <Form.Item label="Categories">
+      <Card title={`📚 ${t('apiConfig.researchFields')}`} size="small">
+        <Form.Item label={t('apiConfig.categories')}>
           <Checkbox.Group
             value={arxivConfig.categories}
             onChange={(value) => setArxivConfig({...arxivConfig, categories: value as string[]})}
@@ -333,21 +333,21 @@ const ApiConfigPage: React.FC = () => {
         </Form.Item>
       </Card>
 
-      <Card title="🔑 Keywords" size="small">
-        <Form.Item label="Search Keywords">
+      <Card title={`🔑 ${t('apiConfig.keywords')}`} size="small">
+        <Form.Item label={t('apiConfig.searchKeywords')}>
           <Select
             mode="tags"
             value={arxivConfig.keywords}
             onChange={(value) => setArxivConfig({...arxivConfig, keywords: value})}
-            placeholder="Enter keywords"
+            placeholder={t('apiConfig.enterKeywords')}
           />
         </Form.Item>
       </Card>
 
-      <Card title="⚙️ Fetch Settings" size="small">
+      <Card title={`⚙️ ${t('apiConfig.fetchSettings')}`} size="small">
         <Row gutter={16}>
           <Col span={8}>
-            <Form.Item label="Period (Days)">
+            <Form.Item label={t('apiConfig.periodDays')}>
               <InputNumber
                 min={1}
                 max={365}
@@ -358,7 +358,7 @@ const ApiConfigPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="Max Results">
+            <Form.Item label={t('apiConfig.maxResults')}>
               <InputNumber
                 min={10}
                 max={1000}
@@ -369,14 +369,14 @@ const ApiConfigPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="Sort By">
+            <Form.Item label={t('apiConfig.sortBy')}>
               <Select
                 value={arxivConfig.sort_by}
                 onChange={(value) => setArxivConfig({...arxivConfig, sort_by: value})}
               >
-                <Option value="relevance">Relevance</Option>
-                <Option value="lastUpdatedDate">Updated Date</Option>
-                <Option value="submittedDate">Submitted Date</Option>
+                <Option value="relevance">{t('apiConfig.sortRelevance')}</Option>
+                <Option value="lastUpdatedDate">{t('apiConfig.sortLastUpdated')}</Option>
+                <Option value="submittedDate">{t('apiConfig.sortSubmitted')}</Option>
               </Select>
             </Form.Item>
           </Col>
@@ -388,15 +388,15 @@ const ApiConfigPage: React.FC = () => {
   // Hugging Face配置面板
   const renderHuggingFaceConfig = () => (
     <Space direction="vertical" style={{ width: '100%' }}>
-      <Card title="🤖 Model Settings" size="small">
+      <Card title={`🤖 ${t('apiConfig.modelSettings')}`} size="small">
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item label="Pipeline Tasks">
+            <Form.Item label={t('apiConfig.pipelineTasks')}>
               <Select
                 mode="multiple"
                 value={huggingfaceConfig.pipeline_tags}
                 onChange={(value) => setHuggingfaceConfig({...huggingfaceConfig, pipeline_tags: value})}
-                placeholder="Select tasks"
+                placeholder={t('apiConfig.selectTasks')}
               >
                 {huggingfacePipelineTags.map(tag => (
                   <Option key={tag} value={tag}>{tag}</Option>
@@ -405,12 +405,12 @@ const ApiConfigPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label="Supported Languages">
+            <Form.Item label={t('apiConfig.supportedLanguages')}>
               <Select
                 mode="multiple"
                 value={huggingfaceConfig.languages}
                 onChange={(value) => setHuggingfaceConfig({...huggingfaceConfig, languages: value})}
-                placeholder="Select languages"
+                placeholder={t('apiConfig.selectLanguages')}
               >
                 <Option value="en">English</Option>
                 <Option value="ja">Japanese</Option>
@@ -424,10 +424,10 @@ const ApiConfigPage: React.FC = () => {
         </Row>
       </Card>
 
-      <Card title="📊 Filter Conditions" size="small">
+      <Card title={`📊 ${t('apiConfig.filterConditions')}`} size="small">
         <Row gutter={16}>
           <Col span={8}>
-            <Form.Item label="Min Downloads">
+            <Form.Item label={t('apiConfig.minDownloads')}>
               <InputNumber
                 min={0}
                 value={huggingfaceConfig.min_downloads}
@@ -437,7 +437,7 @@ const ApiConfigPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="Period (Days)">
+            <Form.Item label={t('apiConfig.periodDays')}>
               <InputNumber
                 min={1}
                 max={365}
@@ -448,15 +448,15 @@ const ApiConfigPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="Sort By">
+            <Form.Item label={t('apiConfig.sortBy')}>
               <Select
                 value={huggingfaceConfig.sort_by}
                 onChange={(value) => setHuggingfaceConfig({...huggingfaceConfig, sort_by: value})}
               >
-                <Option value="downloads">Downloads</Option>
-                <Option value="likes">Likes</Option>
-                <Option value="updated">Updated</Option>
-                <Option value="created">Created</Option>
+                <Option value="downloads">{t('apiConfig.sortDownloads')}</Option>
+                <Option value="likes">{t('apiConfig.sortLikes')}</Option>
+                <Option value="updated">{t('apiConfig.sortUpdated')}</Option>
+                <Option value="created">{t('apiConfig.sortCreated')}</Option>
               </Select>
             </Form.Item>
           </Col>
@@ -464,7 +464,7 @@ const ApiConfigPage: React.FC = () => {
 
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item label="Include Datasets">
+            <Form.Item label={t('apiConfig.includeDatasets')}>
               <Switch
                 checked={huggingfaceConfig.include_datasets}
                 onChange={(checked) => setHuggingfaceConfig({...huggingfaceConfig, include_datasets: checked})}
@@ -472,7 +472,7 @@ const ApiConfigPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label="Include Spaces">
+            <Form.Item label={t('apiConfig.includeSpaces')}>
               <Switch
                 checked={huggingfaceConfig.include_spaces}
                 onChange={(checked) => setHuggingfaceConfig({...huggingfaceConfig, include_spaces: checked})}
@@ -487,19 +487,19 @@ const ApiConfigPage: React.FC = () => {
   // Zenn配置面板
   const renderZennConfig = () => (
     <Space direction="vertical" style={{ width: '100%' }}>
-      <Card title="📝 Article Settings" size="small">
-        <Form.Item label="Topics of Interest">
+      <Card title={`📝 ${t('apiConfig.articleSettings')}`} size="small">
+        <Form.Item label={t('apiConfig.topicsOfInterest')}>
           <Select
             mode="tags"
             value={zennConfig.topics}
             onChange={(value) => setZennConfig({...zennConfig, topics: value})}
-            placeholder="Enter topics"
+            placeholder={t('apiConfig.enterTopics')}
           />
         </Form.Item>
 
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item label="Min Likes">
+            <Form.Item label={t('apiConfig.minLikes')}>
               <InputNumber
                 min={0}
                 value={zennConfig.min_likes}
@@ -509,7 +509,7 @@ const ApiConfigPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label="Period (Days)">
+            <Form.Item label={t('apiConfig.periodDays')}>
               <InputNumber
                 min={1}
                 max={365}
@@ -523,19 +523,19 @@ const ApiConfigPage: React.FC = () => {
 
         <Row gutter={16}>
           <Col span={8}>
-            <Form.Item label="Sort By">
+            <Form.Item label={t('apiConfig.sortBy')}>
               <Select
                 value={zennConfig.sort_by}
                 onChange={(value) => setZennConfig({...zennConfig, sort_by: value})}
               >
-                <Option value="liked">Likes</Option>
-                <Option value="published_at">Published Date</Option>
-                <Option value="updated_at">Updated Date</Option>
+                <Option value="liked">{t('apiConfig.sortLiked')}</Option>
+                <Option value="published_at">{t('apiConfig.sortPublished')}</Option>
+                <Option value="updated_at">{t('apiConfig.sortUpdated')}</Option>
               </Select>
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="Include Books">
+            <Form.Item label={t('apiConfig.includeBooks')}>
               <Switch
                 checked={zennConfig.include_books}
                 onChange={(checked) => setZennConfig({...zennConfig, include_books: checked})}
@@ -543,7 +543,7 @@ const ApiConfigPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="Include Scraps">
+            <Form.Item label={t('apiConfig.includeScraps')}>
               <Switch
                 checked={zennConfig.include_scraps}
                 onChange={(checked) => setZennConfig({...zennConfig, include_scraps: checked})}
@@ -557,10 +557,10 @@ const ApiConfigPage: React.FC = () => {
 
   // 调度配置面板
   const renderScheduleConfig = () => (
-    <Card title="⏰ Auto Collection Schedule">
+    <Card title={`⏰ ${t('apiConfig.autoCollectionSchedule')}`}>
       <Row gutter={16}>
         <Col span={6}>
-          <Form.Item label="Enable">
+          <Form.Item label={t('apiConfig.enable')}>
             <Switch
               checked={scheduleConfig.enabled}
               onChange={(checked) => setScheduleConfig({...scheduleConfig, enabled: checked})}
@@ -568,20 +568,20 @@ const ApiConfigPage: React.FC = () => {
           </Form.Item>
         </Col>
         <Col span={6}>
-          <Form.Item label="Frequency">
+          <Form.Item label={t('apiConfig.frequency')}>
             <Select
               value={scheduleConfig.frequency}
               onChange={(value) => setScheduleConfig({...scheduleConfig, frequency: value})}
               disabled={!scheduleConfig.enabled}
             >
-              <Option value="hourly">Hourly</Option>
-              <Option value="daily">Daily</Option>
-              <Option value="weekly">Weekly</Option>
+              <Option value="hourly">{t('apiConfig.hourly')}</Option>
+              <Option value="daily">{t('apiConfig.daily')}</Option>
+              <Option value="weekly">{t('apiConfig.weekly')}</Option>
             </Select>
           </Form.Item>
         </Col>
         <Col span={6}>
-          <Form.Item label="Execution Time">
+          <Form.Item label={t('apiConfig.executionTime')}>
             <TimePicker
               value={dayjs(scheduleConfig.time, 'HH:mm')}
               format="HH:mm"
@@ -594,7 +594,7 @@ const ApiConfigPage: React.FC = () => {
           </Form.Item>
         </Col>
         <Col span={6}>
-          <Form.Item label="Timezone">
+          <Form.Item label={t('apiConfig.timezone')}>
             <Select
               value={scheduleConfig.timezone}
               onChange={(value) => setScheduleConfig({...scheduleConfig, timezone: value})}

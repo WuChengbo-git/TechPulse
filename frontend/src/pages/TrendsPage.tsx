@@ -207,32 +207,38 @@ const TrendsPage: React.FC = () => {
     const previousPeriod = now.subtract(days * 2, 'day')
 
     const aiFields = {
-      '大语言模型': {
+      'llm': {
+        name: t('trends.fieldLLM'),
         keywords: ['llm', 'gpt', 'chatgpt', 'claude', 'gemini', 'llama', 'qwen', 'transformer', 'bert', 'language model', 'nlp', 'natural language', '大语言模型', '语言模型', 'instruct', 'chat', 'openai', 'anthropic', 'mistral', 'phi', 'qwen2', 'baichuan', 'text-generation', 'chat-completion'],
         icon: <RobotOutlined />,
         color: '#1890ff'
       },
-      '计算机视觉': {
+      'computer_vision': {
+        name: t('trends.fieldComputerVision'),
         keywords: ['computer vision', 'cv', 'opencv', 'yolo', 'object detection', 'image recognition', 'cnn', 'vision', 'stable diffusion', 'midjourney', '计算机视觉', '图像识别', 'image', 'visual', 'resnet', 'vgg', 'efficientnet', 'segmentation', 'face recognition', 'ocr', 'diffusion', 'gan'],
         icon: <EyeOutlined />,
         color: '#52c41a'
       },
-      '语音技术': {
+      'speech': {
+        name: t('trends.fieldSpeech'),
         keywords: ['speech', 'voice', 'audio', 'tts', 'stt', 'whisper', 'speech recognition', 'voice synthesis', '语音', '音频', 'asr', 'wav2vec', 'speech-to-text', 'text-to-speech', 'audio-classification', 'speech-processing'],
         icon: <SoundOutlined />,
         color: '#faad14'
       },
-      '多模态AI': {
+      'multimodal': {
+        name: t('trends.fieldMultimodal'),
         keywords: ['multimodal', 'vision-language', 'clip', 'dall-e', 'gpt-4v', 'multimodal ai', 'cross-modal', '多模态', 'vision language', 'vilt', 'blip', 'flamingo', 'align', 'vlm'],
         icon: <PictureOutlined />,
         color: '#722ed1'
       },
-      '机器学习': {
+      'machine_learning': {
+        name: t('trends.fieldMachineLearning'),
         keywords: ['machine learning', 'ml', 'scikit-learn', 'xgboost', 'random forest', 'svm', 'clustering', '机器学习', 'sklearn', 'gradient boosting', 'decision tree', 'classification', 'regression', 'ensemble'],
         icon: <ThunderboltOutlined />,
         color: '#fa541c'
       },
-      '深度学习': {
+      'deep_learning': {
+        name: t('trends.fieldDeepLearning'),
         keywords: ['deep learning', 'neural network', 'pytorch', 'tensorflow', 'keras', 'cnn', 'rnn', 'lstm', '深度学习', '神经网络', 'neural', 'backpropagation', 'gradient descent', 'attention', 'autoencoder', 'gru'],
         icon: <BulbOutlined />,
         color: '#eb2f96'
@@ -294,10 +300,10 @@ const TrendsPage: React.FC = () => {
     const currentCounts = countField(currentCards)
     const previousCounts = countField(previousCards)
 
-    const trends: AIFieldTrend[] = Object.entries(aiFields).map(([field, { icon, color }]) => {
-      const currentCount = currentCounts[field]?.count || 0
-      const previousCount = previousCounts[field]?.count || 0
-      const hotKeywords = currentCounts[field]?.keywords || []
+    const trends: AIFieldTrend[] = Object.entries(aiFields).map(([fieldKey, { name, icon, color }]) => {
+      const currentCount = currentCounts[fieldKey]?.count || 0
+      const previousCount = previousCounts[fieldKey]?.count || 0
+      const hotKeywords = currentCounts[fieldKey]?.keywords || []
 
       let growth = 0
       if (previousCount === 0 && currentCount > 0) {
@@ -307,7 +313,7 @@ const TrendsPage: React.FC = () => {
       }
 
       return {
-        field,
+        field: name,
         count: currentCount,
         growth,
         hotKeywords,
@@ -318,8 +324,8 @@ const TrendsPage: React.FC = () => {
 
     // 如果没有检测到任何AI领域数据，使用示例数据
     if (trends.every(trend => trend.count === 0)) {
-      const sampleTrends = Object.entries(aiFields).map(([field, { icon, color }]) => ({
-        field,
+      const sampleTrends = Object.entries(aiFields).map(([fieldKey, { name, icon, color }]) => ({
+        field: name,
         count: Math.floor(Math.random() * 20) + 5, // 5-25之间的随机数
         growth: Math.floor(Math.random() * 40) - 20, // -20到20之间的增长率
         hotKeywords: [],
@@ -342,7 +348,7 @@ const TrendsPage: React.FC = () => {
         popularity: 95,
         recent: true,
         provider: 'OpenAI',
-        description: '最新旗舰模型，推理和多模态能力大幅提升'
+        description: t('trends.llmDescGPT5')
       },
       {
         name: 'GPT-4o',
@@ -350,7 +356,7 @@ const TrendsPage: React.FC = () => {
         popularity: 90,
         recent: true,
         provider: 'OpenAI',
-        description: '实时多模态交互，音频处理能力强'
+        description: t('trends.llmDescGPT4o')
       },
       {
         name: 'Claude 3.5 Sonnet',
@@ -358,7 +364,7 @@ const TrendsPage: React.FC = () => {
         popularity: 88,
         recent: true,
         provider: 'Anthropic',
-        description: '代码生成和复杂推理的顶级表现'
+        description: t('trends.llmDescClaude35')
       },
       {
         name: 'Gemini 2.0 Flash',
@@ -366,7 +372,7 @@ const TrendsPage: React.FC = () => {
         popularity: 82,
         recent: true,
         provider: 'Google',
-        description: '速度和效率优化，多模态集成'
+        description: t('trends.llmDescGemini2')
       },
       {
         name: 'Llama 3.3 70B',
@@ -374,7 +380,7 @@ const TrendsPage: React.FC = () => {
         popularity: 92,
         recent: true,
         provider: 'Meta',
-        description: '开源模型性能新高度，成本效益突出'
+        description: t('trends.llmDescLlama33')
       },
       {
         name: 'Qwen 2.5 Max',
@@ -382,7 +388,7 @@ const TrendsPage: React.FC = () => {
         popularity: 75,
         recent: true,
         provider: '阿里云',
-        description: '中文理解和推理能力业界领先'
+        description: t('trends.llmDescQwen25')
       },
       {
         name: 'o1 Pro',
@@ -390,7 +396,7 @@ const TrendsPage: React.FC = () => {
         popularity: 78,
         recent: true,
         provider: 'OpenAI',
-        description: '深度推理模型，科学和数学问题解决能力强'
+        description: t('trends.llmDescO1Pro')
       },
       {
         name: 'Deepseek V3',
@@ -398,7 +404,7 @@ const TrendsPage: React.FC = () => {
         popularity: 70,
         recent: true,
         provider: 'Deepseek',
-        description: '开源模型新星，编程和推理能力突出'
+        description: t('trends.llmDescDeepseek')
       }
     ]
 
@@ -439,7 +445,7 @@ const TrendsPage: React.FC = () => {
     return (
       <div style={{ textAlign: 'center', padding: '50px' }}>
         <Spin size="large" />
-        <div style={{ marginTop: 16 }}>分析AI技术趋势中...</div>
+        <div style={{ marginTop: 16 }}>{t('trends.analyzingTrends')}</div>
       </div>
     )
   }
@@ -473,8 +479,8 @@ const TrendsPage: React.FC = () => {
       }
     },
     meta: {
-      language: { alias: '编程语言' },
-      count: { alias: '项目数量' }
+      language: { alias: t('trends.programmingLanguage') },
+      count: { alias: t('trends.chartProjectCount') }
     },
     xAxis: {
       label: {
@@ -493,7 +499,7 @@ const TrendsPage: React.FC = () => {
     },
     yAxis: {
       label: {
-        formatter: (text: string) => `${text}个`,
+        formatter: (text: string) => `${text}${t('trends.unit')}`,
         style: {
           fontSize: 11
         }
@@ -531,8 +537,8 @@ const TrendsPage: React.FC = () => {
           const item = data[0]
           return `<div style="padding: 10px;">
             <div style="font-weight: bold;">${item.data.field}</div>
-            <div>项目数量: ${item.data.count} 个</div>
-            <div>占比: ${item.data.percent ? (item.data.percent * 100).toFixed(1) : 0}%</div>
+            <div>${t('trends.aiFieldTooltipCount')}: ${item.data.count} ${t('trends.unit')}</div>
+            <div>${t('trends.aiFieldTooltipPercent')}: ${item.data.percent ? (item.data.percent * 100).toFixed(1) : 0}%</div>
           </div>`
         }
         return ''
@@ -566,9 +572,9 @@ const TrendsPage: React.FC = () => {
               onChange={setTimeRange}
               style={{ width: 120 }}
             >
-              <Option value="week">近一周</Option>
-              <Option value="month">近一月</Option>
-              <Option value="quarter">近一季度</Option>
+              <Option value="week">{t('trends.timeRangeWeek')}</Option>
+              <Option value="month">{t('trends.timeRangeMonth')}</Option>
+              <Option value="quarter">{t('trends.timeRangeQuarter')}</Option>
             </Select>
 
             <Button
@@ -576,7 +582,7 @@ const TrendsPage: React.FC = () => {
               onClick={fetchCards}
               loading={loading}
             >
-              刷新数据
+              {t('trends.refreshData')}
             </Button>
           </Space>
         </div>
@@ -587,7 +593,7 @@ const TrendsPage: React.FC = () => {
         <Col xs={12} sm={6}>
           <Card>
             <Statistic
-              title="最热编程语言"
+              title={t('trends.statHottestLanguage')}
               value={languageTrends[0]?.language || 'Python'}
               prefix={<CodeOutlined style={{ color: '#1890ff' }} />}
               suffix={`(${languageTrends[0]?.count || 0})`}
@@ -599,7 +605,7 @@ const TrendsPage: React.FC = () => {
         <Col xs={12} sm={6}>
           <Card>
             <Statistic
-              title="最活跃AI领域"
+              title={t('trends.statMostActiveField')}
               value={aiFieldTrends[0]?.field || 'AI'}
               prefix={<FireOutlined style={{ color: '#f5222d' }} />}
               suffix={`(${aiFieldTrends[0]?.count || 0})`}
@@ -611,10 +617,10 @@ const TrendsPage: React.FC = () => {
         <Col xs={12} sm={6}>
           <Card>
             <Statistic
-              title="顶级LLM模型"
+              title={t('trends.statTopLLM')}
               value={llmModels[0]?.name || 'GPT-4o'}
               prefix={<StarOutlined style={{ color: '#faad14' }} />}
-              suffix={`(${llmModels[0]?.capability || 0}分)`}
+              suffix={`(${llmModels[0]?.capability || 0}${t('trends.score')})`}
               valueStyle={{ color: '#faad14' }}
             />
           </Card>
@@ -623,7 +629,7 @@ const TrendsPage: React.FC = () => {
         <Col xs={12} sm={6}>
           <Card>
             <Statistic
-              title="增长最快"
+              title={t('trends.statFastestGrowing')}
               value={languageTrends.filter(l => l.trend === 'up')[0]?.language || 'Rust'}
               prefix={<RiseOutlined style={{ color: '#52c41a' }} />}
               suffix={`+${languageTrends.filter(l => l.trend === 'up')[0]?.growth.toFixed(1) || 0}%`}
@@ -635,32 +641,32 @@ const TrendsPage: React.FC = () => {
 
       <Tabs defaultActiveKey="languages">
         {/* 编程语言活跃度 */}
-        <TabPane tab={<span><CodeOutlined />编程语言活跃度</span>} key="languages">
+        <TabPane tab={<span><CodeOutlined />{t('trends.tabLanguageActivity')}</span>} key="languages">
           <Row gutter={[16, 16]}>
             <Col xs={24} lg={16}>
               <Card
-                title="编程语言热度排行"
+                title={t('trends.chartLanguageRanking')}
                 extra={<BarChartOutlined />}
                 style={{ marginBottom: 16 }}
               >
                 <div style={{ marginBottom: 16, padding: '12px', background: '#f9f9f9', borderRadius: '6px' }}>
                   <Text type="secondary" style={{ fontSize: '12px' }}>
-                    📊 <strong>评判标准</strong>：根据项目标题、摘要、标签中的关键词匹配统计各编程语言的出现频次。
-                    统计范围包括近{timeRange === 'week' ? '7天' : timeRange === 'month' ? '30天' : '90天'}内收集的GitHub、arXiv、HuggingFace、Zenn等平台的项目数据。
+                    📊 <strong>{t('trends.chartCriteriaLabel')}</strong>：{t('trends.chartCriteriaText')}
+                    {t('trends.chartTimeRangeDays').replace('{days}', timeRange === 'week' ? '7' : timeRange === 'month' ? '30' : '90')}
                   </Text>
                 </div>
                 {languageTrends.filter(trend => trend.count > 0).length > 0 ? (
                   <Column {...languageChartConfig} />
                 ) : (
                   <div style={{ textAlign: 'center', padding: '50px', color: '#999' }}>
-                    暂无数据，可能需要更多时间收集编程语言相关的项目
+                    {t('trends.chartNoData')}
                   </div>
                 )}
               </Card>
             </Col>
 
             <Col xs={24} lg={8}>
-              <Card title="语言趋势详情">
+              <Card title={t('trends.chartLanguageTrendDetails')}>
                 <List
                   dataSource={languageTrends.slice(0, 8)}
                   size="small"
@@ -696,7 +702,7 @@ const TrendsPage: React.FC = () => {
                         }
                         description={
                           <div>
-                            <Text type="secondary">项目数量: {item.count}</Text>
+                            <Text type="secondary">{t('trends.chartProjectCount')}: {item.count}</Text>
                             <div style={{ height: 12, marginTop: 4, display: 'flex', alignItems: 'end', gap: '1px' }}>
                               {item.weeklyData.map((data, idx) => {
                                 const maxCount = Math.max(...item.weeklyData.map(d => d.count))
@@ -726,31 +732,31 @@ const TrendsPage: React.FC = () => {
         </TabPane>
 
         {/* AI领域分析 */}
-        <TabPane tab={<span><RobotOutlined />AI细分领域</span>} key="ai-fields">
+        <TabPane tab={<span><RobotOutlined />{t('trends.tabAIFields')}</span>} key="ai-fields">
           <Row gutter={[16, 16]}>
             <Col xs={24} lg={12}>
-              <Card title="AI领域活跃度分布" extra={<PictureOutlined />}>
+              <Card title={t('trends.aiFieldTitle')} extra={<PictureOutlined />}>
                 <div style={{ marginBottom: 16, padding: '12px', background: '#f0f9ff', borderRadius: '6px', borderLeft: '4px solid #1890ff' }}>
                   <Text type="secondary" style={{ fontSize: '12px' }}>
-                    🤖 <strong>分类标准</strong>：基于项目关键词智能识别AI细分领域<br/>
-                    • <strong>大语言模型</strong>：LLM、GPT、Claude、Transformer等<br/>
-                    • <strong>计算机视觉</strong>：OpenCV、YOLO、图像识别、Stable Diffusion等<br/>
-                    • <strong>语音技术</strong>：TTS、STT、Whisper、语音识别等<br/>
-                    • <strong>多模态AI</strong>：视觉语言模型、CLIP、DALL-E等
+                    🤖 <strong>{t('trends.aiFieldCriteriaTitle')}</strong>：{t('trends.aiFieldCriteriaText')}<br/>
+                    • <strong>{t('trends.fieldLLM')}</strong>：{t('trends.aiFieldLLMDesc')}<br/>
+                    • <strong>{t('trends.fieldComputerVision')}</strong>：{t('trends.aiFieldCVDesc')}<br/>
+                    • <strong>{t('trends.fieldSpeech')}</strong>：{t('trends.aiFieldSpeechDesc')}<br/>
+                    • <strong>{t('trends.fieldMultimodal')}</strong>：{t('trends.aiFieldMultimodalDesc')}
                   </Text>
                 </div>
                 {loading ? (
                   <div style={{ textAlign: 'center', padding: '50px' }}>
                     <Spin size="large" />
-                    <div style={{ marginTop: 16, color: '#999' }}>正在分析AI领域数据...</div>
+                    <div style={{ marginTop: 16, color: '#999' }}>{t('trends.aiFieldAnalyzing')}</div>
                   </div>
                 ) : validAIFieldData.length > 0 ? (
                   <Pie {...aiFieldPieConfig} />
                 ) : (
                   <div style={{ textAlign: 'center', padding: '50px', color: '#999' }}>
-                    <div style={{ marginBottom: 16 }}>🔍 暂未检测到AI领域项目</div>
+                    <div style={{ marginBottom: 16 }}>🔍 {t('trends.aiFieldNoData')}</div>
                     <div style={{ fontSize: '12px', color: '#bbb' }}>
-                      将自动显示示例分布，或等待更多数据收集
+                      {t('trends.aiFieldNoDataHint')}
                     </div>
                   </div>
                 )}
@@ -758,7 +764,7 @@ const TrendsPage: React.FC = () => {
             </Col>
 
             <Col xs={24} lg={12}>
-              <Card title="领域热点关键词">
+              <Card title={t('trends.aiFieldHotKeywords')}>
                 <Space direction="vertical" style={{ width: '100%' }} size="large">
                   {aiFieldTrends.map(field => (
                     <div key={field.field}>
@@ -795,16 +801,16 @@ const TrendsPage: React.FC = () => {
         </TabPane>
 
         {/* LLM模型排行 */}
-        <TabPane tab={<span><ThunderboltOutlined />LLM模型对比</span>} key="llm-models">
+        <TabPane tab={<span><ThunderboltOutlined />{t('trends.tabLLMModels')}</span>} key="llm-models">
           <Row gutter={[16, 16]}>
             <Col xs={24}>
-              <Card title="大语言模型能力与热度对比" extra={<StarOutlined />}>
+              <Card title={t('trends.llmTitle')} extra={<StarOutlined />}>
                 <div style={{ marginBottom: 16, padding: '12px', background: '#fff7e6', borderRadius: '6px', borderLeft: '4px solid #faad14' }}>
                   <Text type="secondary" style={{ fontSize: '12px' }}>
-                    ⭐ <strong>评分说明</strong>：<br/>
-                    • <strong>能力评分</strong>：基于官方基准测试、代码能力、推理能力等综合评估<br/>
-                    • <strong>社区热度</strong>：结合模型在各平台的提及次数、下载量、讨论度等指标<br/>
-                    • <strong>数据来源</strong>：整合GitHub、论文、技术博客等多渠道信息
+                    ⭐ <strong>{t('trends.llmScoringTitle')}</strong>：<br/>
+                    • <strong>{t('trends.llmTableCapability')}</strong>：{t('trends.llmCapabilityDesc')}<br/>
+                    • <strong>{t('trends.llmTablePopularity')}</strong>：{t('trends.llmPopularityDesc')}<br/>
+                    • {t('trends.llmDataSource')}
                   </Text>
                 </div>
                 <Table
@@ -812,7 +818,7 @@ const TrendsPage: React.FC = () => {
                   pagination={false}
                   columns={[
                     {
-                      title: '排名',
+                      title: t('trends.llmTableRanking'),
                       dataIndex: 'index',
                       width: 80,
                       render: (_: any, __: any, index: number) => (
@@ -825,19 +831,19 @@ const TrendsPage: React.FC = () => {
                       )
                     },
                     {
-                      title: '模型名称',
+                      title: t('trends.llmTableModelName'),
                       dataIndex: 'name',
                       render: (name: string, record: LLMModel) => (
                         <div>
                           <Text strong style={{ fontSize: '16px' }}>{name}</Text>
-                          {record.recent && <Tag color="red" style={{ marginLeft: 8, fontSize: '11px' }}>最新</Tag>}
+                          {record.recent && <Tag color="red" style={{ marginLeft: 8, fontSize: '11px' }}>{t('trends.llmTagLatest')}</Tag>}
                           <br />
                           <Text type="secondary">{record.provider}</Text>
                         </div>
                       )
                     },
                     {
-                      title: '能力评分',
+                      title: t('trends.llmTableCapability'),
                       dataIndex: 'capability',
                       sorter: (a: LLMModel, b: LLMModel) => a.capability - b.capability,
                       render: (capability: number) => (
@@ -855,7 +861,7 @@ const TrendsPage: React.FC = () => {
                       )
                     },
                     {
-                      title: '社区热度',
+                      title: t('trends.llmTablePopularity'),
                       dataIndex: 'popularity',
                       sorter: (a: LLMModel, b: LLMModel) => a.popularity - b.popularity,
                       render: (popularity: number) => (
@@ -870,7 +876,7 @@ const TrendsPage: React.FC = () => {
                       )
                     },
                     {
-                      title: '特点描述',
+                      title: t('trends.llmTableDescription'),
                       dataIndex: 'description',
                       render: (description: string) => (
                         <Text style={{ fontSize: '13px' }}>{description}</Text>
@@ -884,33 +890,33 @@ const TrendsPage: React.FC = () => {
         </TabPane>
 
         {/* 趋势预测 */}
-        <TabPane tab={<span><BulbOutlined />趋势预测</span>} key="predictions">
+        <TabPane tab={<span><BulbOutlined />{t('trends.tabPredictions')}</span>} key="predictions">
           <Row gutter={[16, 16]}>
             <Col xs={24} lg={12}>
-              <Card title="🚀 下一个崛起方向预测">
+              <Card title={`🚀 ${t('trends.predictionTitle')}`}>
                 <List
                   dataSource={[
                     {
-                      title: '多模态AI',
-                      description: '文本、图像、音频融合，GPT-4o引领趋势',
+                      title: t('trends.predictionMultimodal'),
+                      description: t('trends.predictionMultimodalDesc'),
                       trend: 'up',
                       confidence: 95
                     },
                     {
-                      title: 'AI Agent',
-                      description: '智能体将成为AI应用的主流形态',
+                      title: t('trends.predictionAgent'),
+                      description: t('trends.predictionAgentDesc'),
                       trend: 'up',
                       confidence: 90
                     },
                     {
-                      title: '端侧AI',
-                      description: '本地部署的小模型将快速发展',
+                      title: t('trends.predictionEdgeAI'),
+                      description: t('trends.predictionEdgeAIDesc'),
                       trend: 'up',
                       confidence: 85
                     },
                     {
-                      title: '代码生成',
-                      description: 'AI编程助手将重塑开发流程',
+                      title: t('trends.predictionCodeGen'),
+                      description: t('trends.predictionCodeGenDesc'),
                       trend: 'up',
                       confidence: 88
                     }
@@ -922,7 +928,7 @@ const TrendsPage: React.FC = () => {
                         title={
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <Text strong>{item.title}</Text>
-                            <Tag color="green">置信度 {item.confidence}%</Tag>
+                            <Tag color="green">{t('trends.predictionConfidence')} {item.confidence}%</Tag>
                           </div>
                         }
                         description={item.description}
@@ -934,27 +940,27 @@ const TrendsPage: React.FC = () => {
             </Col>
 
             <Col xs={24} lg={12}>
-              <Card title="🔥 热门工具生态">
+              <Card title={t('trends.toolEcosystemTitle')}>
                 <List
                   dataSource={[
                     {
-                      category: 'LLM框架',
+                      category: t('trends.toolCategoryLLM'),
                       tools: ['LangChain', 'LlamaIndex', 'Haystack', 'AutoGPT']
                     },
                     {
-                      category: 'AI编程',
+                      category: t('trends.toolCategoryAICoding'),
                       tools: ['GitHub Copilot', 'Cursor', 'Claude Dev', 'v0.dev']
                     },
                     {
-                      category: '图像生成',
+                      category: t('trends.toolCategoryImageGen'),
                       tools: ['Stable Diffusion', 'Midjourney', 'DALL-E 3', 'Flux']
                     },
                     {
-                      category: '向量数据库',
+                      category: t('trends.toolCategoryVectorDB'),
                       tools: ['Pinecone', 'Weaviate', 'Milvus', 'Chroma']
                     },
                     {
-                      category: '模型部署',
+                      category: t('trends.toolCategoryDeployment'),
                       tools: ['Ollama', 'vLLM', 'Hugging Face', 'Together AI']
                     }
                   ]}
