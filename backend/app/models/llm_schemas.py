@@ -185,6 +185,7 @@ class TestProviderResponse(BaseModel):
     """测试提供商连接响应"""
     success: bool
     message: str
+    message_code: Optional[str] = None  # 错误码用于前端国际化
     details: Optional[Dict[str, Any]] = None
 
 

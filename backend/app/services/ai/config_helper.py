@@ -2,28 +2,39 @@
 AI 配置辅助函数
 提供获取用户特定 AI 配置的工具函数
 """
-from typing import Optional
+from typing import Optional, Union
 from .azure_openai import AzureOpenAIService
+from .llm_service import UnifiedLLMService
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-def get_ai_service_for_user(user_id: Optional[int] = None) -> AzureOpenAIService:
+def get_ai_service_for_user(user_id: Optional[int] = None) -> Union[UnifiedLLMService, AzureOpenAIService]:
     """
     获取针对特定用户的 AI 服务实例
 
     配置优先级：
-    1. 用户个人配置（UserSettings）- 如果提供 user_id
-    2. 全局 AI 配置（AIConfig）
-    3. 环境变量配置（.env）
+    1. 用户的LLM Provider配置(新系统) - 如果存在
+    2. 用户个人配置（UserSettings）- 旧系统
+    3. 全局 AI 配置（AIConfig）
+    4. 环境变量配置（.env）
 
     Args:
         user_id: 用户ID，如果提供则使用该用户的个人配置
 
     Returns:
-        AzureOpenAIService 实例
+        UnifiedLLMService 或 AzureOpenAIService 实例
     """
+    # 优先使用新的LLM Provider系统
+    if user_id:
+        llm_service = UnifiedLLMService(user_id=user_id)
+        if llm_service.is_available():
+            logger.info(f"Using UnifiedLLMService for user {user_id}")
+            return llm_service
+
+    # 降级到旧的Azure OpenAI服务
+    logger.info(f"Falling back to AzureOpenAIService for user {user_id}")
     return AzureOpenAIService(user_id=user_id)
 
 

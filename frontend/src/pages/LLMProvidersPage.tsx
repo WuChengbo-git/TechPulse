@@ -23,12 +23,14 @@ import llmService, {
   CreateProviderData,
   UpdateProviderData
 } from '../services/llmService'
+import { useLanguage } from '../contexts/LanguageContext'
 
 const { Title, Text, Paragraph } = Typography
 const { TabPane } = Tabs
 const { Option } = Select
 
 const LLMProvidersPage: React.FC = () => {
+  const { t } = useLanguage()
   const [providers, setProviders] = useState<LLMProvider[]>([])
   const [templates, setTemplates] = useState<{
     cloud_providers: ProviderTemplate[]
@@ -64,10 +66,11 @@ const LLMProvidersPage: React.FC = () => {
     try {
       setLoading(true)
       const data = await llmService.listProviders()
+      console.log('API返回的providers数据:', data)
       setProviders(data)
     } catch (error: any) {
       if (error.response?.status !== 401) {
-        message.error('加载提供商列表失败')
+        message.error(t('llmProviders.loadProvidersFailed'))
       }
     } finally {
       setLoading(false)
@@ -79,8 +82,16 @@ const LLMProvidersPage: React.FC = () => {
       const models = await llmService.listModels(providerId)
       setCurrentProviderModels(models)
     } catch (error) {
-      message.error('加载模型列表失败')
+      message.error(t('llmProviders.loadModelsFailed'))
     }
+  }
+
+  // 关闭模态框
+  const handleCloseModal = () => {
+    setModalVisible(false)
+    setEditingProvider(null)
+    setSelectedTemplate(null)
+    form.resetFields()
   }
 
   // 打开添加提供商模态框
@@ -93,7 +104,9 @@ const LLMProvidersPage: React.FC = () => {
 
   // 打开编辑提供商模态框
   const handleEditProvider = async (provider: LLMProvider) => {
-    setEditingProvider(provider)
+    console.log('编辑Provider - 原始数据:', provider)
+    console.log('  is_enabled:', provider.is_enabled, 'type:', typeof provider.is_enabled)
+    console.log('  is_default:', provider.is_default, 'type:', typeof provider.is_default)
 
     // 查找对应的模板
     const allTemplates = [
@@ -101,21 +114,28 @@ const LLMProvidersPage: React.FC = () => {
       ...(templates?.local_providers || [])
     ]
     const template = allTemplates.find(t => t.category === provider.provider_category)
-    setSelectedTemplate(template || null)
 
-    // 设置表单值
-    form.setFieldsValue({
-      provider_name: provider.provider_name,
-      provider_category: provider.provider_category,
-      is_enabled: provider.is_enabled,
-      is_default: provider.is_default,
-      ...provider.config
-    })
+    // 先打开模态框
+    setEditingProvider(provider)
+    setSelectedTemplate(template || null)
+    setModalVisible(true)
+
+    // 使用 setTimeout 确保模态框完全渲染后再设置表单值
+    setTimeout(() => {
+      // 设置表单值
+      const formValues = {
+        provider_name: provider.provider_name,
+        provider_category: provider.provider_category,
+        is_enabled: provider.is_enabled,
+        is_default: provider.is_default,
+        ...provider.config
+      }
+      console.log('设置表单值:', formValues)
+      form.setFieldsValue(formValues)
+    }, 0)
 
     // 加载模型列表
     await loadProviderModels(provider.id)
-
-    setModalVisible(true)
   }
 
   // 选择模板
@@ -129,7 +149,10 @@ const LLMProvidersPage: React.FC = () => {
 
     // 设置默认值
     if (template) {
-      const defaultConfig: any = {}
+      const defaultConfig: any = {
+        is_enabled: true,  // 默认启用
+        is_default: false  // 默认不设为默认提供商
+      }
       template.config_fields.forEach(field => {
         if (field.default) {
           defaultConfig[field.name] = field.default
@@ -146,7 +169,7 @@ const LLMProvidersPage: React.FC = () => {
       const values = form.getFieldsValue()
 
       if (!selectedTemplate) {
-        message.warning('请先选择提供商类型')
+        message.warning(t('llmProviders.selectProviderTypeFirst'))
         return
       }
 
@@ -155,8 +178,10 @@ const LLMProvidersPage: React.FC = () => {
       // 构建配置对象
       const config: Record<string, any> = {}
       selectedTemplate.config_fields.forEach(field => {
-        if (values[field.name]) {
-          config[field.name] = values[field.name]
+        // 使用用户输入的值，如果没有则使用默认值
+        const value = values[field.name] || field.default
+        if (value) {
+          config[field.name] = value
         }
       })
 
@@ -166,13 +191,40 @@ const LLMProvidersPage: React.FC = () => {
         test_model: values.test_model
       })
 
+      // 根据错误码翻译消息
+      let translatedMessage = result.message
+      if (result.message_code) {
+        switch (result.message_code) {
+          case 'OLLAMA_CONNECTION_SUCCESS':
+            translatedMessage = t('llmProviders.ollamaConnectionSuccess').replace('{count}', result.details?.model_count || 0)
+            break
+          case 'OLLAMA_HTTP_ERROR':
+            translatedMessage = t('llmProviders.ollamaHttpError').replace('{code}', result.details?.status_code || '')
+            break
+          case 'OLLAMA_CONNECTION_ERROR':
+            translatedMessage = t('llmProviders.ollamaConnectionError').replace('{error}', result.details?.error || '')
+            break
+          case 'CONNECTION_SUCCESS':
+            translatedMessage = t('llmProviders.connectionSuccess')
+            break
+          case 'TEST_NOT_SUPPORTED':
+            translatedMessage = t('llmProviders.testNotSupported').replace('{category}', result.details?.category || '')
+            break
+          case 'TEST_FAILED':
+            translatedMessage = t('llmProviders.testFailed').replace('{error}', result.details?.error || '')
+            break
+          default:
+            translatedMessage = result.message
+        }
+      }
+
       if (result.success) {
-        message.success(result.message)
+        message.success(translatedMessage)
       } else {
-        message.error(result.message)
+        message.error(translatedMessage)
       }
     } catch (error: any) {
-      message.error('测试连接失败')
+      message.error(t('llmProviders.testConnectionFailed'))
     } finally {
       setTestingConnection(false)
     }
@@ -184,7 +236,7 @@ const LLMProvidersPage: React.FC = () => {
       const values = await form.validateFields()
 
       if (!selectedTemplate && !editingProvider) {
-        message.warning('请先选择提供商类型')
+        message.warning(t('llmProviders.selectProviderTypeFirst'))
         return
       }
 
@@ -195,15 +247,17 @@ const LLMProvidersPage: React.FC = () => {
       )
 
       if (!template) {
-        message.error('无法找到提供商模板')
+        message.error(t('llmProviders.providerTemplateNotFound'))
         return
       }
 
       // 构建配置对象
       const config: Record<string, any> = {}
       template.config_fields.forEach(field => {
-        if (values[field.name] !== undefined) {
-          config[field.name] = values[field.name]
+        // 使用用户输入的值，如果为空字符串或undefined则使用默认值
+        const value = values[field.name] || field.default
+        if (value !== undefined) {
+          config[field.name] = value
         }
       })
 
@@ -215,7 +269,7 @@ const LLMProvidersPage: React.FC = () => {
           is_enabled: values.is_enabled,
           is_default: values.is_default
         })
-        message.success('提供商更新成功')
+        message.success(t('llmProviders.providerUpdatedSuccess'))
       } else {
         // 创建
         await llmService.createProvider({
@@ -226,16 +280,16 @@ const LLMProvidersPage: React.FC = () => {
           is_enabled: values.is_enabled ?? true,
           is_default: values.is_default ?? false
         })
-        message.success('提供商创建成功')
+        message.success(t('llmProviders.providerCreatedSuccess'))
       }
 
-      setModalVisible(false)
+      handleCloseModal()
       loadProviders()
     } catch (error: any) {
       if (error.errorFields) {
-        message.error('请填写必填字段')
+        message.error(t('llmProviders.fillRequiredFields'))
       } else {
-        message.error('保存失败')
+        message.error(t('llmProviders.saveFailed'))
       }
     }
   }
@@ -244,10 +298,10 @@ const LLMProvidersPage: React.FC = () => {
   const handleDeleteProvider = async (providerId: number) => {
     try {
       await llmService.deleteProvider(providerId)
-      message.success('提供商删除成功')
+      message.success(t('llmProviders.providerDeletedSuccess'))
       loadProviders()
     } catch (error) {
-      message.error('删除失败')
+      message.error(t('llmProviders.deleteFailed'))
     }
   }
 
@@ -287,14 +341,14 @@ const LLMProvidersPage: React.FC = () => {
         ...values
       })
 
-      message.success('模型添加成功')
+      message.success(t('llmProviders.modelAddedSuccess'))
       setModelModalVisible(false)
       await loadProviderModels(editingProvider.id)
     } catch (error: any) {
       if (error.errorFields) {
-        message.error('请填写必填字段')
+        message.error(t('llmProviders.fillRequiredFields'))
       } else {
-        message.error('保存模型失败')
+        message.error(t('llmProviders.saveModelFailed'))
       }
     }
   }
@@ -303,19 +357,19 @@ const LLMProvidersPage: React.FC = () => {
   const handleDeleteModel = async (modelId: number) => {
     try {
       await llmService.deleteModel(modelId)
-      message.success('模型删除成功')
+      message.success(t('llmProviders.modelDeletedSuccess'))
       if (editingProvider) {
         await loadProviderModels(editingProvider.id)
       }
     } catch (error) {
-      message.error('删除模型失败')
+      message.error(t('llmProviders.deleteModelFailed'))
     }
   }
 
   // 表格列定义
   const columns: ColumnsType<LLMProvider> = [
     {
-      title: '提供商名称',
+      title: t('llmProviders.providerName'),
       dataIndex: 'provider_name',
       key: 'provider_name',
       render: (name, record) => (
@@ -326,12 +380,12 @@ const LLMProvidersPage: React.FC = () => {
             <DesktopOutlined style={{ color: '#52c41a' }} />
           )}
           <Text strong>{name}</Text>
-          {record.is_default && <Tag color="blue">默认</Tag>}
+          {record.is_default && <Tag color="blue">{t('llmProviders.default')}</Tag>}
         </Space>
       )
     },
     {
-      title: '类型',
+      title: t('llmProviders.type'),
       dataIndex: 'provider_category',
       key: 'provider_category',
       render: (category) => {
@@ -341,27 +395,27 @@ const LLMProvidersPage: React.FC = () => {
           anthropic: 'Anthropic',
           ollama: 'Ollama',
           lm_studio: 'LM Studio',
-          custom: '自定义'
+          custom: t('llmProviders.custom')
         }
         return <Tag>{labels[category] || category}</Tag>
       }
     },
     {
-      title: '状态',
+      title: t('llmProviders.status'),
       key: 'status',
       render: (_, record) => (
         <Space>
           <Badge
             status={record.is_enabled ? 'success' : 'default'}
-            text={record.is_enabled ? '启用' : '禁用'}
+            text={record.is_enabled ? t('llmProviders.enabled') : t('llmProviders.disabled')}
           />
           {record.validation_status === 'success' && (
-            <Tooltip title="连接正常">
+            <Tooltip title={t('llmProviders.connectionNormal')}>
               <CheckCircleOutlined style={{ color: '#52c41a' }} />
             </Tooltip>
           )}
           {record.validation_status === 'failed' && (
-            <Tooltip title="连接失败">
+            <Tooltip title={t('llmProviders.connectionFailed')}>
               <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />
             </Tooltip>
           )}
@@ -369,13 +423,13 @@ const LLMProvidersPage: React.FC = () => {
       )
     },
     {
-      title: '创建时间',
+      title: t('llmProviders.createdAt'),
       dataIndex: 'created_at',
       key: 'created_at',
       render: (date) => new Date(date).toLocaleDateString('zh-CN')
     },
     {
-      title: '操作',
+      title: t('llmProviders.actions'),
       key: 'action',
       render: (_, record) => (
         <Space>
@@ -384,17 +438,17 @@ const LLMProvidersPage: React.FC = () => {
             icon={<EditOutlined />}
             onClick={() => handleEditProvider(record)}
           >
-            编辑
+            {t('llmProviders.edit')}
           </Button>
           <Popconfirm
-            title="确定删除此提供商吗？"
-            description="删除后将同时删除该提供商下的所有模型配置"
+            title={t('llmProviders.deleteProviderConfirm')}
+            description={t('llmProviders.deleteProviderWarning')}
             onConfirm={() => handleDeleteProvider(record.id)}
-            okText="确定"
-            cancelText="取消"
+            okText={t('llmProviders.confirm')}
+            cancelText={t('llmProviders.cancel')}
           >
             <Button type="link" danger icon={<DeleteOutlined />}>
-              删除
+              {t('llmProviders.delete')}
             </Button>
           </Popconfirm>
         </Space>
@@ -405,46 +459,46 @@ const LLMProvidersPage: React.FC = () => {
   // 模型表格列定义
   const modelColumns: ColumnsType<LLMModel> = [
     {
-      title: '模型名称',
+      title: t('llmProviders.modelName'),
       dataIndex: 'model_name',
       key: 'model_name',
       render: (name, record) => (
         <Space>
           <Text strong>{record.display_name || name}</Text>
-          {record.is_default && <Tag color="blue">默认</Tag>}
+          {record.is_default && <Tag color="blue">{t('llmProviders.default')}</Tag>}
         </Space>
       )
     },
     {
-      title: '最大Token',
+      title: t('llmProviders.maxTokens'),
       dataIndex: 'max_tokens',
       key: 'max_tokens'
     },
     {
-      title: '上下文窗口',
+      title: t('llmProviders.contextWindow'),
       dataIndex: 'context_window',
       key: 'context_window'
     },
     {
-      title: '状态',
+      title: t('llmProviders.status'),
       dataIndex: 'is_enabled',
       key: 'is_enabled',
       render: (enabled) => (
-        <Badge status={enabled ? 'success' : 'default'} text={enabled ? '启用' : '禁用'} />
+        <Badge status={enabled ? 'success' : 'default'} text={enabled ? t('llmProviders.enabled') : t('llmProviders.disabled')} />
       )
     },
     {
-      title: '操作',
+      title: t('llmProviders.actions'),
       key: 'action',
       render: (_, record) => (
         <Popconfirm
-          title="确定删除此模型吗？"
+          title={t('llmProviders.deleteModelConfirm')}
           onConfirm={() => handleDeleteModel(record.id)}
-          okText="确定"
-          cancelText="取消"
+          okText={t('llmProviders.confirm')}
+          cancelText={t('llmProviders.cancel')}
         >
           <Button type="link" danger size="small" icon={<DeleteOutlined />}>
-            删除
+            {t('llmProviders.delete')}
           </Button>
         </Popconfirm>
       )
@@ -456,19 +510,19 @@ const LLMProvidersPage: React.FC = () => {
       <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
         <Col>
           <Title level={2}>
-            <ApiOutlined /> LLM 模型管理
+            <ApiOutlined /> {t('llmProviders.pageTitle')}
           </Title>
           <Paragraph type="secondary">
-            管理云端和本地 LLM 提供商，配置模型参数
+            {t('llmProviders.pageDescription')}
           </Paragraph>
         </Col>
         <Col>
           <Space>
             <Button icon={<ReloadOutlined />} onClick={loadProviders}>
-              刷新
+              {t('llmProviders.refresh')}
             </Button>
             <Button type="primary" icon={<PlusOutlined />} onClick={handleAddProvider}>
-              添加提供商
+              {t('llmProviders.addProvider')}
             </Button>
           </Space>
         </Col>
@@ -481,32 +535,32 @@ const LLMProvidersPage: React.FC = () => {
           loading={loading}
           rowKey="id"
           pagination={{ pageSize: 10 }}
-          locale={{ emptyText: '暂无提供商，点击"添加提供商"开始配置' }}
+          locale={{ emptyText: t('llmProviders.noProvidersHint') }}
         />
       </Card>
 
       {/* 提供商配置模态框 */}
       <Modal
-        title={editingProvider ? '编辑提供商' : '添加提供商'}
+        title={editingProvider ? t('llmProviders.editProvider') : t('llmProviders.addProvider')}
         open={modalVisible}
         onOk={handleSaveProvider}
-        onCancel={() => setModalVisible(false)}
+        onCancel={handleCloseModal}
         width={800}
-        okText="保存"
-        cancelText="取消"
+        okText={t('llmProviders.save')}
+        cancelText={t('llmProviders.cancel')}
       >
         <Form form={form} layout="vertical">
           {!editingProvider && (
             <Form.Item
-              label="提供商类型"
+              label={t('llmProviders.providerType')}
               name="provider_category"
-              rules={[{ required: true, message: '请选择提供商类型' }]}
+              rules={[{ required: true, message: t('llmProviders.selectProviderType') }]}
             >
               <Select
-                placeholder="选择提供商类型"
+                placeholder={t('llmProviders.chooseProviderType')}
                 onChange={handleSelectTemplate}
               >
-                <Select.OptGroup label="云端提供商">
+                <Select.OptGroup label={t('llmProviders.cloudProvider')}>
                   {templates?.cloud_providers.map(t => (
                     <Option key={t.category} value={t.category}>
                       <Space>
@@ -516,7 +570,7 @@ const LLMProvidersPage: React.FC = () => {
                     </Option>
                   ))}
                 </Select.OptGroup>
-                <Select.OptGroup label="本地提供商">
+                <Select.OptGroup label={t('llmProviders.localProvider')}>
                   {templates?.local_providers.map(t => (
                     <Option key={t.category} value={t.category}>
                       <Space>
@@ -541,11 +595,11 @@ const LLMProvidersPage: React.FC = () => {
           )}
 
           <Form.Item
-            label="提供商名称"
+            label={t('llmProviders.providerName')}
             name="provider_name"
-            rules={[{ required: true, message: '请输入提供商名称' }]}
+            rules={[{ required: true, message: t('llmProviders.inputProviderName') }]}
           >
-            <Input placeholder="例如：我的OpenAI" />
+            <Input placeholder={t('llmProviders.exampleOpenAI')} />
           </Form.Item>
 
           {selectedTemplate?.config_fields.map(field => (
@@ -553,7 +607,7 @@ const LLMProvidersPage: React.FC = () => {
               key={field.name}
               label={field.label}
               name={field.name}
-              rules={[{ required: field.required, message: `请输入${field.label}` }]}
+              rules={[{ required: field.required, message: `Please enter ${field.label}` }]}
             >
               {field.type === 'password' ? (
                 <Input.Password placeholder={field.default} />
@@ -564,13 +618,19 @@ const LLMProvidersPage: React.FC = () => {
           ))}
 
           <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-            <Form.Item name="is_enabled" valuePropName="checked" noStyle>
-              <Switch /> <Text style={{ marginLeft: 8 }}>启用</Text>
-            </Form.Item>
+            <Space>
+              <Form.Item name="is_enabled" valuePropName="checked" noStyle>
+                <Switch />
+              </Form.Item>
+              <Text style={{ marginLeft: 8 }}>{t('llmProviders.enabled')}</Text>
+            </Space>
 
-            <Form.Item name="is_default" valuePropName="checked" noStyle>
-              <Switch /> <Text style={{ marginLeft: 8 }}>设为默认</Text>
-            </Form.Item>
+            <Space>
+              <Form.Item name="is_default" valuePropName="checked" noStyle>
+                <Switch />
+              </Form.Item>
+              <Text style={{ marginLeft: 8 }}>{t('llmProviders.setAsDefault')}</Text>
+            </Space>
 
             {selectedTemplate && (
               <Button
@@ -578,7 +638,7 @@ const LLMProvidersPage: React.FC = () => {
                 onClick={handleTestConnection}
                 loading={testingConnection}
               >
-                测试连接
+                {t('llmProviders.testConnection')}
               </Button>
             )}
           </Space>
@@ -588,20 +648,20 @@ const LLMProvidersPage: React.FC = () => {
             <>
               <div style={{ marginTop: 24, marginBottom: 16 }}>
                 <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-                  <Title level={5}>模型配置</Title>
+                  <Title level={5}>{t('llmProviders.modelConfiguration')}</Title>
                   <Button
                     type="dashed"
                     icon={<PlusOutlined />}
                     onClick={handleAddModel}
                   >
-                    添加模型
+                    {t('llmProviders.addModel')}
                   </Button>
                 </Space>
               </div>
 
               {selectedTemplate && selectedTemplate.default_models.length > 0 && (
                 <Alert
-                  message="快速添加"
+                  message={t('llmProviders.quickAdd')}
                   description={
                     <Space wrap>
                       {selectedTemplate.default_models.map(model => (
@@ -626,7 +686,7 @@ const LLMProvidersPage: React.FC = () => {
                 rowKey="id"
                 size="small"
                 pagination={false}
-                locale={{ emptyText: '暂无模型，点击"添加模型"或使用快速添加' }}
+                locale={{ emptyText: t('llmProviders.noModelsHint') }}
               />
             </>
           )}
@@ -635,43 +695,43 @@ const LLMProvidersPage: React.FC = () => {
 
       {/* 添加模型模态框 */}
       <Modal
-        title="添加模型"
+        title={t('llmProviders.addModel')}
         open={modelModalVisible}
         onOk={handleSaveModel}
         onCancel={() => setModelModalVisible(false)}
-        okText="保存"
-        cancelText="取消"
+        okText={t('llmProviders.save')}
+        cancelText={t('llmProviders.cancel')}
       >
         <Form form={modelForm} layout="vertical">
           <Form.Item
-            label="模型名称"
+            label={t('llmProviders.modelName')}
             name="model_name"
-            rules={[{ required: true, message: '请输入模型名称' }]}
+            rules={[{ required: true, message: t('llmProviders.inputModelName') }]}
           >
-            <Input placeholder="例如：gpt-4o" />
+            <Input placeholder={t('llmProviders.exampleGPT4')} />
           </Form.Item>
 
-          <Form.Item label="显示名称" name="display_name">
-            <Input placeholder="例如：GPT-4o" />
+          <Form.Item label={t('llmProviders.displayName')} name="display_name">
+            <Input placeholder={t('llmProviders.exampleGPT4Display')} />
           </Form.Item>
 
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                label="最大Token数"
+                label={t('llmProviders.maxTokenCount')}
                 name="max_tokens"
                 initialValue={4096}
-                rules={[{ required: true, message: '请输入最大Token数' }]}
+                rules={[{ required: true, message: t('llmProviders.inputMaxTokens') }]}
               >
                 <InputNumber min={1} style={{ width: '100%' }} />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-                label="上下文窗口"
+                label={t('llmProviders.contextWindow')}
                 name="context_window"
                 initialValue={4096}
-                rules={[{ required: true, message: '请输入上下文窗口' }]}
+                rules={[{ required: true, message: t('llmProviders.inputContextWindow') }]}
               >
                 <InputNumber min={1} style={{ width: '100%' }} />
               </Form.Item>
@@ -680,11 +740,11 @@ const LLMProvidersPage: React.FC = () => {
 
           <Space style={{ width: '100%', justifyContent: 'space-between' }}>
             <Form.Item name="is_enabled" valuePropName="checked" initialValue={true} noStyle>
-              <Switch defaultChecked /> <Text style={{ marginLeft: 8 }}>启用</Text>
+              <Switch defaultChecked /> <Text style={{ marginLeft: 8 }}>{t('llmProviders.enabled')}</Text>
             </Form.Item>
 
             <Form.Item name="is_default" valuePropName="checked" initialValue={false} noStyle>
-              <Switch /> <Text style={{ marginLeft: 8 }}>设为默认</Text>
+              <Switch /> <Text style={{ marginLeft: 8 }}>{t('llmProviders.setAsDefault')}</Text>
             </Form.Item>
           </Space>
         </Form>

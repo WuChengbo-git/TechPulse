@@ -154,6 +154,7 @@ export interface TestConnectionRequest {
 export interface TestConnectionResponse {
   success: boolean
   message: string
+  message_code?: string  // 错误码用于前端国际化
   details?: Record<string, any>
 }
 

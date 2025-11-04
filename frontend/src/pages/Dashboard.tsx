@@ -38,10 +38,52 @@ interface Language {
 }
 
 const Dashboard: React.FC = () => {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const [cards, setCards] = useState<TechCard[]>([])
   const [filteredCards, setFilteredCards] = useState<TechCard[]>([])
   const [loading, setLoading] = useState(true)
+
+  // 翻译summary中的中文标签
+  const translateSummary = (summary: string): string => {
+    if (!summary) return summary
+
+    // 根据当前语言翻译标签
+    const translations: Record<string, Record<string, string>> = {
+      'zh-CN': {
+        '作者:': '作者:',
+        '点赞:': '点赞:',
+        '关键词:': '关键词:',
+        'Author:': '作者:',
+        'Likes:': '点赞:',
+        'Keyword:': '关键词:'
+      },
+      'en-US': {
+        '作者:': 'Author:',
+        '点赞:': 'Likes:',
+        '关键词:': 'Keyword:',
+        'Author:': 'Author:',
+        'Likes:': 'Likes:',
+        'Keyword:': 'Keyword:'
+      },
+      'ja-JP': {
+        '作者:': '著者:',
+        '点赞:': 'いいね:',
+        '关键词:': 'キーワード:',
+        'Author:': '著者:',
+        'Likes:': 'いいね:',
+        'Keyword:': 'キーワード:'
+      }
+    }
+
+    let translatedSummary = summary
+    const langTranslations = translations[language] || translations['en-US']
+
+    Object.entries(langTranslations).forEach(([from, to]) => {
+      translatedSummary = translatedSummary.replace(new RegExp(from, 'g'), to)
+    })
+
+    return translatedSummary
+  }
   const [error, setError] = useState<string | null>(null)
   const [languages, setLanguages] = useState<Record<string, Language>>({})
   const [currentLanguage, setCurrentLanguage] = useState('zh')
@@ -134,7 +176,14 @@ const Dashboard: React.FC = () => {
 
   const fetchServiceStatus = async () => {
     try {
-      const response = await fetch('/api/v1/status')
+      // 获取token (优先从localStorage,然后从sessionStorage)
+      const token = localStorage.getItem('techpulse_token') || sessionStorage.getItem('techpulse_token')
+
+      const response = await fetch('/api/v1/status', {
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : ''
+        }
+      })
       if (response.ok) {
         const data = await response.json()
         setServiceStatus(data)
@@ -168,25 +217,29 @@ const Dashboard: React.FC = () => {
 
     try {
       setTranslationLoading(true)
+      const token = localStorage.getItem('techpulse_token') || sessionStorage.getItem('techpulse_token')
       const response = await fetch('/api/v1/translate/card', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
+        },
         body: JSON.stringify({ card_id: cardId, target_language: currentLanguage })
       })
       
       if (response.ok) {
         const data = await response.json()
         Modal.info({
-          title: '翻译结果',
+          title: t('dashboard.translationResult'),
           content: (
             <div>
-              <p><strong>原文概要：</strong></p>
+              <p><strong>{t('dashboard.originalSummary')}</strong></p>
               <p>{data.original_summary}</p>
-              <p><strong>翻译概要：</strong></p>
+              <p><strong>{t('dashboard.translatedSummary')}</strong></p>
               <p>{data.translated_summary}</p>
               {data.translated_trial_suggestion && (
                 <>
-                  <p><strong>试用建议：</strong></p>
+                  <p><strong>{t('dashboard.trialSuggestion')}</strong></p>
                   <p>{data.translated_trial_suggestion}</p>
                 </>
               )}
@@ -293,7 +346,7 @@ const Dashboard: React.FC = () => {
       })
 
       if (response.ok) {
-        message.success('已保存到Notion！')
+        message.success(t('dashboard.savedToNotion'))
         setDetailModalVisible(false)
       } else {
         message.error('Save failed')
@@ -544,11 +597,11 @@ const Dashboard: React.FC = () => {
 
               {/* 摘要 */}
               {card.summary && (
-                <Paragraph 
+                <Paragraph
                   ellipsis={{ rows: 3, expandable: false }}
                   style={{ fontSize: '12px', marginBottom: 12 }}
                 >
-                  {card.summary}
+                  {translateSummary(card.summary)}
                 </Paragraph>
               )}
 

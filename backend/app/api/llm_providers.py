@@ -35,11 +35,11 @@ async def get_provider_templates():
             category=ProviderCategory.OPENAI,
             name="OpenAI",
             type=ProviderType.CLOUD,
-            description="OpenAI官方API，支持GPT-4、GPT-3.5等模型",
+            description="OpenAI official API, supports GPT-4, GPT-3.5 and other models",
             config_fields=[
                 {"name": "api_key", "type": "password", "required": True, "label": "API Key"},
-                {"name": "base_url", "type": "text", "required": False, "label": "Base URL（可选）", "default": "https://api.openai.com/v1"},
-                {"name": "organization", "type": "text", "required": False, "label": "Organization ID（可选）"}
+                {"name": "base_url", "type": "text", "required": False, "label": "Base URL (Optional)", "default": "https://api.openai.com/v1"},
+                {"name": "organization", "type": "text", "required": False, "label": "Organization ID (Optional)"}
             ],
             default_models=[
                 {"model_name": "gpt-4o", "display_name": "GPT-4o", "max_tokens": 128000, "context_window": 128000},
@@ -52,7 +52,7 @@ async def get_provider_templates():
             category=ProviderCategory.AZURE_OPENAI,
             name="Azure OpenAI",
             type=ProviderType.CLOUD,
-            description="Microsoft Azure OpenAI服务",
+            description="Microsoft Azure OpenAI Service",
             config_fields=[
                 {"name": "api_key", "type": "password", "required": True, "label": "API Key"},
                 {"name": "endpoint", "type": "text", "required": True, "label": "Endpoint URL"},
@@ -67,10 +67,10 @@ async def get_provider_templates():
             category=ProviderCategory.ANTHROPIC,
             name="Anthropic",
             type=ProviderType.CLOUD,
-            description="Anthropic Claude系列模型",
+            description="Anthropic Claude series models",
             config_fields=[
                 {"name": "api_key", "type": "password", "required": True, "label": "API Key"},
-                {"name": "base_url", "type": "text", "required": False, "label": "Base URL（可选）"}
+                {"name": "base_url", "type": "text", "required": False, "label": "Base URL (Optional)"}
             ],
             default_models=[
                 {"model_name": "claude-3-5-sonnet-20241022", "display_name": "Claude 3.5 Sonnet", "max_tokens": 200000, "context_window": 200000},
@@ -85,9 +85,9 @@ async def get_provider_templates():
             category=ProviderCategory.OLLAMA,
             name="Ollama",
             type=ProviderType.LOCAL,
-            description="本地运行的开源大语言模型",
+            description="Open source large language models running locally",
             config_fields=[
-                {"name": "base_url", "type": "text", "required": True, "label": "服务地址", "default": "http://localhost:11434"}
+                {"name": "base_url", "type": "text", "required": True, "label": "Base URL", "default": "http://localhost:11434"}
             ],
             default_models=[
                 {"model_name": "llama2", "display_name": "Llama 2", "max_tokens": 4096, "context_window": 4096},
@@ -100,20 +100,20 @@ async def get_provider_templates():
             category=ProviderCategory.LM_STUDIO,
             name="LM Studio",
             type=ProviderType.LOCAL,
-            description="LM Studio本地模型服务",
+            description="LM Studio local model service",
             config_fields=[
-                {"name": "base_url", "type": "text", "required": True, "label": "服务地址", "default": "http://localhost:1234/v1"}
+                {"name": "base_url", "type": "text", "required": True, "label": "Base URL", "default": "http://localhost:1234/v1"}
             ],
             default_models=[]
         ),
         ProviderTemplate(
             category=ProviderCategory.CUSTOM,
-            name="自定义OpenAI兼容服务",
+            name="Custom OpenAI-Compatible Service",
             type=ProviderType.LOCAL,
-            description="支持OpenAI API格式的自定义服务",
+            description="Custom service supporting OpenAI API format",
             config_fields=[
-                {"name": "base_url", "type": "text", "required": True, "label": "服务地址"},
-                {"name": "api_key", "type": "password", "required": False, "label": "API Key（如果需要）"}
+                {"name": "base_url", "type": "text", "required": True, "label": "Base URL"},
+                {"name": "api_key", "type": "password", "required": False, "label": "API Key (If Required)"}
             ],
             default_models=[]
         )
@@ -448,18 +448,19 @@ async def test_provider_connection(
         category = test_request.provider_category
         config = test_request.config
 
-        # 根据不同的提供商类型进行测试
+        # Test different provider types
         if category == ProviderCategory.OPENAI:
-            # 测试OpenAI连接
-            # TODO: 实现OpenAI连接测试
+            # Test OpenAI connection
+            # TODO: Implement OpenAI connection test
             return TestProviderResponse(
                 success=True,
-                message="OpenAI连接测试成功",
+                message="OpenAI connection test successful",
+                message_code="CONNECTION_SUCCESS",
                 details={"test_model": test_request.test_model or "gpt-3.5-turbo"}
             )
 
         elif category == ProviderCategory.AZURE_OPENAI:
-            # 测试Azure OpenAI连接
+            # Test Azure OpenAI connection
             service = AzureOpenAIService(
                 api_key=config.get("api_key"),
                 endpoint=config.get("endpoint"),
@@ -474,38 +475,49 @@ async def test_provider_connection(
             )
 
         elif category == ProviderCategory.OLLAMA:
-            # 测试Ollama连接
+            # Test Ollama connection
             import requests
             base_url = config.get("base_url", "http://localhost:11434")
             try:
-                response = requests.get(f"{base_url}/api/tags", timeout=5)
+                # 禁用代理以直接连接本地服务
+                proxies = {"http": None, "https": None}
+                response = requests.get(f"{base_url}/api/tags", timeout=5, proxies=proxies)
                 if response.status_code == 200:
                     models = response.json().get("models", [])
                     return TestProviderResponse(
                         success=True,
-                        message=f"Ollama连接成功，发现{len(models)}个模型",
-                        details={"models": [m["name"] for m in models]}
+                        message=f"Ollama connected successfully, found {len(models)} model(s)",
+                        message_code="OLLAMA_CONNECTION_SUCCESS",
+                        details={"models": [m["name"] for m in models], "model_count": len(models)}
                     )
                 else:
                     return TestProviderResponse(
                         success=False,
-                        message=f"Ollama连接失败: HTTP {response.status_code}"
+                        message=f"Ollama connection failed: HTTP {response.status_code}",
+                        message_code="OLLAMA_HTTP_ERROR",
+                        details={"status_code": response.status_code}
                     )
             except Exception as e:
                 return TestProviderResponse(
                     success=False,
-                    message=f"Ollama连接失败: {str(e)}"
+                    message=f"Ollama connection failed: {str(e)}",
+                    message_code="OLLAMA_CONNECTION_ERROR",
+                    details={"error": str(e)}
                 )
 
         else:
-            # 其他提供商
+            # Other providers
             return TestProviderResponse(
                 success=False,
-                message=f"暂不支持 {category} 的连接测试"
+                message=f"Connection test not supported for {category}",
+                message_code="TEST_NOT_SUPPORTED",
+                details={"category": category}
             )
 
     except Exception as e:
         return TestProviderResponse(
             success=False,
-            message=f"连接测试失败: {str(e)}"
+            message=f"Connection test failed: {str(e)}",
+            message_code="TEST_FAILED",
+            details={"error": str(e)}
         )
