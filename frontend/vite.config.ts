@@ -10,7 +10,7 @@ export default defineConfig({
     open: false,  // 关闭自动打开浏览器，避免使用 localhost
     proxy: {
       '/api': {
-        target: 'http://localhost:8001',
+        target: 'http://localhost:8000',
         changeOrigin: true,
       },
     },
