@@ -1769,7 +1769,9 @@ export const translations: Record<Language, Translations> = {
 
     settings: {
       pageTitle: 'System Settings',
-      pageDescription: 'Configure AI models, knowledge base integration, personalized recommendations and user preferences',
+      pageDescription: 'Configure knowledge base integration, personalized recommendations and user preferences',
+      aiModelsMovedTitle: 'AI Model Configuration Moved to Dedicated Page',
+      aiModelsMovedDescription: 'AI model configuration has been moved to the "LLM Providers" page. You can find it under "System Management > LLM Providers".',
       aiModelsTab: 'AI Models',
       integrationsTab: 'Knowledge Base',
       personalizationTab: 'Personalization',
@@ -2690,7 +2692,9 @@ export const translations: Record<Language, Translations> = {
 
     settings: {
       pageTitle: 'システム設定',
-      pageDescription: 'AIモデル、ナレッジベース統合、パーソナライズ推奨、ユーザー設定を構成',
+      pageDescription: 'ナレッジベース統合、パーソナライズ推奨、ユーザー設定を構成',
+      aiModelsMovedTitle: 'AIモデル設定は専用ページに移動しました',
+      aiModelsMovedDescription: 'AIモデルの設定機能は「LLM モデル管理」ページに移動しました。「システム管理 > LLM モデル管理」でご確認いただけます。',
       aiModelsTab: 'AIモデル設定',
       integrationsTab: 'ナレッジベース統合',
       personalizationTab: 'パーソナライズ推奨',
