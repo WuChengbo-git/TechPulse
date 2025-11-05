@@ -852,7 +852,9 @@ export const translations: Record<Language, Translations> = {
 
     settings: {
       pageTitle: '系统设置',
-      pageDescription: '配置 AI 模型、知识库集成、个性化推荐和用户偏好',
+      pageDescription: '配置知识库集成、个性化推荐和用户偏好',
+      aiModelsMovedTitle: 'AI 模型配置已移至专用页面',
+      aiModelsMovedDescription: 'AI 模型的配置功能已移至"LLM 模型管理"页面，您可以在"系统管理 > LLM 模型管理"中找到它。',
       aiModelsTab: 'AI 模型配置',
       integrationsTab: '知识库集成',
       personalizationTab: '个性化推荐',
