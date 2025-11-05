@@ -10,12 +10,21 @@ import VersionInfo from './components/VersionInfo'
 import InterestSurvey from './components/InterestSurvey'
 import type { UserPreferences } from './components/InterestSurvey'
 import { APP_VERSION } from './config/version'
+// New v0.4.0 pages
+import DiscoverPage from './pages/DiscoverPage'
+import ExplorePage from './pages/ExplorePage'
+import DetailPage from './pages/DetailPage'
+import CollectionsPage from './pages/CollectionsPage'
+
+// Legacy pages (will be phased out)
 import Dashboard from './pages/Dashboard'
 import Overview from './pages/Overview'
 import GitHubPage from './pages/GitHubPage'
 import ArxivPage from './pages/ArxivPage'
 import HuggingFacePage from './pages/HuggingFacePage'
 import ZennPage from './pages/ZennPage'
+
+// Other pages
 import Chat from './pages/Chat'
 import Analytics from './pages/Analytics'
 import TrendsPage from './pages/TrendsPage'
@@ -44,24 +53,34 @@ function AppContent() {
 
   // 从路由路径推断选中的菜单项
   const getSelectedKeyFromPath = (pathname: string) => {
+    // Handle detail page specially (always select 'discover')
+    if (pathname.startsWith('/detail/')) {
+      return 'discover'
+    }
+
     const pathMap: Record<string, string> = {
-      '/': 'dashboard',
-      '/dashboard': 'dashboard',
+      '/': 'discover',
+      '/discover': 'discover',
+      '/explore': 'explore',
+      '/collections': 'collections',
       '/trending': 'trending',
+      '/trends': 'trends',
+      '/chat': 'chat',
+      // Legacy paths (kept for backward compatibility)
+      '/dashboard': 'dashboard',
       '/github': 'github',
       '/arxiv': 'arxiv',
       '/huggingface': 'huggingface',
       '/zenn': 'zenn',
       '/analytics': 'analytics',
-      '/trends': 'trends',
-      '/chat': 'chat',
+      // System management
       '/settings': 'settings',
       '/api-config': 'api-config',
       '/llm-providers': 'llm-providers',
       '/tasks': 'tasks',
       '/status': 'status'
     }
-    return pathMap[pathname] || 'dashboard'
+    return pathMap[pathname] || 'discover'
   }
 
   const selectedKey = getSelectedKeyFromPath(location.pathname)
@@ -69,22 +88,28 @@ function AppContent() {
   // 菜单选择处理 - 使用路由导航
   const handleMenuSelect = (key: string) => {
     const keyToPath: Record<string, string> = {
-      'dashboard': '/dashboard',
+      // New v0.4.0 pages
+      'discover': '/discover',
+      'explore': '/explore',
+      'collections': '/collections',
       'trending': '/trending',
+      'trends': '/trends',
+      'chat': '/chat',
+      // Legacy pages (kept for backward compatibility)
+      'dashboard': '/dashboard',
       'github': '/github',
       'arxiv': '/arxiv',
       'huggingface': '/huggingface',
       'zenn': '/zenn',
       'analytics': '/analytics',
-      'trends': '/trends',
-      'chat': '/chat',
+      // System management
       'settings': '/settings',
       'api-config': '/api-config',
       'llm-providers': '/llm-providers',
       'tasks': '/tasks',
       'status': '/status'
     }
-    navigate(keyToPath[key] || '/dashboard')
+    navigate(keyToPath[key] || '/discover')
   }
 
   // 动态更新页面标题
@@ -218,15 +243,22 @@ function AppContent() {
 
   const getBreadcrumbItems = () => {
     const breadcrumbMap: Record<string, string[]> = {
-      dashboard: [t('nav.home'), t('nav.dashboard')],
+      // New v0.4.0 pages
+      discover: [t('nav.home'), t('discover.title') || '今日精选'],
+      explore: [t('nav.home'), t('explore.title') || '数据探索'],
+      collections: [t('nav.home'), t('collections.title') || '我的收藏'],
+      // Trending & Analysis
       trending: [t('nav.home'), t('nav.trending')],
+      trends: [t('nav.analytics'), t('nav.trendAnalysis')],
+      chat: [t('nav.analytics'), t('nav.aiAssistant')],
+      // Legacy data source pages
+      dashboard: [t('nav.home'), t('nav.dashboard')],
       github: [t('nav.dataSources'), t('nav.github')],
       arxiv: [t('nav.dataSources'), t('nav.arxiv')],
       huggingface: [t('nav.dataSources'), t('nav.huggingface')],
       zenn: [t('nav.dataSources'), t('nav.zenn')],
       analytics: [t('nav.analytics'), t('nav.dataAnalysis')],
-      trends: [t('nav.analytics'), t('nav.trendAnalysis')],
-      chat: [t('nav.analytics'), t('nav.aiAssistant')],
+      // System management
       settings: [t('nav.systemManagement'), t('nav.systemSettings')],
       notion: [t('nav.systemManagement'), t('nav.notionIntegration')],
       'api-config': [t('nav.systemManagement'), t('nav.apiConfig')],
@@ -234,7 +266,7 @@ function AppContent() {
       tasks: [t('nav.systemManagement'), t('nav.taskManagement')],
       status: [t('nav.systemManagement'), t('nav.systemStatus')]
     }
-    
+
     const items = breadcrumbMap[selectedKey] || [t('nav.home')]
     return items.map(item => ({ title: item }))
   }
@@ -389,22 +421,37 @@ function AppContent() {
               overflow: 'auto'
             }}>
               <Routes>
-                <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                <Route path="/dashboard" element={<Overview />} />
+                {/* Default route - redirect to new discover page */}
+                <Route path="/" element={<Navigate to="/discover" replace />} />
+
+                {/* New v0.4.0 pages */}
+                <Route path="/discover" element={<DiscoverPage />} />
+                <Route path="/explore" element={<ExplorePage />} />
+                <Route path="/detail/:id" element={<DetailPage />} />
+                <Route path="/collections" element={<CollectionsPage />} />
+
+                {/* Trending & Analysis */}
                 <Route path="/trending" element={<Dashboard />} />
-                <Route path="/analytics" element={<Analytics />} />
                 <Route path="/trends" element={<TrendsPage />} />
                 <Route path="/chat" element={<Chat />} />
+
+                {/* Legacy data source pages (kept for backward compatibility) */}
+                <Route path="/dashboard" element={<Overview />} />
                 <Route path="/github" element={<GitHubPage />} />
                 <Route path="/arxiv" element={<ArxivPage />} />
                 <Route path="/huggingface" element={<HuggingFacePage />} />
                 <Route path="/zenn" element={<ZennPage />} />
+                <Route path="/analytics" element={<Analytics />} />
+
+                {/* System management */}
                 <Route path="/api-config" element={<ApiConfigPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/llm-providers" element={<LLMProvidersPage />} />
                 <Route path="/tasks" element={<TaskManagementPage />} />
                 <Route path="/status" element={<SystemStatusPage />} />
-                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+
+                {/* Catch all - redirect to discover */}
+                <Route path="*" element={<Navigate to="/discover" replace />} />
               </Routes>
             </Content>
             

@@ -17,7 +17,10 @@ import {
   FireOutlined,
   BarChartOutlined,
   MessageOutlined,
-  DashboardOutlined as AnalyticsOutlined
+  DashboardOutlined as AnalyticsOutlined,
+  StarOutlined,
+  CompassOutlined,
+  GlobalOutlined
 } from '@ant-design/icons'
 import { useLanguage } from '../contexts/LanguageContext'
 
@@ -34,36 +37,58 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, selectedKey, onMenuSelect 
   const { t } = useLanguage()
   
   const menuItems: MenuProps['items'] = [
+    // New v0.4.0 main navigation
     {
-      key: 'overview',
-      icon: <DashboardOutlined />,
-      label: t('sidebar.homeDashboard'),
-      children: [
-        { key: 'dashboard', icon: <BarChartOutlined />, label: t('nav.dashboard') },
-        { key: 'trending', icon: <FireOutlined />, label: t('nav.trending') }
-      ]
+      key: 'discover',
+      icon: <FireOutlined />,
+      label: t('discover.title') || '🎯 今日精选'
     },
     {
-      key: 'sources',
-      icon: <ApiOutlined />,
-      label: t('sidebar.dataSourceManagement'),
+      key: 'explore',
+      icon: <CompassOutlined />,
+      label: t('explore.title') || '🔍 数据探索'
+    },
+    {
+      key: 'collections',
+      icon: <StarOutlined />,
+      label: t('collections.title') || '我的收藏'
+    },
+    {
+      key: 'trending',
+      icon: <LineChartOutlined />,
+      label: t('nav.trending')
+    },
+
+    // Divider
+    { type: 'divider' },
+
+    // AI Assistant
+    {
+      key: 'chat',
+      icon: <MessageOutlined />,
+      label: t('nav.aiAssistant')
+    },
+
+    // Legacy pages (folded under submenus)
+    {
+      key: 'legacy',
+      icon: <DashboardOutlined />,
+      label: '传统视图',
       children: [
+        { key: 'dashboard', icon: <BarChartOutlined />, label: t('nav.dashboard') },
         { key: 'github', icon: <GithubOutlined />, label: t('nav.github') },
         { key: 'arxiv', icon: <FileTextOutlined />, label: t('nav.arxiv') },
         { key: 'huggingface', icon: <RobotOutlined />, label: t('nav.huggingface') },
-        { key: 'zenn', icon: <EditOutlined />, label: t('nav.zenn') }
-      ]
-    },
-    {
-      key: 'analysis',
-      icon: <SearchOutlined />,
-      label: t('sidebar.intelligentAnalysis'),
-      children: [
+        { key: 'zenn', icon: <EditOutlined />, label: t('nav.zenn') },
         { key: 'analytics', icon: <AnalyticsOutlined />, label: t('nav.dataAnalysis') },
-        { key: 'trends', icon: <LineChartOutlined />, label: t('nav.trendAnalysis') },
-        { key: 'chat', icon: <MessageOutlined />, label: t('nav.aiAssistant') }
+        { key: 'trends', icon: <LineChartOutlined />, label: t('nav.trendAnalysis') }
       ]
     },
+
+    // Divider
+    { type: 'divider' },
+
+    // System management
     {
       key: 'system',
       icon: <SettingOutlined />,
