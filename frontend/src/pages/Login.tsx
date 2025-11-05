@@ -67,17 +67,15 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
 
       let errorMsg = '';
 
-      // 优先使用后端返回的详细错误信息
-      if (error.response?.data?.detail) {
-        errorMsg = error.response.data.detail;
-      } else if (error.response?.status === 401) {
-        errorMsg = '用户名或密码错误';
+      // 根据错误类型显示对应语言的错误信息
+      if (error.response?.status === 401) {
+        errorMsg = t('login.invalidCredentials');
       } else if (error.response?.status === 400) {
-        errorMsg = error.response.data?.detail || '请求参数错误';
+        errorMsg = t('login.badRequest');
       } else if (error.response?.status === 500) {
-        errorMsg = '服务器错误，请稍后重试';
+        errorMsg = t('login.serverError');
       } else if (error.message) {
-        errorMsg = `网络错误: ${error.message}`;
+        errorMsg = `${t('login.networkError')}: ${error.message}`;
       } else {
         errorMsg = isRegister ? t('login.registerFailed') : t('login.loginFailed');
       }
