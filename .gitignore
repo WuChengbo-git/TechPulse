@@ -135,20 +135,13 @@ jspm_packages/
 # DynamoDB Local files
 .dynamodb/
 
-# Project specific
-version-config.json
-version.json
+# Project specific (development scripts - gitignored per environment)
 dev.sh
 start.sh
 stop.sh
-update-version.sh
-version.sh
-version-manager.js
 
-# Documentation (internal use only)
+# Documentation (keep public docs, ignore internal planning)
 docs/planning/
-docs/implementation/
-docs/system/
+docs/internal/
 docs/archived/
-docs/*.md
-!docs/README.md
+docs/temp/

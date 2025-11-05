@@ -4,9 +4,9 @@ from .core.config import settings
 from .core.database import engine, Base
 from .core.version import APP_VERSION
 from .api import (
-    cards, sources, ai, notion, chat, auth, translate, user_settings,
+    cards, sources, ai, notion, chat, auth_enhanced, translate, user_settings,
     preferences, ai_config, health, behavior, search, recommend,
-    system_config, llm_providers
+    system_config, llm_providers, oauth
 )
 from .api import settings as settings_api
 from .services.scheduler import task_scheduler
@@ -31,7 +31,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth.router, prefix="/api/v1")  # 认证路由
+app.include_router(auth_enhanced.router, prefix="/api/v1")  # 增强认证路由（含MFA、OAuth、邮箱验证）
 app.include_router(cards.router, prefix="/api/v1")
 app.include_router(sources.router, prefix="/api/v1")
 app.include_router(ai.router, prefix="/api/v1")
@@ -48,6 +48,7 @@ app.include_router(search.router, prefix="/api/v1")  # 智能搜索路由
 app.include_router(recommend.router, prefix="/api/v1")  # 推荐系统路由
 app.include_router(system_config.router)  # 系统配置路由
 app.include_router(llm_providers.router)  # LLM提供商管理路由
+app.include_router(oauth.router, prefix="/api/v1")  # OAuth认证路由（Google、GitHub、Microsoft）
 
 
 @app.on_event("startup")

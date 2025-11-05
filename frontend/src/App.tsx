@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react'
 import { ConfigProvider, Layout, Button, Breadcrumb, Typography, Space, Avatar, Dropdown, Badge, Modal, Form, Input, message } from 'antd'
-import type { MenuProps } from 'antd'
-import { BrowserRouter as Router } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { MenuFoldOutlined, MenuUnfoldOutlined, BellOutlined, SettingOutlined, LogoutOutlined, UserOutlined, GlobalOutlined, LockOutlined, ProfileOutlined, SafetyOutlined, QuestionCircleOutlined, InfoCircleOutlined } from '@ant-design/icons'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from './lib/queryClient'
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext'
 import Sidebar from './components/Sidebar'
 import VersionInfo from './components/VersionInfo'
-import LanguageSelector from './components/LanguageSelector'
 import InterestSurvey from './components/InterestSurvey'
 import type { UserPreferences } from './components/InterestSurvey'
+import { APP_VERSION } from './config/version'
 import Dashboard from './pages/Dashboard'
 import Overview from './pages/Overview'
 import GitHubPage from './pages/GitHubPage'
@@ -34,13 +33,64 @@ const { Text } = Typography
 
 function AppContent() {
   const [collapsed, setCollapsed] = useState(false)
-  const [selectedKey, setSelectedKey] = useState('dashboard')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [username, setUsername] = useState('')
   const [changePasswordVisible, setChangePasswordVisible] = useState(false)
   const [surveyVisible, setSurveyVisible] = useState(false)
   const [form] = Form.useForm()
   const { t, language, setLanguage } = useLanguage()
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  // 从路由路径推断选中的菜单项
+  const getSelectedKeyFromPath = (pathname: string) => {
+    const pathMap: Record<string, string> = {
+      '/': 'dashboard',
+      '/dashboard': 'dashboard',
+      '/trending': 'trending',
+      '/github': 'github',
+      '/arxiv': 'arxiv',
+      '/huggingface': 'huggingface',
+      '/zenn': 'zenn',
+      '/analytics': 'analytics',
+      '/trends': 'trends',
+      '/chat': 'chat',
+      '/settings': 'settings',
+      '/api-config': 'api-config',
+      '/llm-providers': 'llm-providers',
+      '/tasks': 'tasks',
+      '/status': 'status'
+    }
+    return pathMap[pathname] || 'dashboard'
+  }
+
+  const selectedKey = getSelectedKeyFromPath(location.pathname)
+
+  // 菜单选择处理 - 使用路由导航
+  const handleMenuSelect = (key: string) => {
+    const keyToPath: Record<string, string> = {
+      'dashboard': '/dashboard',
+      'trending': '/trending',
+      'github': '/github',
+      'arxiv': '/arxiv',
+      'huggingface': '/huggingface',
+      'zenn': '/zenn',
+      'analytics': '/analytics',
+      'trends': '/trends',
+      'chat': '/chat',
+      'settings': '/settings',
+      'api-config': '/api-config',
+      'llm-providers': '/llm-providers',
+      'tasks': '/tasks',
+      'status': '/status'
+    }
+    navigate(keyToPath[key] || '/dashboard')
+  }
+
+  // 动态更新页面标题
+  useEffect(() => {
+    document.title = t('app.pageTitle')
+  }, [language, t])
 
   // 检查登录状态
   useEffect(() => {
@@ -128,12 +178,36 @@ function AppContent() {
   // 处理修改密码
   const handleChangePassword = async (values: any) => {
     try {
-      // TODO: 调用修改密码API
+      const token = localStorage.getItem('techpulse_token') || sessionStorage.getItem('techpulse_token')
+
+      const response = await fetch('/api/v1/auth/password/change', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          old_password: values.oldPassword,
+          new_password: values.newPassword,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.detail || t('nav.changePasswordFailed'))
+      }
+
       message.success(t('nav.changePasswordSuccess'))
       setChangePasswordVisible(false)
       form.resetFields()
+
+      // 密码修改成功后，提示用户重新登录
+      message.info(t('nav.pleaseRelogin') || '请重新登录', 3)
+      setTimeout(() => {
+        handleLogout()
+      }, 3000)
     } catch (error: any) {
-      message.error(error.response?.data?.detail || t('nav.changePasswordFailed'))
+      message.error(error.message || t('nav.changePasswordFailed'))
     }
   }
 
@@ -165,40 +239,6 @@ function AppContent() {
     return items.map(item => ({ title: item }))
   }
 
-  const renderContent = () => {
-    switch (selectedKey) {
-      case 'dashboard':
-        return <Overview />
-      case 'trending':
-        return <Dashboard />
-      case 'analytics':
-        return <Analytics />
-      case 'trends':
-        return <TrendsPage />
-      case 'chat':
-        return <Chat />
-      case 'github':
-        return <GitHubPage />
-      case 'arxiv':
-        return <ArxivPage />
-      case 'huggingface':
-        return <HuggingFacePage />
-      case 'zenn':
-        return <ZennPage />
-      case 'api-config':
-        return <ApiConfigPage />
-      case 'settings':
-        return <SettingsPage />
-      case 'llm-providers':
-        return <LLMProvidersPage />
-      case 'tasks':
-        return <TaskManagementPage />
-      case 'status':
-        return <SystemStatusPage />
-      default:
-        return <Overview />
-    }
-  }
 
   return (
     <ConfigProvider
@@ -209,12 +249,11 @@ function AppContent() {
         },
       }}
     >
-      <Router>
         <Layout style={{ minHeight: '100vh' }}>
-          <Sidebar 
+          <Sidebar
             collapsed={collapsed}
             selectedKey={selectedKey}
-            onMenuSelect={setSelectedKey}
+            onMenuSelect={handleMenuSelect}
           />
           
           <Layout>
@@ -303,7 +342,7 @@ function AppContent() {
                         key: 'settings',
                         label: t('nav.systemSettings'),
                         icon: <SettingOutlined />,
-                        onClick: () => setSelectedKey('settings'),
+                        onClick: () => navigate('/settings'),
                       },
                       { type: 'divider' },
                       {
@@ -316,7 +355,7 @@ function AppContent() {
                         key: 'about',
                         label: t('nav.about'),
                         icon: <InfoCircleOutlined />,
-                        onClick: () => message.info('TechPulse v0.1.9'),
+                        onClick: () => message.info(`TechPulse v${APP_VERSION}`),
                       },
                       { type: 'divider' },
                       {
@@ -341,15 +380,32 @@ function AppContent() {
               </Space>
             </Header>
             
-            <Content style={{ 
-              margin: '24px', 
+            <Content style={{
+              margin: '24px',
               padding: '24px',
               background: '#fff',
               borderRadius: '8px',
               minHeight: 'calc(100vh - 164px)',
               overflow: 'auto'
             }}>
-              {renderContent()}
+              <Routes>
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/dashboard" element={<Overview />} />
+                <Route path="/trending" element={<Dashboard />} />
+                <Route path="/analytics" element={<Analytics />} />
+                <Route path="/trends" element={<TrendsPage />} />
+                <Route path="/chat" element={<Chat />} />
+                <Route path="/github" element={<GitHubPage />} />
+                <Route path="/arxiv" element={<ArxivPage />} />
+                <Route path="/huggingface" element={<HuggingFacePage />} />
+                <Route path="/zenn" element={<ZennPage />} />
+                <Route path="/api-config" element={<ApiConfigPage />} />
+                <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/llm-providers" element={<LLMProvidersPage />} />
+                <Route path="/tasks" element={<TaskManagementPage />} />
+                <Route path="/status" element={<SystemStatusPage />} />
+                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+              </Routes>
             </Content>
             
             <Footer style={{
@@ -432,7 +488,6 @@ function AppContent() {
           onComplete={handleSurveyComplete}
           onSkip={handleSurveySkip}
         />
-      </Router>
     </ConfigProvider>
   )
 }
@@ -441,7 +496,9 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
-        <AppContent />
+        <Router>
+          <AppContent />
+        </Router>
       </LanguageProvider>
     </QueryClientProvider>
   )

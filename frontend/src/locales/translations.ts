@@ -560,6 +560,7 @@ export const translations: Record<Language, Translations> = {
 
     app: {
       name: 'TechPulse',
+      pageTitle: 'TechPulse - 智能技术情报平台',
       copyright: 'TechPulse ©2025',
       subtitle: '科技脉搏 · 洞察未来',
       description: '每日技术情报可视化仪表盘',
@@ -1470,6 +1471,7 @@ export const translations: Record<Language, Translations> = {
 
     app: {
       name: 'TechPulse',
+      pageTitle: 'TechPulse - Smart Tech Intelligence Platform',
       copyright: 'TechPulse ©2025',
       subtitle: 'Tech Pulse · Insight Future',
       description: 'Daily Tech Intelligence Dashboard',
@@ -2386,6 +2388,7 @@ export const translations: Record<Language, Translations> = {
 
     app: {
       name: 'TechPulse',
+      pageTitle: 'TechPulse - スマート技術情報プラットフォーム',
       copyright: 'TechPulse ©2025',
       subtitle: 'テックパルス · 未来を洞察',
       description: '毎日の技術情報ダッシュボード',

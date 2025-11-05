@@ -10,7 +10,7 @@
 
 <br>
 
-[![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](https://github.com/WuChengbo-git/TechPulse)
+[![Version](https://img.shields.io/badge/version-0.3.0-blue.svg)](https://github.com/WuChengbo-git/TechPulse)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/)
 [![React](https://img.shields.io/badge/react-18-blue.svg)](https://reactjs.org/)
@@ -215,12 +215,14 @@ npm run dev
 
 ## 🎯 版本历史
 
-### 最新版本 - v0.2.0 (2025-10-15)
+### 最新版本 - v0.3.0 (2025-11-05)
+- 🔐 启用增强认证系统（MFA、OAuth、邮箱验证、密码重置）
+- 🌐 支持 Google、GitHub、Microsoft OAuth 登录
+- 🔑 实现完整的修改密码功能
+- 🎨 统一版本号管理系统
+- 🧹 清理冗余代码和未使用组件
 - ✅ 完整的后端测试套件（176个测试）
-- 🔍 智能搜索与推荐系统测试
-- 🛡️ 认证与安全性测试覆盖
-- 📊 Cards API 完整测试
-- 🐛 修复推荐系统 exclude_ids 处理
+- 🔍 智能搜索与推荐系统
 - 📈 代码覆盖率提升至 35%
 
 查看 [完整版本历史](docs/RELEASE.md)
