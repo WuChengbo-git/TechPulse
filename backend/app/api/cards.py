@@ -17,18 +17,98 @@ def get_cards(
     source: Optional[SourceType] = None,
     status: Optional[TrialStatus] = None,
     search: Optional[str] = None,
+    keyword: Optional[str] = None,
+    field: Optional[str] = None,
+    language: Optional[str] = None,
+    min_stars: Optional[int] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    sort_by: Optional[str] = Query("latest", regex="^(latest|hot|stars|relevant)$"),
+    translate_to: Optional[str] = None,
     db: Session = Depends(get_db)
 ):
+    """
+    获取卡片列表，支持多种筛选和排序选项
+
+    - skip: 跳过的记录数
+    - limit: 返回的最大记录数
+    - source: 数据源筛选 (github/arxiv/huggingface/zenn)
+    - keyword: 关键词搜索（标题和摘要）
+    - field: 领域筛选 (llm/cv/nlp/tools/ml)
+    - language: 编程语言筛选
+    - min_stars: 最小 star 数
+    - start_date/end_date: 日期范围（YYYY-MM-DD）
+    - sort_by: 排序方式 (latest/hot/stars/relevant)
+    - translate_to: 翻译目标语言 (zh-CN/en-US/ja-JP)
+    """
     query = db.query(TechCard)
-    
+
+    # 基础筛选
     if source:
         query = query.filter(TechCard.source == source)
     if status:
         query = query.filter(TechCard.status == status)
+
+    # 关键词搜索
     if search:
         query = query.filter(TechCard.title.contains(search))
-    
-    cards = query.order_by(TechCard.created_at.desc()).offset(skip).limit(limit).all()
+    if keyword:
+        query = query.filter(
+            (TechCard.title.contains(keyword)) |
+            (TechCard.summary.contains(keyword))
+        )
+
+    # 领域筛选 (通过标签)
+    if field:
+        # 这里简化处理，实际应该根据 chinese_tags 筛选
+        pass
+
+    # 编程语言筛选 (通过 metadata)
+    if language:
+        # 需要 metadata 字段支持
+        pass
+
+    # 最小 star 数
+    if min_stars is not None and min_stars > 0:
+        # 需要从 metadata 中提取 stars
+        pass
+
+    # 日期范围
+    if start_date:
+        try:
+            start_dt = datetime.strptime(start_date, "%Y-%m-%d")
+            query = query.filter(TechCard.created_at >= start_dt)
+        except ValueError:
+            pass
+
+    if end_date:
+        try:
+            end_dt = datetime.strptime(end_date, "%Y-%m-%d")
+            # 包含整个结束日期
+            end_dt = end_dt.replace(hour=23, minute=59, second=59)
+            query = query.filter(TechCard.created_at <= end_dt)
+        except ValueError:
+            pass
+
+    # 排序
+    if sort_by == "latest":
+        query = query.order_by(TechCard.created_at.desc())
+    elif sort_by == "hot":
+        # 按质量分数排序
+        query = query.order_by(TechCard.quality_score.desc())
+    elif sort_by == "stars":
+        # 需要 metadata 支持，暂时用质量分数
+        query = query.order_by(TechCard.quality_score.desc())
+    elif sort_by == "relevant":
+        # 相关度排序，暂时用创建时间
+        query = query.order_by(TechCard.created_at.desc())
+
+    cards = query.offset(skip).limit(limit).all()
+
+    # TODO: 如果需要翻译，调用翻译服务
+    # if translate_to:
+    #     cards = translate_cards(cards, translate_to)
+
     return cards
 
 

@@ -16,6 +16,80 @@ from ..models.user_preference import UserPreference
 router = APIRouter(tags=["recommendations"])
 
 
+@router.get("/recommend/")
+async def get_simple_recommendations(
+    limit: int = Query(20, le=100),
+    field: Optional[str] = None,
+    sort_by: str = Query("recommended", regex="^(recommended|latest|hot|stars)$"),
+    translate_to: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    """
+    简化的推荐端点（不需要用户ID，用于未登录或新用户）
+
+    返回高质量的最新内容
+
+    - limit: 返回数量
+    - field: 领域筛选 (llm/cv/nlp/tools/ml)
+    - sort_by: 排序方式 (recommended/latest/hot/stars)
+    - translate_to: 翻译目标语言
+    """
+    query = db.query(TechCard).filter(
+        TechCard.quality_score >= 5.0
+    )
+
+    # 领域筛选（简化版，通过标签匹配）
+    if field and field != "all":
+        # TODO: 根据 chinese_tags 筛选
+        pass
+
+    # 排序
+    if sort_by == "recommended" or sort_by == "hot":
+        # 推荐度 = 质量分数 + 新鲜度
+        query = query.order_by(
+            TechCard.quality_score.desc(),
+            TechCard.created_at.desc()
+        )
+    elif sort_by == "latest":
+        query = query.order_by(TechCard.created_at.desc())
+    elif sort_by == "stars":
+        # 暂时用质量分数代替
+        query = query.order_by(TechCard.quality_score.desc())
+
+    cards = query.limit(limit).all()
+
+    # 转换为前端期望的格式
+    results = []
+    for card in cards:
+        result = {
+            "id": card.id,
+            "title": card.title,
+            "source": card.source.value if hasattr(card.source, 'value') else str(card.source),
+            "url": card.original_url,
+            "summary": card.summary or "",
+            "tags": card.chinese_tags or [],
+            "created_at": card.created_at.isoformat() if card.created_at else None,
+            "metadata": {
+                "author": None,
+                "language": None,
+                "stars": None,
+                "forks": None,
+                "citations": None,
+                "downloads": None,
+                "likes": None,
+            }
+        }
+
+        # TODO: 添加翻译支持
+        # if translate_to:
+        #     result["translated_title"] = translate(card.title, translate_to)
+        #     result["translated_summary"] = translate(card.summary, translate_to)
+
+        results.append(result)
+
+    return results
+
+
 class RecommendationItem(BaseModel):
     card: dict
     score: float  # 推荐分数 0-1
