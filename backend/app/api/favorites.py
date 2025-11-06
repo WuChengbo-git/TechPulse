@@ -10,7 +10,7 @@ from datetime import datetime
 
 from ..core.database import get_db
 from ..models.card import TechCard
-from ..core.auth import get_current_user
+from ..core.security import get_current_user
 from ..models.user import User
 
 router = APIRouter(prefix="/favorites", tags=["favorites"])
