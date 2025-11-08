@@ -12,6 +12,7 @@ from ..core.database import get_db
 from ..models.card import TechCard
 from ..models.behavior import UserBehavior, ActionType, UserRecommendation
 from ..models.user_preference import UserPreference
+from ..services.translation_service import translate_zenn_content
 
 router = APIRouter(tags=["recommendations"])
 
@@ -30,18 +31,111 @@ async def get_simple_recommendations(
     返回高质量的最新内容
 
     - limit: 返回数量
-    - field: 领域筛选 (llm/cv/nlp/tools/ml)
+    - field: 领域筛选 (llm/cv/nlp/ml/dl/rl/tools/robotics/data)
     - sort_by: 排序方式 (recommended/latest/hot/stars)
     - translate_to: 翻译目标语言
     """
     query = db.query(TechCard).filter(
-        TechCard.quality_score >= 5.0
+        TechCard.quality_score >= 3.0
     )
 
-    # 领域筛选（简化版，通过标签匹配）
+    # 领域筛选（通过标签匹配）
     if field and field != "all":
-        # TODO: 根据 chinese_tags 筛选
-        pass
+        # 领域到标签的映射
+        field_tags_map = {
+            'llm': ['LLM', '大语言模型', '语言模型', 'GPT', 'transformers', 'text-generation', 'conversational', 'llama', 'chatbot', '对话'],
+            'cv': ['计算机视觉', 'CV', 'cs.CV', 'image', 'vision', 'object-detection', 'segmentation', '图像', '视觉', 'YOLO'],
+            'nlp': ['NLP', '自然语言处理', 'cs.CL', 'text', 'language', '文本', 'BERT', 'token-classification', 'question-answering'],
+            'ml': ['机器学习', 'cs.LG', 'machine-learning', 'pytorch', 'tensorflow', 'scikit-learn'],
+            'dl': ['深度学习', 'deep-learning', 'neural-network', 'CNN', 'RNN', 'LSTM', 'GAN'],
+            'rl': ['强化学习', 'reinforcement-learning', 'RL', 'Q-learning', 'DQN', 'policy-gradient'],
+            'tools': ['工具', 'tools', 'Python', 'library', 'framework', 'API'],
+            'robotics': ['机器人', 'robotics', 'robot', 'autonomous', 'navigation', 'manipulation'],
+            'data': ['数据科学', 'data-science', 'dataset', '数据集', 'pandas', 'numpy', 'data-analysis']
+        }
+
+        if field in field_tags_map:
+            field_keywords = field_tags_map[field]
+            # 在 Python 端过滤（因为 SQLite 的 JSON 支持有限）
+            # 先获取所有候选卡片
+            all_cards = query.all()
+
+            # 筛选包含目标标签的卡片
+            filtered_cards = []
+            for card in all_cards:
+                if card.chinese_tags:
+                    # 检查是否有任何标签匹配
+                    card_tags_lower = [str(tag).lower() for tag in card.chinese_tags]
+                    for keyword in field_keywords:
+                        if keyword.lower() in card_tags_lower:
+                            filtered_cards.append(card)
+                            break
+
+            # 直接返回筛选后的结果
+            cards = filtered_cards[:limit]
+            results = []
+            for card in cards:
+                # 从 card 和 raw_data 中提取元数据
+                raw_data = card.raw_data or {}
+
+                # 根据数据源构建元数据
+                metadata = {}
+                if card.source.value == 'github':
+                    metadata = {
+                        "author": card.title.split('/')[0] if '/' in card.title else None,
+                        "language": card.tech_stack[0] if card.tech_stack and len(card.tech_stack) > 0 else None,
+                        "stars": card.stars if card.stars is not None else None,
+                        "forks": card.forks if card.forks is not None else None,
+                        "watchers": raw_data.get('watchers'),
+                        "issues": card.issues if card.issues is not None else None,
+                        "citations": None,
+                        "downloads": None,
+                        "likes": None,
+                    }
+                elif card.source.value == 'arxiv':
+                    metadata = {
+                        "author": None,
+                        "language": None,
+                        "stars": None,
+                        "forks": None,
+                        "citations": raw_data.get('citations'),
+                        "downloads": None,
+                        "likes": None,
+                    }
+                elif card.source.value == 'huggingface':
+                    metadata = {
+                        "author": raw_data.get('author'),
+                        "language": raw_data.get('library_name'),
+                        "stars": None,
+                        "forks": None,
+                        "citations": None,
+                        "downloads": raw_data.get('downloads'),
+                        "likes": raw_data.get('likes'),
+                    }
+                else:  # zenn or others
+                    metadata = {
+                        "author": None,
+                        "language": None,
+                        "stars": None,
+                        "forks": None,
+                        "citations": None,
+                        "downloads": None,
+                        "likes": None,
+                    }
+
+                result = {
+                    "id": card.id,
+                    "title": card.title,
+                    "source": card.source.value if hasattr(card.source, 'value') else str(card.source),
+                    "url": card.original_url,
+                    "summary": card.summary or "",
+                    "tags": card.chinese_tags or [],
+                    "created_at": card.created_at.isoformat() if card.created_at else None,
+                    "metadata": metadata
+                }
+                results.append(result)
+
+            return results
 
     # 排序
     if sort_by == "recommended" or sort_by == "hot":
@@ -61,15 +155,45 @@ async def get_simple_recommendations(
     # 转换为前端期望的格式
     results = []
     for card in cards:
-        result = {
-            "id": card.id,
-            "title": card.title,
-            "source": card.source.value if hasattr(card.source, 'value') else str(card.source),
-            "url": card.original_url,
-            "summary": card.summary or "",
-            "tags": card.chinese_tags or [],
-            "created_at": card.created_at.isoformat() if card.created_at else None,
-            "metadata": {
+        # 从 card 和 raw_data 中提取元数据
+        raw_data = card.raw_data or {}
+
+        # 根据数据源构建元数据
+        metadata = {}
+        if card.source.value == 'github':
+            metadata = {
+                "author": card.title.split('/')[0] if '/' in card.title else None,
+                "language": card.tech_stack[0] if card.tech_stack and len(card.tech_stack) > 0 else None,
+                "stars": card.stars if card.stars is not None else None,
+                "forks": card.forks if card.forks is not None else None,
+                "watchers": raw_data.get('watchers'),
+                "issues": card.issues if card.issues is not None else None,
+                "citations": None,
+                "downloads": None,
+                "likes": None,
+            }
+        elif card.source.value == 'arxiv':
+            metadata = {
+                "author": None,
+                "language": None,
+                "stars": None,
+                "forks": None,
+                "citations": raw_data.get('citations'),
+                "downloads": None,
+                "likes": None,
+            }
+        elif card.source.value == 'huggingface':
+            metadata = {
+                "author": raw_data.get('author'),
+                "language": raw_data.get('library_name'),
+                "stars": None,
+                "forks": None,
+                "citations": None,
+                "downloads": raw_data.get('downloads'),
+                "likes": raw_data.get('likes'),
+            }
+        else:  # zenn or others
+            metadata = {
                 "author": None,
                 "language": None,
                 "stars": None,
@@ -78,12 +202,27 @@ async def get_simple_recommendations(
                 "downloads": None,
                 "likes": None,
             }
+
+        result = {
+            "id": card.id,
+            "title": card.title,
+            "source": card.source.value if hasattr(card.source, 'value') else str(card.source),
+            "url": card.original_url,
+            "summary": card.summary or "",
+            "tags": card.chinese_tags or [],
+            "created_at": card.created_at.isoformat() if card.created_at else None,
+            "metadata": metadata
         }
 
-        # TODO: 添加翻译支持
-        # if translate_to:
-        #     result["translated_title"] = translate(card.title, translate_to)
-        #     result["translated_summary"] = translate(card.summary, translate_to)
+        # 翻译支持（主要用于 Zenn 日文内容）
+        if translate_to and translate_to == "zh-CN" and card.source.value == 'zenn':
+            try:
+                translated = await translate_zenn_content(card.title, card.summary)
+                result["translated_title"] = translated["title"]
+                result["translated_summary"] = translated["summary"]
+            except Exception as e:
+                logger.error(f"Translation error for card {card.id}: {e}")
+                # 翻译失败时不添加翻译字段
 
         results.append(result)
 

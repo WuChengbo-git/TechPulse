@@ -113,7 +113,17 @@ const CollectionsPage: React.FC = () => {
       setAllCollectionTags(Array.from(tagsSet));
     } catch (error: any) {
       console.error('Failed to fetch collections:', error);
-      message.error(t('collections.loadFailed') || '加载收藏失败');
+
+      // 检查是否是未登录错误
+      if (error.response?.status === 401) {
+        message.warning(t('collections.loginRequired') || '请先登录以查看收藏', 5);
+        // 3秒后跳转到登录页
+        setTimeout(() => {
+          navigate('/login');
+        }, 3000);
+      } else {
+        message.error(t('collections.loadFailed') || '加载收藏失败');
+      }
     } finally {
       setLoading(false);
     }
@@ -365,16 +375,16 @@ const CollectionsPage: React.FC = () => {
 
                 {/* 元数据 */}
                 <Space size="middle" style={{ marginBottom: '12px' }}>
-                  {card.metadata.author && (
+                  {card.metadata?.author && (
                     <Text type="secondary">{card.metadata.author}</Text>
                   )}
-                  {card.metadata.stars !== undefined && (
+                  {card.metadata?.stars !== undefined && card.metadata?.stars !== null && (
                     <Text type="secondary">⭐ {card.metadata.stars.toLocaleString()}</Text>
                   )}
-                  {card.metadata.citations !== undefined && (
+                  {card.metadata?.citations !== undefined && card.metadata?.citations !== null && (
                     <Text type="secondary">📚 引用 {card.metadata.citations}</Text>
                   )}
-                  {card.metadata.downloads !== undefined && (
+                  {card.metadata?.downloads !== undefined && card.metadata?.downloads !== null && (
                     <Text type="secondary">⬇️ {card.metadata.downloads.toLocaleString()}</Text>
                   )}
                   {card.favorited_at && (
@@ -407,13 +417,15 @@ const CollectionsPage: React.FC = () => {
                 )}
 
                 {/* 技术标签 */}
-                <div style={{ marginBottom: '12px' }}>
-                  <Space size="small" wrap>
-                    {card.tags.slice(0, 5).map((tag, index) => (
-                      <Tag key={index}>{tag}</Tag>
-                    ))}
-                  </Space>
-                </div>
+                {card.tags && card.tags.length > 0 && (
+                  <div style={{ marginBottom: '12px' }}>
+                    <Space size="small" wrap>
+                      {card.tags.slice(0, 5).map((tag, index) => (
+                        <Tag key={index}>{tag}</Tag>
+                      ))}
+                    </Space>
+                  </div>
+                )}
 
                 {/* 操作按钮 */}
                 <Space>

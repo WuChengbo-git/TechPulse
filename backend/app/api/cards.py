@@ -6,12 +6,16 @@ from datetime import datetime, timedelta
 from ..core.database import get_db
 from ..models.card import TechCard, SourceType, TrialStatus
 from ..models.schemas import TechCard as TechCardSchema, TechCardCreate, TechCardUpdate
+from ..services.translation_service import translate_zenn_content
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/cards", tags=["cards"])
 
 
-@router.get("/", response_model=List[TechCardSchema])
-def get_cards(
+@router.get("/")
+async def get_cards(
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
     source: Optional[SourceType] = None,
@@ -58,10 +62,8 @@ def get_cards(
             (TechCard.summary.contains(keyword))
         )
 
-    # 领域筛选 (通过标签)
-    if field:
-        # 这里简化处理，实际应该根据 chinese_tags 筛选
-        pass
+    # 领域筛选 (通过标签) - 需要在最后处理
+    field_filter_enabled = field and field != "all"
 
     # 编程语言筛选 (通过 metadata)
     if language:
@@ -103,13 +105,65 @@ def get_cards(
         # 相关度排序，暂时用创建时间
         query = query.order_by(TechCard.created_at.desc())
 
-    cards = query.offset(skip).limit(limit).all()
+    # 先获取卡片
+    cards = query.offset(skip).limit(limit * 3 if field_filter_enabled else limit).all()
 
-    # TODO: 如果需要翻译，调用翻译服务
-    # if translate_to:
-    #     cards = translate_cards(cards, translate_to)
+    # 应用领域筛选（在Python端处理）
+    if field_filter_enabled:
+        field_tags_map = {
+            'llm': ['LLM', '大语言模型', '语言模型', 'GPT', 'transformers', 'text-generation', 'conversational', 'llama', 'chatbot', '对话'],
+            'cv': ['计算机视觉', 'CV', 'cs.CV', 'image', 'vision', 'object-detection', 'segmentation', '图像', '视觉', 'YOLO'],
+            'nlp': ['NLP', '自然语言处理', 'cs.CL', 'text', 'language', '文本', 'BERT', 'token-classification', 'question-answering'],
+            'ml': ['机器学习', 'cs.LG', 'machine-learning', 'pytorch', 'tensorflow', 'scikit-learn', '深度学习', 'deep-learning'],
+            'tools': ['工具', 'tools', 'Python', 'library', 'framework', 'API', 'dataset', '数据集']
+        }
 
-    return cards
+        if field in field_tags_map:
+            field_keywords = field_tags_map[field]
+            filtered_cards = []
+            for card in cards:
+                if card.chinese_tags:
+                    card_tags_lower = [str(tag).lower() for tag in card.chinese_tags]
+                    for keyword in field_keywords:
+                        if keyword.lower() in card_tags_lower:
+                            filtered_cards.append(card)
+                            break
+            cards = filtered_cards[:limit]
+
+    # 如果需要翻译 Zenn 内容
+    results = []
+    for card in cards:
+        # 转换为字典
+        card_dict = {
+            "id": card.id,
+            "title": card.title,
+            "summary": card.summary,
+            "original_url": card.original_url,
+            "source": card.source.value if hasattr(card.source, 'value') else str(card.source),
+            "created_at": card.created_at.isoformat() if card.created_at else None,
+            "updated_at": card.updated_at.isoformat() if card.updated_at else None,
+            "quality_score": card.quality_score,
+            "chinese_tags": card.chinese_tags,
+            "stars": card.stars if card.stars is not None else None,
+            "forks": card.forks if card.forks is not None else None,
+            "issues": card.issues if card.issues is not None else None,
+            "license": card.license,
+            "tech_stack": card.tech_stack,
+            "raw_data": card.raw_data
+        }
+
+        # 翻译 Zenn 内容 (日文 → 中文)
+        if translate_to and translate_to == "zh-CN" and card.source.value == 'zenn':
+            try:
+                translated = await translate_zenn_content(card.title, card.summary)
+                card_dict["translated_title"] = translated["title"]
+                card_dict["translated_summary"] = translated["summary"]
+            except Exception as e:
+                logger.error(f"Translation error for card {card.id}: {e}")
+
+        results.append(card_dict)
+
+    return results
 
 
 @router.get("/stats")
@@ -201,12 +255,51 @@ def get_overview_stats(db: Session = Depends(get_db)) -> Dict[str, Any]:
     }
 
 
-@router.get("/{card_id}", response_model=TechCardSchema)
-def get_card(card_id: int, db: Session = Depends(get_db)):
+@router.get("/{card_id}")
+async def get_card(
+    card_id: int,
+    translate_to: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    """
+    获取单个卡片详情
+
+    - card_id: 卡片ID
+    - translate_to: 翻译目标语言 (zh-CN/en-US/ja-JP)
+    """
     card = db.query(TechCard).filter(TechCard.id == card_id).first()
     if not card:
         raise HTTPException(status_code=404, detail="Card not found")
-    return card
+
+    # 转换为字典
+    card_dict = {
+        "id": card.id,
+        "title": card.title,
+        "summary": card.summary,
+        "original_url": card.original_url,
+        "source": card.source.value if hasattr(card.source, 'value') else str(card.source),
+        "created_at": card.created_at.isoformat() if card.created_at else None,
+        "updated_at": card.updated_at.isoformat() if card.updated_at else None,
+        "quality_score": card.quality_score,
+        "chinese_tags": card.chinese_tags,
+        "stars": card.stars if card.stars is not None else None,
+        "forks": card.forks if card.forks is not None else None,
+        "issues": card.issues if card.issues is not None else None,
+        "license": card.license,
+        "tech_stack": card.tech_stack,
+        "raw_data": card.raw_data
+    }
+
+    # 翻译 Zenn 内容 (日文 → 中文)
+    if translate_to and translate_to == "zh-CN" and card.source.value == 'zenn':
+        try:
+            translated = await translate_zenn_content(card.title, card.summary)
+            card_dict["translated_title"] = translated["title"]
+            card_dict["translated_summary"] = translated["summary"]
+        except Exception as e:
+            logger.error(f"Translation error for card {card.id}: {e}")
+
+    return card_dict
 
 
 @router.post("/", response_model=TechCardSchema)

@@ -104,38 +104,45 @@ const LLMProvidersPage: React.FC = () => {
 
   // 打开编辑提供商模态框
   const handleEditProvider = async (provider: LLMProvider) => {
-    console.log('编辑Provider - 原始数据:', provider)
-    console.log('  is_enabled:', provider.is_enabled, 'type:', typeof provider.is_enabled)
-    console.log('  is_default:', provider.is_default, 'type:', typeof provider.is_default)
+    try {
+      console.log('编辑Provider - 原始数据:', provider)
+      console.log('  is_enabled:', provider.is_enabled, 'type:', typeof provider.is_enabled)
+      console.log('  is_default:', provider.is_default, 'type:', typeof provider.is_default)
 
-    // 查找对应的模板
-    const allTemplates = [
-      ...(templates?.cloud_providers || []),
-      ...(templates?.local_providers || [])
-    ]
-    const template = allTemplates.find(t => t.category === provider.provider_category)
+      // 查找对应的模板
+      const allTemplates = [
+        ...(templates?.cloud_providers || []),
+        ...(templates?.local_providers || [])
+      ]
+      const template = allTemplates.find(t => t.category === provider.provider_category)
 
-    // 先打开模态框
-    setEditingProvider(provider)
-    setSelectedTemplate(template || null)
-    setModalVisible(true)
+      // 先加载模型列表
+      await loadProviderModels(provider.id)
 
-    // 使用 setTimeout 确保模态框完全渲染后再设置表单值
-    setTimeout(() => {
-      // 设置表单值
-      const formValues = {
-        provider_name: provider.provider_name,
-        provider_category: provider.provider_category,
-        is_enabled: provider.is_enabled,
-        is_default: provider.is_default,
-        ...provider.config
-      }
-      console.log('设置表单值:', formValues)
-      form.setFieldsValue(formValues)
-    }, 0)
+      // 设置状态
+      setEditingProvider(provider)
+      setSelectedTemplate(template || null)
 
-    // 加载模型列表
-    await loadProviderModels(provider.id)
+      // 使用 setTimeout 确保状态更新后再打开模态框
+      setTimeout(() => {
+        // 设置表单值
+        const formValues = {
+          provider_name: provider.provider_name,
+          provider_category: provider.provider_category,
+          is_enabled: Boolean(provider.is_enabled),
+          is_default: Boolean(provider.is_default),
+          ...provider.config
+        }
+        console.log('设置表单值:', formValues)
+        form.setFieldsValue(formValues)
+
+        // 最后打开模态框
+        setModalVisible(true)
+      }, 100)
+    } catch (error) {
+      console.error('Failed to edit provider:', error)
+      message.error(t('llmProviders.loadProviderFailed'))
+    }
   }
 
   // 选择模板
@@ -148,7 +155,7 @@ const LLMProvidersPage: React.FC = () => {
     setSelectedTemplate(template || null)
 
     // 设置默认值
-    if (template) {
+    if (template && template.config_fields) {
       const defaultConfig: any = {
         is_enabled: true,  // 默认启用
         is_default: false  // 默认不设为默认提供商
@@ -177,13 +184,15 @@ const LLMProvidersPage: React.FC = () => {
 
       // 构建配置对象
       const config: Record<string, any> = {}
-      selectedTemplate.config_fields.forEach(field => {
-        // 使用用户输入的值，如果没有则使用默认值
-        const value = values[field.name] || field.default
-        if (value) {
-          config[field.name] = value
-        }
-      })
+      if (selectedTemplate.config_fields) {
+        selectedTemplate.config_fields.forEach(field => {
+          // 使用用户输入的值，如果没有则使用默认值
+          const value = values[field.name] || field.default
+          if (value) {
+            config[field.name] = value
+          }
+        })
+      }
 
       const result = await llmService.testConnection({
         provider_category: selectedTemplate.category,
@@ -253,13 +262,15 @@ const LLMProvidersPage: React.FC = () => {
 
       // 构建配置对象
       const config: Record<string, any> = {}
-      template.config_fields.forEach(field => {
-        // 使用用户输入的值，如果为空字符串或undefined则使用默认值
-        const value = values[field.name] || field.default
-        if (value !== undefined) {
-          config[field.name] = value
-        }
-      })
+      if (template.config_fields) {
+        template.config_fields.forEach(field => {
+          // 使用用户输入的值，如果为空字符串或undefined则使用默认值
+          const value = values[field.name] || field.default
+          if (value !== undefined) {
+            config[field.name] = value
+          }
+        })
+      }
 
       if (editingProvider) {
         // 更新
@@ -602,7 +613,7 @@ const LLMProvidersPage: React.FC = () => {
             <Input placeholder={t('llmProviders.exampleOpenAI')} />
           </Form.Item>
 
-          {selectedTemplate?.config_fields.map(field => (
+          {selectedTemplate?.config_fields?.map(field => (
             <Form.Item
               key={field.name}
               label={field.label}
@@ -615,7 +626,7 @@ const LLMProvidersPage: React.FC = () => {
                 <Input placeholder={field.default} />
               )}
             </Form.Item>
-          ))}
+          )) || null}
 
           <Space style={{ width: '100%', justifyContent: 'space-between' }}>
             <Space>

@@ -11,7 +11,6 @@ import {
   Spin,
   Empty,
   Typography,
-  Tooltip,
   Badge,
   message,
   Row,
@@ -32,6 +31,7 @@ import {
 import { useLanguage } from '../contexts/LanguageContext';
 import axios from 'axios';
 import dayjs, { Dayjs } from 'dayjs';
+import QuickViewModal from '../components/QuickViewModal';
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -66,8 +66,10 @@ const ExplorePage: React.FC = () => {
   const { t, language } = useLanguage();
   const [cards, setCards] = useState<TechCard[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [activeTab, setActiveTab] = useState<DataSource>('all');
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
+  const [hasMore, setHasMore] = useState<boolean>(true);
 
   // 筛选条件
   const [searchKeyword, setSearchKeyword] = useState<string>('');
@@ -77,10 +79,13 @@ const ExplorePage: React.FC = () => {
   const [minStars, setMinStars] = useState<number | undefined>(undefined);
   const [sortBy, setSortBy] = useState<string>('latest');
   const [itemsPerPage, setItemsPerPage] = useState<number>(20);
+  const [quickViewVisible, setQuickViewVisible] = useState(false);
+  const [selectedCard, setSelectedCard] = useState<TechCard | null>(null);
 
   // 获取数据
   const fetchCards = async () => {
     setLoading(true);
+    setHasMore(true); // 重置 hasMore 状态
     try {
       const token = localStorage.getItem('techpulse_token') || sessionStorage.getItem('techpulse_token');
 
@@ -126,12 +131,89 @@ const ExplorePage: React.FC = () => {
         params,
       });
 
-      setCards(response.data || []);
+      const newCards = response.data || [];
+      setCards(newCards);
+
+      // 如果返回的数据少于请求数量，说明没有更多了
+      if (newCards.length < itemsPerPage) {
+        setHasMore(false);
+      }
     } catch (error: any) {
       console.error('Failed to fetch cards:', error);
       message.error(t('explore.loadFailed') || '加载数据失败');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // 加载更多卡片
+  const loadMoreCards = async () => {
+    if (!hasMore || loadingMore) return;
+
+    setLoadingMore(true);
+    try {
+      const token = localStorage.getItem('techpulse_token') || sessionStorage.getItem('techpulse_token');
+
+      const params: any = {
+        limit: itemsPerPage,
+        skip: cards.length, // 使用当前卡片数量作为偏移量
+        sort_by: sortBy,
+        translate_to: language,
+      };
+
+      // 添加数据源筛选
+      if (activeTab !== 'all') {
+        params.source = activeTab;
+      }
+
+      // 添加关键词搜索
+      if (searchKeyword.trim()) {
+        params.keyword = searchKeyword.trim();
+      }
+
+      // 添加领域筛选
+      if (selectedField !== 'all') {
+        params.field = selectedField;
+      }
+
+      // 添加语言筛选
+      if (selectedLanguage !== 'all') {
+        params.language = selectedLanguage;
+      }
+
+      // 添加日期范围筛选
+      if (dateRange && dateRange[0] && dateRange[1]) {
+        params.start_date = dateRange[0].format('YYYY-MM-DD');
+        params.end_date = dateRange[1].format('YYYY-MM-DD');
+      }
+
+      // 添加最小 Star 数筛选
+      if (minStars !== undefined && minStars > 0) {
+        params.min_stars = minStars;
+      }
+
+      const response = await axios.get('/api/v1/cards/', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        params,
+      });
+
+      const newCards = response.data || [];
+
+      if (newCards.length === 0 || newCards.length < itemsPerPage) {
+        setHasMore(false);
+      }
+
+      if (newCards.length > 0) {
+        setCards([...cards, ...newCards]); // 追加新卡片
+        // 移除提示框，改为静默加载
+      } else {
+        setHasMore(false);
+      }
+    } catch (error: any) {
+      console.error('Failed to load more:', error);
+      message.error(t('explore.loadMoreFailed') || '加载更多失败');
+    } finally {
+      setLoadingMore(false);
     }
   };
 
@@ -166,8 +248,8 @@ const ExplorePage: React.FC = () => {
 
   // 快速查看
   const handleQuickView = (card: TechCard) => {
-    message.info('快速查看功能开发中...');
-    // TODO: 打开 QuickViewModal
+    setSelectedCard(card);
+    setQuickViewVisible(true);
   };
 
   // 深度阅读
@@ -415,30 +497,32 @@ const ExplorePage: React.FC = () => {
 
                 {/* 元数据 */}
                 <Space size="middle" style={{ marginBottom: '12px' }}>
-                  {card.metadata.author && (
+                  {card.metadata?.author && (
                     <Text type="secondary">{card.metadata.author}</Text>
                   )}
-                  {card.metadata.language && (
+                  {card.metadata?.language && (
                     <Tag>{card.metadata.language}</Tag>
                   )}
-                  {card.metadata.stars !== undefined && (
+                  {card.metadata?.stars !== undefined && card.metadata?.stars !== null && (
                     <Text type="secondary">⭐ {card.metadata.stars.toLocaleString()}</Text>
                   )}
-                  {card.metadata.forks !== undefined && (
+                  {card.metadata?.forks !== undefined && card.metadata?.forks !== null && (
                     <Text type="secondary">🔱 {card.metadata.forks.toLocaleString()}</Text>
                   )}
-                  {card.metadata.citations !== undefined && (
+                  {card.metadata?.citations !== undefined && card.metadata?.citations !== null && (
                     <Text type="secondary">📚 引用 {card.metadata.citations}</Text>
                   )}
-                  {card.metadata.downloads !== undefined && (
+                  {card.metadata?.downloads !== undefined && card.metadata?.downloads !== null && (
                     <Text type="secondary">⬇️ {card.metadata.downloads.toLocaleString()}</Text>
                   )}
-                  {card.metadata.likes !== undefined && (
+                  {card.metadata?.likes !== undefined && card.metadata?.likes !== null && (
                     <Text type="secondary">👍 {card.metadata.likes}</Text>
                   )}
-                  <Text type="secondary">
-                    🕒 {new Date(card.created_at).toLocaleDateString()}
-                  </Text>
+                  {card.created_at && (
+                    <Text type="secondary">
+                      🕒 {new Date(card.created_at).toLocaleDateString()}
+                    </Text>
+                  )}
                 </Space>
 
                 {/* 摘要 */}
@@ -450,13 +534,15 @@ const ExplorePage: React.FC = () => {
                 </Paragraph>
 
                 {/* 标签 */}
-                <div style={{ marginBottom: '12px' }}>
-                  <Space size="small" wrap>
-                    {card.tags.slice(0, 8).map((tag, index) => (
-                      <Tag key={index}>{tag}</Tag>
-                    ))}
-                  </Space>
-                </div>
+                {card.tags && card.tags.length > 0 && (
+                  <div style={{ marginBottom: '12px' }}>
+                    <Space size="small" wrap>
+                      {card.tags.slice(0, 8).map((tag, index) => (
+                        <Tag key={index}>{tag}</Tag>
+                      ))}
+                    </Space>
+                  </div>
+                )}
 
                 {/* 操作按钮 */}
                 <Space>
@@ -485,11 +571,32 @@ const ExplorePage: React.FC = () => {
       {/* 加载更多按钮 */}
       {!loading && cards.length > 0 && (
         <div style={{ textAlign: 'center', marginTop: '24px' }}>
-          <Button size="large" onClick={() => message.info('加载更多功能开发中...')}>
-            {t('explore.loadMore') || '加载更多'}
+          <Button
+            size="large"
+            onClick={loadMoreCards}
+            loading={loadingMore}
+            disabled={!hasMore}
+          >
+            {hasMore ? (t('explore.loadMore') || '加载更多') : (t('explore.noMore') || '没有更多了')}
           </Button>
         </div>
       )}
+
+      {/* 快速查看模态框 */}
+      <QuickViewModal
+        visible={quickViewVisible}
+        cardId={selectedCard?.id || null}
+        onClose={() => {
+          setQuickViewVisible(false);
+          setSelectedCard(null);
+        }}
+        onDeepRead={() => {
+          if (selectedCard) {
+            setQuickViewVisible(false);
+            handleDeepRead(selectedCard);
+          }
+        }}
+      />
     </div>
   );
 };

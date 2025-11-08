@@ -48,7 +48,7 @@ async def get_favorites(
     # TODO: 实际应该查询 UserFavorite 表
     # 这里暂时返回一些示例数据
     query = db.query(TechCard).filter(
-        TechCard.quality_score >= 6.0
+        TechCard.quality_score >= 3.0
     )
 
     # 排序
@@ -66,6 +66,37 @@ async def get_favorites(
     # 转换为前端期望的格式
     results = []
     for card in cards:
+        # 提取元数据
+        metadata = {}
+
+        # GitHub项目的stars和forks
+        if card.stars is not None:
+            metadata["stars"] = card.stars
+        if card.forks is not None:
+            metadata["forks"] = card.forks
+        if card.issues is not None:
+            metadata["issues"] = card.issues
+
+        # 从raw_data中提取其他元数据
+        if card.raw_data:
+            if "author" in card.raw_data:
+                metadata["author"] = card.raw_data.get("author")
+            if "citations" in card.raw_data:
+                metadata["citations"] = card.raw_data.get("citations")
+            if "downloads" in card.raw_data:
+                metadata["downloads"] = card.raw_data.get("downloads")
+            if "likes" in card.raw_data:
+                metadata["likes"] = card.raw_data.get("likes")
+            if "language" in card.raw_data:
+                metadata["language"] = card.raw_data.get("language")
+
+        # 如果有tech_stack,也添加language
+        if card.tech_stack and not metadata.get("language"):
+            if isinstance(card.tech_stack, list) and len(card.tech_stack) > 0:
+                metadata["language"] = card.tech_stack[0]
+            elif isinstance(card.tech_stack, str):
+                metadata["language"] = card.tech_stack
+
         result = {
             "id": card.id,
             "title": card.title,
@@ -76,13 +107,20 @@ async def get_favorites(
             "collection_tags": [],  # TODO: 从 UserFavorite 表获取
             "created_at": card.created_at.isoformat() if card.created_at else None,
             "favorited_at": card.created_at.isoformat() if card.created_at else None,  # TODO: 实际收藏时间
-            "metadata": {
-                "author": None,
-                "stars": None,
-                "citations": None,
-                "downloads": None,
-            }
+            "metadata": metadata
         }
+
+        # 如果需要翻译
+        if translate_to and translate_to == "zh-CN" and card.source.value == 'zenn':
+            try:
+                from ..services.translation_service import translate_zenn_content
+                translated = await translate_zenn_content(card.title, card.summary)
+                result["translated_title"] = translated["title"]
+                result["translated_summary"] = translated["summary"]
+            except Exception as e:
+                import logging
+                logging.error(f"Translation error for card {card.id}: {e}")
+
         results.append(result)
 
     return results

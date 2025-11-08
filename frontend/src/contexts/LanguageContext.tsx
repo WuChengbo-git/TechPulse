@@ -13,10 +13,10 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 // 语言提供者组件
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // 从 localStorage 读取保存的语言，默认中文
+  // 从 localStorage 读取保存的语言，默认日语
   const [language, setLanguageState] = useState<Language>(() => {
     const saved = localStorage.getItem('techpulse_language')
-    return (saved as Language) || 'zh-CN'
+    return (saved as Language) || 'ja-JP'
   })
 
   // 设置语言并保存到 localStorage

@@ -11,6 +11,7 @@ import {
   message,
   Descriptions,
   Card,
+  Empty,
 } from 'antd';
 import {
   StarOutlined,
@@ -207,44 +208,46 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({
                     <Tag>{card.metadata.language}</Tag>
                   </Descriptions.Item>
                 )}
-                {card.metadata.stars !== undefined && (
+                {card.metadata?.stars !== undefined && card.metadata?.stars !== null && (
                   <Descriptions.Item label="Stars">
                     ⭐ {card.metadata.stars.toLocaleString()}
                   </Descriptions.Item>
                 )}
-                {card.metadata.forks !== undefined && (
+                {card.metadata?.forks !== undefined && card.metadata?.forks !== null && (
                   <Descriptions.Item label="Forks">
                     🔱 {card.metadata.forks.toLocaleString()}
                   </Descriptions.Item>
                 )}
-                {card.metadata.watchers !== undefined && (
+                {card.metadata?.watchers !== undefined && card.metadata?.watchers !== null && (
                   <Descriptions.Item label="Watchers">
                     👀 {card.metadata.watchers.toLocaleString()}
                   </Descriptions.Item>
                 )}
-                {card.metadata.issues !== undefined && (
+                {card.metadata?.issues !== undefined && card.metadata?.issues !== null && (
                   <Descriptions.Item label="Issues">
                     🐛 {card.metadata.issues.toLocaleString()}
                   </Descriptions.Item>
                 )}
-                {card.metadata.citations !== undefined && (
+                {card.metadata?.citations !== undefined && card.metadata?.citations !== null && (
                   <Descriptions.Item label={t('quickView.citations') || '引用'}>
                     📚 {card.metadata.citations.toLocaleString()}
                   </Descriptions.Item>
                 )}
-                {card.metadata.downloads !== undefined && (
+                {card.metadata?.downloads !== undefined && card.metadata?.downloads !== null && (
                   <Descriptions.Item label={t('quickView.downloads') || '下载'}>
                     ⬇️ {card.metadata.downloads.toLocaleString()}
                   </Descriptions.Item>
                 )}
-                {card.metadata.likes !== undefined && (
+                {card.metadata?.likes !== undefined && card.metadata?.likes !== null && (
                   <Descriptions.Item label={t('quickView.likes') || '点赞'}>
                     👍 {card.metadata.likes.toLocaleString()}
                   </Descriptions.Item>
                 )}
-                <Descriptions.Item label={t('quickView.date') || '日期'}>
-                  🕒 {new Date(card.created_at).toLocaleDateString()}
-                </Descriptions.Item>
+                {card.created_at && (
+                  <Descriptions.Item label={t('quickView.date') || '日期'}>
+                    🕒 {new Date(card.created_at).toLocaleDateString()}
+                  </Descriptions.Item>
+                )}
               </Descriptions>
             </Card>
 

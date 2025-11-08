@@ -319,9 +319,11 @@ const DetailPage: React.FC = () => {
                 </a>
               </Descriptions.Item>
             )}
-            <Descriptions.Item label={t('detail.createdAt') || '创建时间'}>
-              {new Date(card.created_at).toLocaleString()}
-            </Descriptions.Item>
+            {card.created_at && (
+              <Descriptions.Item label={t('detail.createdAt') || '创建时间'}>
+                {new Date(card.created_at).toLocaleString()}
+              </Descriptions.Item>
+            )}
             {card.updated_at && (
               <Descriptions.Item label={t('detail.updatedAt') || '更新时间'}>
                 {new Date(card.updated_at).toLocaleString()}

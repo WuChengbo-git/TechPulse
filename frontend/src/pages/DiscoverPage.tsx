@@ -8,7 +8,6 @@ import {
   Spin,
   Empty,
   Typography,
-  Tooltip,
   Badge,
   message,
 } from 'antd';
@@ -24,6 +23,8 @@ import {
 } from '@ant-design/icons';
 import { useLanguage } from '../contexts/LanguageContext';
 import axios from 'axios';
+import QuickViewModal from '../components/QuickViewModal';
+import AddToFavoriteModal from '../components/AddToFavoriteModal';
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -55,14 +56,21 @@ const DiscoverPage: React.FC = () => {
   const { t, language } = useLanguage();
   const [cards, setCards] = useState<TechCard[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [selectedField, setSelectedField] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('recommended');
   const [itemsPerPage, setItemsPerPage] = useState<number>(20);
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [quickViewVisible, setQuickViewVisible] = useState(false);
+  const [selectedCard, setSelectedCard] = useState<TechCard | null>(null);
+  const [favoriteModalVisible, setFavoriteModalVisible] = useState(false);
+  const [favoriteCard, setFavoriteCard] = useState<TechCard | null>(null);
 
   // 获取推荐卡片
   const fetchRecommendedCards = async () => {
     setLoading(true);
+    setHasMore(true); // 重置 hasMore 状态
     try {
       const token = localStorage.getItem('techpulse_token') || sessionStorage.getItem('techpulse_token');
 
@@ -76,7 +84,13 @@ const DiscoverPage: React.FC = () => {
         },
       });
 
-      setCards(response.data.recommendations || response.data || []);
+      const newCards = response.data.recommendations || response.data || [];
+      setCards(newCards);
+
+      // 如果返回的数据少于请求数量，说明没有更多了
+      if (newCards.length < itemsPerPage) {
+        setHasMore(false);
+      }
     } catch (error: any) {
       console.error('Failed to fetch recommendations:', error);
       message.error(t('discover.loadFailed') || '加载推荐失败');
@@ -89,12 +103,55 @@ const DiscoverPage: React.FC = () => {
             translate_to: language,
           },
         });
-        setCards(fallbackResponse.data || []);
+        const fallbackCards = fallbackResponse.data || [];
+        setCards(fallbackCards);
+        if (fallbackCards.length < itemsPerPage) {
+          setHasMore(false);
+        }
       } catch (fallbackError) {
         console.error('Fallback also failed:', fallbackError);
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  // 加载更多卡片
+  const loadMoreCards = async () => {
+    if (!hasMore || loadingMore) return;
+
+    setLoadingMore(true);
+    try {
+      const token = localStorage.getItem('techpulse_token') || sessionStorage.getItem('techpulse_token');
+
+      const response = await axios.get('/api/v1/recommend/', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        params: {
+          limit: itemsPerPage,
+          skip: cards.length, // 使用当前卡片数量作为偏移量
+          field: selectedField === 'all' ? undefined : selectedField,
+          sort_by: sortBy,
+          translate_to: language,
+        },
+      });
+
+      const newCards = response.data.recommendations || response.data || [];
+
+      if (newCards.length === 0 || newCards.length < itemsPerPage) {
+        setHasMore(false);
+      }
+
+      if (newCards.length > 0) {
+        setCards([...cards, ...newCards]); // 追加新卡片
+        // 移除提示框，改为静默加载
+      } else {
+        setHasMore(false);
+      }
+    } catch (error: any) {
+      console.error('Failed to load more:', error);
+      message.error(t('discover.loadMoreFailed') || '加载更多失败');
+    } finally {
+      setLoadingMore(false);
     }
   };
 
@@ -113,24 +170,65 @@ const DiscoverPage: React.FC = () => {
   };
 
   // 切换收藏
-  const toggleFavorite = async (cardId: number) => {
-    const newFavorites = new Set(favorites);
-    if (newFavorites.has(cardId)) {
-      newFavorites.delete(cardId);
-      message.success(t('discover.unfavorited') || '已取消收藏');
-    } else {
-      newFavorites.add(cardId);
-      message.success(t('discover.favorited') || '已收藏');
-    }
-    setFavorites(newFavorites);
+  const toggleFavorite = async (card: TechCard) => {
+    if (favorites.has(card.id)) {
+      // 取消收藏
+      const newFavorites = new Set(favorites);
+      newFavorites.delete(card.id);
+      setFavorites(newFavorites);
 
-    // TODO: 调用后端 API 保存收藏状态
+      try {
+        const token = localStorage.getItem('techpulse_token') || sessionStorage.getItem('techpulse_token');
+        await axios.delete(`/api/v1/favorites/${card.id}`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        message.success(t('discover.unfavorited') || '已取消收藏');
+      } catch (error) {
+        // 回滚
+        newFavorites.add(card.id);
+        setFavorites(newFavorites);
+        message.error(t('discover.unfavoriteFailed') || '取消收藏失败');
+      }
+    } else {
+      // 添加收藏 - 打开标签选择模态框
+      setFavoriteCard(card);
+      setFavoriteModalVisible(true);
+    }
   };
 
-  // 快速查看（待实现模态框）
+  // 确认添加收藏（带标签）
+  const handleConfirmFavorite = async (cardId: number, tags: string[]) => {
+    try {
+      const token = localStorage.getItem('techpulse_token') || sessionStorage.getItem('techpulse_token');
+
+      // 添加到收藏
+      await axios.post(
+        '/api/v1/favorites/',
+        { card_id: cardId },
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+      );
+
+      // 添加标签
+      if (tags.length > 0) {
+        await axios.put(
+          `/api/v1/favorites/${cardId}/tags`,
+          { tags },
+          { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+        );
+      }
+
+      const newFavorites = new Set(favorites);
+      newFavorites.add(cardId);
+      setFavorites(newFavorites);
+    } catch (error) {
+      throw error; // 让模态框处理错误
+    }
+  };
+
+  // 快速查看
   const handleQuickView = (card: TechCard) => {
-    message.info('快速查看功能开发中...');
-    // TODO: 打开 QuickViewModal
+    setSelectedCard(card);
+    setQuickViewVisible(true);
   };
 
   // 深度阅读（跳转详情页）
@@ -186,11 +284,46 @@ const DiscoverPage: React.FC = () => {
                 {t('discover.nlp') || 'NLP'}
               </Tag>
               <Tag
+                color={selectedField === 'ml' ? 'blue' : 'default'}
+                style={{ cursor: 'pointer' }}
+                onClick={() => setSelectedField('ml')}
+              >
+                {t('discover.ml') || '机器学习'}
+              </Tag>
+              <Tag
+                color={selectedField === 'dl' ? 'blue' : 'default'}
+                style={{ cursor: 'pointer' }}
+                onClick={() => setSelectedField('dl')}
+              >
+                {t('discover.dl') || '深度学习'}
+              </Tag>
+              <Tag
+                color={selectedField === 'rl' ? 'blue' : 'default'}
+                style={{ cursor: 'pointer' }}
+                onClick={() => setSelectedField('rl')}
+              >
+                {t('discover.rl') || '强化学习'}
+              </Tag>
+              <Tag
                 color={selectedField === 'tools' ? 'blue' : 'default'}
                 style={{ cursor: 'pointer' }}
                 onClick={() => setSelectedField('tools')}
               >
                 {t('discover.tools') || '工具库'}
+              </Tag>
+              <Tag
+                color={selectedField === 'robotics' ? 'blue' : 'default'}
+                style={{ cursor: 'pointer' }}
+                onClick={() => setSelectedField('robotics')}
+              >
+                {t('discover.robotics') || '机器人'}
+              </Tag>
+              <Tag
+                color={selectedField === 'data' ? 'blue' : 'default'}
+                style={{ cursor: 'pointer' }}
+                onClick={() => setSelectedField('data')}
+              >
+                {t('discover.data') || '数据科学'}
               </Tag>
             </Space>
           </Space>
@@ -254,30 +387,32 @@ const DiscoverPage: React.FC = () => {
                   <Button
                     type="text"
                     icon={favorites.has(card.id) ? <StarFilled style={{ color: '#faad14' }} /> : <StarOutlined />}
-                    onClick={() => toggleFavorite(card.id)}
+                    onClick={() => toggleFavorite(card)}
                   />
                 </div>
 
                 {/* 元数据 */}
                 <Space size="middle" style={{ marginBottom: '12px' }}>
-                  {card.metadata.author && (
+                  {card.metadata?.author && (
                     <Text type="secondary">{card.metadata.author}</Text>
                   )}
-                  {card.metadata.stars !== undefined && (
+                  {card.metadata?.stars !== undefined && card.metadata?.stars !== null && (
                     <Text type="secondary">⭐ {card.metadata.stars.toLocaleString()}</Text>
                   )}
-                  {card.metadata.citations !== undefined && (
+                  {card.metadata?.citations !== undefined && card.metadata?.citations !== null && (
                     <Text type="secondary">📚 引用 {card.metadata.citations}</Text>
                   )}
-                  {card.metadata.downloads !== undefined && (
+                  {card.metadata?.downloads !== undefined && card.metadata?.downloads !== null && (
                     <Text type="secondary">⬇️ {card.metadata.downloads.toLocaleString()}</Text>
                   )}
-                  {card.metadata.likes !== undefined && (
+                  {card.metadata?.likes !== undefined && card.metadata?.likes !== null && (
                     <Text type="secondary">👍 {card.metadata.likes}</Text>
                   )}
-                  <Text type="secondary">
-                    🕒 {new Date(card.created_at).toLocaleDateString()}
-                  </Text>
+                  {card.created_at && (
+                    <Text type="secondary">
+                      🕒 {new Date(card.created_at).toLocaleDateString()}
+                    </Text>
+                  )}
                 </Space>
 
                 {/* 摘要 */}
@@ -289,13 +424,15 @@ const DiscoverPage: React.FC = () => {
                 </Paragraph>
 
                 {/* 标签 */}
-                <div style={{ marginBottom: '12px' }}>
-                  <Space size="small" wrap>
-                    {card.tags.slice(0, 5).map((tag, index) => (
-                      <Tag key={index}>{tag}</Tag>
-                    ))}
-                  </Space>
-                </div>
+                {card.tags && card.tags.length > 0 && (
+                  <div style={{ marginBottom: '12px' }}>
+                    <Space size="small" wrap>
+                      {card.tags.slice(0, 5).map((tag, index) => (
+                        <Tag key={index}>{tag}</Tag>
+                      ))}
+                    </Space>
+                  </div>
+                )}
 
                 {/* 操作按钮 */}
                 <Space>
@@ -324,11 +461,44 @@ const DiscoverPage: React.FC = () => {
       {/* 加载更多按钮 */}
       {!loading && cards.length > 0 && (
         <div style={{ textAlign: 'center', marginTop: '24px' }}>
-          <Button size="large" onClick={() => message.info('加载更多功能开发中...')}>
-            {t('discover.loadMore') || '加载更多'}
+          <Button
+            size="large"
+            onClick={loadMoreCards}
+            loading={loadingMore}
+            disabled={!hasMore}
+          >
+            {hasMore ? (t('discover.loadMore') || '加载更多') : (t('discover.noMore') || '没有更多了')}
           </Button>
         </div>
       )}
+
+      {/* 快速查看模态框 */}
+      <QuickViewModal
+        visible={quickViewVisible}
+        cardId={selectedCard?.id || null}
+        onClose={() => {
+          setQuickViewVisible(false);
+          setSelectedCard(null);
+        }}
+        onDeepRead={() => {
+          if (selectedCard) {
+            setQuickViewVisible(false);
+            handleDeepRead(selectedCard);
+          }
+        }}
+      />
+
+      {/* 添加到收藏模态框 */}
+      <AddToFavoriteModal
+        visible={favoriteModalVisible}
+        cardId={favoriteCard?.id || null}
+        cardTitle={favoriteCard?.title || ''}
+        onClose={() => {
+          setFavoriteModalVisible(false);
+          setFavoriteCard(null);
+        }}
+        onConfirm={handleConfirmFavorite}
+      />
     </div>
   );
 };
