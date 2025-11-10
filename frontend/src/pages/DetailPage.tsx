@@ -35,6 +35,7 @@ import {
 } from '@ant-design/icons';
 import { useLanguage } from '../contexts/LanguageContext';
 import axios from 'axios';
+import MarkdownRenderer from '../components/MarkdownRenderer';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -192,19 +193,11 @@ const DetailPage: React.FC = () => {
           {/* 完整内容 */}
           <Card size="small">
             <Title level={5}>{t('detail.fullContent') || '完整内容'}</Title>
-            <div
-              style={{
-                fontSize: '15px',
-                lineHeight: '1.8',
-                color: '#24292f',
-                whiteSpace: 'pre-wrap',
-                wordBreak: 'break-word',
-              }}
-            >
-              {card.translated_content || card.content || (
-                <Text type="secondary">{t('detail.noContent') || '暂无详细内容'}</Text>
-              )}
-            </div>
+            {card.translated_content || card.content ? (
+              <MarkdownRenderer content={card.translated_content || card.content} />
+            ) : (
+              <Text type="secondary">{t('detail.noContent') || '暂无详细内容'}</Text>
+            )}
             {(card.translated_summary || card.translated_content) && (
               <div style={{ marginTop: '16px' }}>
                 <Text type="secondary" style={{ fontSize: '12px' }}>
@@ -227,22 +220,22 @@ const DetailPage: React.FC = () => {
       children: (
         <Card size="small">
           <Descriptions column={2} bordered size="small">
-            {card.metadata.author && (
+            {card.metadata?.author && (
               <Descriptions.Item label={t('detail.author') || '作者'} span={2}>
                 <Text strong>{card.metadata.author}</Text>
               </Descriptions.Item>
             )}
-            {card.metadata.language && (
+            {card.metadata?.language && (
               <Descriptions.Item label={t('detail.language') || '编程语言'}>
                 <Tag color="blue">{card.metadata.language}</Tag>
               </Descriptions.Item>
             )}
-            {card.metadata.license && (
+            {card.metadata?.license && (
               <Descriptions.Item label={t('detail.license') || '许可证'}>
                 <Tag>{card.metadata.license}</Tag>
               </Descriptions.Item>
             )}
-            {card.metadata.stars !== undefined && (
+            {card.metadata?.stars !== undefined && (
               <Descriptions.Item label="Stars">
                 <Statistic
                   value={card.metadata.stars}
@@ -251,7 +244,7 @@ const DetailPage: React.FC = () => {
                 />
               </Descriptions.Item>
             )}
-            {card.metadata.forks !== undefined && (
+            {card.metadata?.forks !== undefined && (
               <Descriptions.Item label="Forks">
                 <Statistic
                   value={card.metadata.forks}
@@ -260,7 +253,7 @@ const DetailPage: React.FC = () => {
                 />
               </Descriptions.Item>
             )}
-            {card.metadata.watchers !== undefined && (
+            {card.metadata?.watchers !== undefined && (
               <Descriptions.Item label="Watchers">
                 <Statistic
                   value={card.metadata.watchers}
@@ -269,7 +262,7 @@ const DetailPage: React.FC = () => {
                 />
               </Descriptions.Item>
             )}
-            {card.metadata.issues !== undefined && (
+            {card.metadata?.issues !== undefined && (
               <Descriptions.Item label="Issues">
                 <Statistic
                   value={card.metadata.issues}
@@ -278,7 +271,7 @@ const DetailPage: React.FC = () => {
                 />
               </Descriptions.Item>
             )}
-            {card.metadata.citations !== undefined && (
+            {card.metadata?.citations !== undefined && (
               <Descriptions.Item label={t('detail.citations') || '引用数'}>
                 <Statistic
                   value={card.metadata.citations}
@@ -287,7 +280,7 @@ const DetailPage: React.FC = () => {
                 />
               </Descriptions.Item>
             )}
-            {card.metadata.downloads !== undefined && (
+            {card.metadata?.downloads !== undefined && (
               <Descriptions.Item label={t('detail.downloads') || '下载量'}>
                 <Statistic
                   value={card.metadata.downloads}
@@ -296,7 +289,7 @@ const DetailPage: React.FC = () => {
                 />
               </Descriptions.Item>
             )}
-            {card.metadata.likes !== undefined && (
+            {card.metadata?.likes !== undefined && (
               <Descriptions.Item label={t('detail.likes') || '点赞'}>
                 <Statistic
                   value={card.metadata.likes}
@@ -305,14 +298,14 @@ const DetailPage: React.FC = () => {
                 />
               </Descriptions.Item>
             )}
-            {card.metadata.homepage && (
+            {card.metadata?.homepage && (
               <Descriptions.Item label={t('detail.homepage') || '主页'} span={2}>
                 <a href={card.metadata.homepage} target="_blank" rel="noopener noreferrer">
                   {card.metadata.homepage}
                 </a>
               </Descriptions.Item>
             )}
-            {card.metadata.documentation && (
+            {card.metadata?.documentation && (
               <Descriptions.Item label={t('detail.documentation') || '文档'} span={2}>
                 <a href={card.metadata.documentation} target="_blank" rel="noopener noreferrer">
                   {card.metadata.documentation}
@@ -332,7 +325,7 @@ const DetailPage: React.FC = () => {
           </Descriptions>
 
           {/* Topics */}
-          {card.metadata.topics && card.metadata.topics.length > 0 && (
+          {card.metadata?.topics && card.metadata.topics.length > 0 && (
             <div style={{ marginTop: '16px' }}>
               <Text strong>{t('detail.topics') || '主题'}:</Text>
               <div style={{ marginTop: '8px' }}>

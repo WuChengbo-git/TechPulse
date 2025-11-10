@@ -198,12 +198,12 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({
             {/* 元数据 */}
             <Card size="small" style={{ marginBottom: '16px', backgroundColor: '#fafafa' }}>
               <Descriptions column={2} size="small">
-                {card.metadata.author && (
+                {card.metadata?.author && (
                   <Descriptions.Item label={t('quickView.author') || '作者'}>
                     {card.metadata.author}
                   </Descriptions.Item>
                 )}
-                {card.metadata.language && (
+                {card.metadata?.language && (
                   <Descriptions.Item label={t('quickView.language') || '语言'}>
                     <Tag>{card.metadata.language}</Tag>
                   </Descriptions.Item>

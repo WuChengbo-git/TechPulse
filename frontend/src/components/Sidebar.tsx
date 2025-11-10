@@ -1,5 +1,5 @@
 import React from 'react'
-import { Layout, Menu, Avatar, Typography } from 'antd'
+import { Layout, Menu, Typography } from 'antd'
 import type { MenuProps } from 'antd'
 import {
   DashboardOutlined,
@@ -41,12 +41,12 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, selectedKey, onMenuSelect 
     {
       key: 'discover',
       icon: <FireOutlined />,
-      label: t('discover.title') || '🎯 今日精选'
+      label: t('discover.title') || '今日精选'
     },
     {
       key: 'explore',
       icon: <CompassOutlined />,
-      label: t('explore.title') || '🔍 数据探索'
+      label: t('explore.title') || '数据探索'
     },
     {
       key: 'collections',
@@ -56,7 +56,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, selectedKey, onMenuSelect 
     {
       key: 'trending',
       icon: <LineChartOutlined />,
-      label: t('nav.trending')
+      label: t('nav.trendAnalysis')
     },
 
     // Divider
@@ -67,22 +67,6 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, selectedKey, onMenuSelect 
       key: 'chat',
       icon: <MessageOutlined />,
       label: t('nav.aiAssistant')
-    },
-
-    // Legacy pages (folded under submenus)
-    {
-      key: 'legacy',
-      icon: <DashboardOutlined />,
-      label: '传统视图',
-      children: [
-        { key: 'dashboard', icon: <BarChartOutlined />, label: t('nav.dashboard') },
-        { key: 'github', icon: <GithubOutlined />, label: t('nav.github') },
-        { key: 'arxiv', icon: <FileTextOutlined />, label: t('nav.arxiv') },
-        { key: 'huggingface', icon: <RobotOutlined />, label: t('nav.huggingface') },
-        { key: 'zenn', icon: <EditOutlined />, label: t('nav.zenn') },
-        { key: 'analytics', icon: <AnalyticsOutlined />, label: t('nav.dataAnalysis') },
-        { key: 'trends', icon: <LineChartOutlined />, label: t('nav.trendAnalysis') }
-      ]
     },
 
     // Divider
@@ -126,15 +110,37 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, selectedKey, onMenuSelect 
         }}
       >
         {collapsed ? (
-          <Avatar style={{ backgroundColor: '#1890ff' }} size="small">
-            T
-          </Avatar>
+          <svg width="32" height="32" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="techGradientCollapsed" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#1890ff" />
+                <stop offset="50%" stopColor="#52c41a" />
+                <stop offset="100%" stopColor="#722ed1" />
+              </linearGradient>
+            </defs>
+            <circle cx="100" cy="100" r="90" stroke="url(#techGradientCollapsed)" strokeWidth="4" fill="none" strokeDasharray="10 5" />
+            <path d="M 70 60 L 130 60 L 130 70 L 105 70 L 105 140 L 95 140 L 95 70 L 70 70 Z" fill="url(#techGradientCollapsed)" />
+          </svg>
         ) : (
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Avatar style={{ backgroundColor: '#1890ff' }} size="small">
-              T
-            </Avatar>
-            <Text strong style={{ color: '#1890ff', fontSize: 16 }}>
+            <svg width="32" height="32" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="techGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#1890ff" />
+                  <stop offset="50%" stopColor="#52c41a" />
+                  <stop offset="100%" stopColor="#722ed1" />
+                </linearGradient>
+              </defs>
+              <circle cx="100" cy="100" r="90" stroke="url(#techGradient)" strokeWidth="4" fill="none" strokeDasharray="10 5" />
+              <path d="M 70 60 L 130 60 L 130 70 L 105 70 L 105 140 L 95 140 L 95 70 L 70 70 Z" fill="url(#techGradient)" />
+            </svg>
+            <Text strong style={{
+              fontSize: 16,
+              background: 'linear-gradient(90deg, #1890ff, #52c41a, #722ed1)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}>
               TechPulse
             </Text>
           </div>

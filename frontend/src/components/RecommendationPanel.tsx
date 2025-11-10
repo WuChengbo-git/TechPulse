@@ -3,8 +3,9 @@ import { Card, Button, Empty, Spin, Space, Typography, message } from 'antd'
 import { ReloadOutlined, BulbOutlined, SettingOutlined } from '@ant-design/icons'
 import { useLanguage } from '../contexts/LanguageContext'
 import RecommendationCard from './RecommendationCard'
+import { translateTags } from '../utils/translateTags'
 
-const { Title, Text } = Typography
+const { Text } = Typography
 
 interface RecommendationData {
   card: {
@@ -33,10 +34,11 @@ export const RecommendationPanel: React.FC<RecommendationPanelProps> = ({
   limit = 10,
   onCardClick
 }) => {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const [recommendations, setRecommendations] = useState<RecommendationData[]>([])
   const [loading, setLoading] = useState(false)
   const [userTags, setUserTags] = useState<string[]>([])
+  const [translatedUserTags, setTranslatedUserTags] = useState<string[]>([])
   const [excludedIds, setExcludedIds] = useState<number[]>([])
 
   // 加载推荐
@@ -90,6 +92,25 @@ export const RecommendationPanel: React.FC<RecommendationPanelProps> = ({
   useEffect(() => {
     loadRecommendations()
   }, [userId])
+
+  // 翻译用户标签
+  useEffect(() => {
+    const translateUserTagsAsync = async () => {
+      if (userTags.length > 0 && language !== 'zh-CN') {
+        try {
+          const translated = await translateTags(userTags, language as 'en-US' | 'ja-JP' | 'zh-CN')
+          setTranslatedUserTags(translated)
+        } catch (error) {
+          console.error('Failed to translate user tags:', error)
+          setTranslatedUserTags(userTags)
+        }
+      } else {
+        setTranslatedUserTags(userTags)
+      }
+    }
+
+    translateUserTagsAsync()
+  }, [userTags, language])
 
   // 处理卡片点击
   const handleCardClick = async (cardId: number) => {
@@ -194,10 +215,10 @@ export const RecommendationPanel: React.FC<RecommendationPanelProps> = ({
       bodyStyle={{ padding: '12px' }}
     >
       {/* 用户兴趣标签 */}
-      {userTags.length > 0 && (
+      {translatedUserTags.length > 0 && (
         <div style={{ marginBottom: 12, padding: '8px 12px', background: '#f6f8fa', borderRadius: 4 }}>
           <Text type="secondary" style={{ fontSize: 12 }}>
-            🎯 {t('recommendation.yourInterests') || '你的兴趣'}: {userTags.join(', ')}
+            🎯 {t('recommendation.yourInterests') || '你的兴趣'}: {translatedUserTags.join(', ')}
           </Text>
         </div>
       )}

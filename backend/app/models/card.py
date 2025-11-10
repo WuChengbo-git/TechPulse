@@ -26,6 +26,7 @@ class TechCard(Base):
     source = Column(Enum(SourceType), nullable=False, index=True)
     original_url = Column(String(1000), nullable=False)
     summary = Column(Text)
+    content = Column(Text)  # 完整内容（Markdown格式）
     chinese_tags = Column(JSON)  # 中文标签
     ai_category = Column(JSON)   # AI分类标签：LLM、CV、NLP、Agent等
     tech_stack = Column(JSON)    # 技术栈：Python、PyTorch、FastAPI等

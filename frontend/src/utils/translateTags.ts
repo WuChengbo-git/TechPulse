@@ -11,12 +11,12 @@ const cache: Record<string, string> = {};
 /**
  * 翻译标签列表
  * @param tags 要翻译的标签数组
- * @param targetLanguage 目标语言 ('en-US' | 'ja-JP')
+ * @param targetLanguage 目标语言 ('en-US' | 'ja-JP' | 'zh-CN')
  * @returns 翻译后的标签数组
  */
 export async function translateTags(
   tags: string[],
-  targetLanguage: 'en-US' | 'ja-JP'
+  targetLanguage: 'en-US' | 'ja-JP' | 'zh-CN'
 ): Promise<string[]> {
   // 如果是中文，直接返回
   if (targetLanguage === 'zh-CN') {

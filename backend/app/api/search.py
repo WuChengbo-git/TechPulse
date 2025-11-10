@@ -3,16 +3,18 @@
 """
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import or_, func
+from sqlalchemy import or_, func, text
 from pydantic import BaseModel
 from typing import List, Optional
 import re
+import logging
 
 from ..core.database import get_db
 from ..models.card import TechCard
 from ..models.behavior import SearchHistory
 
 router = APIRouter(tags=["search"])
+logger = logging.getLogger(__name__)
 
 
 # Pydantic模型
@@ -267,3 +269,133 @@ async def search_autocomplete(
     # 2. TODO: 从热门标签中查找
 
     return suggestions[:limit]
+
+
+@router.get("/search/fulltext")
+async def fulltext_search(
+    q: str = Query(..., description="搜索关键词", min_length=1),
+    limit: int = Query(20, ge=1, le=100, description="返回结果数量"),
+    offset: int = Query(0, ge=0, description="偏移量"),
+    source: Optional[str] = Query(None, description="数据源筛选"),
+    min_stars: Optional[int] = Query(None, description="最小Star数"),
+    db: Session = Depends(get_db)
+):
+    """
+    FTS5全文搜索
+
+    使用SQLite FTS5进行高性能全文搜索
+
+    - **q**: 搜索关键词（必填）
+    - **limit**: 返回结果数量（默认20）
+    - **offset**: 分页偏移量（默认0）
+    - **source**: 数据源筛选（可选：github, arxiv, huggingface, zenn）
+    - **min_stars**: 最小Star数筛选（可选）
+    """
+
+    try:
+        # 构建FTS5搜索查询
+        base_query = """
+            SELECT
+                tc.*,
+                bm25(tcf) as relevance_score
+            FROM tech_cards tc
+            INNER JOIN tech_cards_fts tcf ON tc.id = tcf.card_id
+            WHERE tcf MATCH :query
+        """
+
+        # 添加额外筛选条件
+        filters = []
+        params = {"query": q, "limit": limit, "offset": offset}
+
+        if source:
+            filters.append("tc.source = :source")
+            params["source"] = source
+
+        if min_stars is not None:
+            filters.append("tc.stars >= :min_stars")
+            params["min_stars"] = min_stars
+
+        if filters:
+            base_query += " AND " + " AND ".join(filters)
+
+        # 按相关性排序
+        base_query += " ORDER BY relevance_score LIMIT :limit OFFSET :offset"
+
+        # 执行查询
+        result = db.execute(text(base_query), params)
+        rows = result.fetchall()
+
+        # 转换为字典列表
+        cards = []
+        for row in rows:
+            card_dict = {
+                "id": row.id,
+                "title": row.title,
+                "source": row.source,
+                "url": row.original_url,
+                "summary": row.summary or "",
+                "content": row.content or "",
+                "tags": row.chinese_tags or [],
+                "created_at": row.created_at.isoformat() if row.created_at else None,
+                "metadata": {
+                    "stars": row.stars or 0,
+                    "forks": row.forks or 0,
+                },
+                "quality_score": row.quality_score or 5.0,
+            }
+
+            cards.append(card_dict)
+
+        logger.info(f"FTS5搜索 '{q}' 返回 {len(cards)} 条结果")
+
+        return {
+            "results": cards,
+            "total": len(cards),
+            "query": q
+        }
+
+    except Exception as e:
+        logger.error(f"FTS5搜索失败: {str(e)}")
+        return {
+            "results": [],
+            "total": 0,
+            "query": q,
+            "error": str(e)
+        }
+
+
+@router.get("/search/popular-keywords")
+async def get_popular_keywords(
+    limit: int = Query(10, ge=1, le=50),
+    db: Session = Depends(get_db)
+):
+    """
+    获取热门搜索关键词
+
+    基于标签频率返回热门关键词
+    """
+
+    try:
+        query = """
+            SELECT
+                json_each.value as tag,
+                COUNT(*) as frequency
+            FROM tech_cards, json_each(tech_cards.chinese_tags)
+            WHERE json_each.value IS NOT NULL
+            GROUP BY json_each.value
+            ORDER BY frequency DESC
+            LIMIT :limit
+        """
+
+        result = db.execute(text(query), {"limit": limit})
+
+        keywords = [
+            {"keyword": row[0], "count": row[1]}
+            for row in result.fetchall()
+        ]
+
+        return {"keywords": keywords}
+
+    except Exception as e:
+        logger.error(f"获取热门关键词失败: {str(e)}")
+        return {"keywords": []}

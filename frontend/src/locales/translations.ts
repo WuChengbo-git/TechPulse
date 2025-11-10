@@ -950,7 +950,7 @@ export const translations: Record<Language, Translations> = {
     },
 
     discover: {
-      title: '🎯 今日精选',
+      title: '今日精选',
       subtitle: '为你精选的技术情报',
       field: '领域',
       all: '全部',
@@ -972,11 +972,12 @@ export const translations: Record<Language, Translations> = {
       favorited: '已收藏',
       unfavorited: '已取消收藏',
       translatedFromJapanese: 'AI翻译自日语原文',
+      translatedFromChinese: 'AI翻译自中文原文',
       loadMore: '加载更多',
     },
 
     explore: {
-      title: '🔍 数据探索',
+      title: '数据探索',
       subtitle: '探索所有技术数据源',
       allSources: '全部数据源',
       advancedFilters: '高级筛选',
@@ -2021,7 +2022,7 @@ export const translations: Record<Language, Translations> = {
     },
 
     discover: {
-      title: '🎯 Today\'s Picks',
+      title: 'Today\'s Picks',
       subtitle: 'Curated tech intelligence for you',
       field: 'Field',
       all: 'All',
@@ -2043,11 +2044,12 @@ export const translations: Record<Language, Translations> = {
       favorited: 'Favorited',
       unfavorited: 'Unfavorited',
       translatedFromJapanese: 'AI translated from Japanese',
+      translatedFromChinese: 'AI translated from Chinese',
       loadMore: 'Load More',
     },
 
     explore: {
-      title: '🔍 Explore Data',
+      title: 'Explore Data',
       subtitle: 'Explore all tech data sources',
       allSources: 'All Sources',
       advancedFilters: 'Advanced Filters',
@@ -3098,7 +3100,7 @@ export const translations: Record<Language, Translations> = {
     },
 
     discover: {
-      title: '🎯 本日のピックアップ',
+      title: '本日のピックアップ',
       subtitle: 'あなたのための厳選技術情報',
       field: '分野',
       all: 'すべて',
@@ -3120,11 +3122,12 @@ export const translations: Record<Language, Translations> = {
       favorited: 'お気に入りに追加しました',
       unfavorited: 'お気に入りを解除しました',
       translatedFromJapanese: '日本語原文からAI翻訳',
+      translatedFromChinese: '中国語原文からAI翻訳',
       loadMore: 'さらに読み込む',
     },
 
     explore: {
-      title: '🔍 データ探索',
+      title: 'データ探索',
       subtitle: 'すべての技術データソースを探索',
       allSources: 'すべてのソース',
       advancedFilters: '高度なフィルター',

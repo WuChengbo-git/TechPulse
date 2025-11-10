@@ -17,6 +17,8 @@ import logging
 from typing import List, Optional, Dict
 from enum import Enum
 import httpx
+import asyncio
+from asyncio import Queue, Semaphore
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +28,7 @@ class TranslationProvider(Enum):
     OPENAI = "openai"
     GOOGLE = "google"
     DEEPL = "deepl"
+    OLLAMA = "ollama"  # 本地 Ollama
     NONE = "none"  # 不翻译
 
 
@@ -42,6 +45,9 @@ class TranslationService:
         self.provider = provider
         self.cache: Dict[str, str] = {}  # 简单的内存缓存
 
+        # Ollama 速率限制：同时只处理 1 个请求，避免 503
+        self.ollama_semaphore = Semaphore(1) if provider == TranslationProvider.OLLAMA else None
+
         # 检查 API 密钥和配置
         if provider == TranslationProvider.OPENAI:
             # 优先使用 Azure OpenAI
@@ -54,6 +60,10 @@ class TranslationService:
             self.api_key = os.getenv("GOOGLE_TRANSLATE_API_KEY")
         elif provider == TranslationProvider.DEEPL:
             self.api_key = os.getenv("DEEPL_API_KEY")
+        elif provider == TranslationProvider.OLLAMA:
+            self.ollama_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+            self.ollama_model = os.getenv("OLLAMA_MODEL", "swallow-8B-Instruct-v0.3-Q4_K_M")
+            self.api_key = "ollama"  # Ollama 不需要 API key，但设置一个标记
         else:
             self.api_key = None
 
@@ -93,6 +103,8 @@ class TranslationService:
                 result = await self._translate_with_google(text, source_lang, target_lang)
             elif self.provider == TranslationProvider.DEEPL:
                 result = await self._translate_with_deepl(text, source_lang, target_lang)
+            elif self.provider == TranslationProvider.OLLAMA:
+                result = await self._translate_with_ollama(text, source_lang, target_lang)
             else:
                 result = text
 
@@ -265,6 +277,68 @@ Keep the translation natural and preserve technical terms where appropriate.
             logger.error(f"DeepL translation error: {e}")
             return text
 
+    async def _translate_with_ollama(
+        self,
+        text: str,
+        source_lang: str,
+        target_lang: str
+    ) -> str:
+        """使用本地 Ollama 翻译（带速率限制）"""
+        # 使用信号量确保同时只有一个请求
+        async with self.ollama_semaphore:
+            try:
+                # 语言名称映射
+                lang_names = {
+                    "ja": "日本語",
+                    "en": "English",
+                    "zh-CN": "中文",
+                    "zh": "中文"
+                }
+
+                source_name = lang_names.get(source_lang, source_lang)
+                target_name = lang_names.get(target_lang, target_lang)
+
+                # 构建翻译提示词
+                prompt = f"""あなたはプロの翻訳者です。以下の{source_name}テキストを{target_name}に翻訳してください。
+技術用語は適切に保持し、自然な翻訳を心がけてください。
+翻訳結果のみを出力し、説明や追加のコメントは不要です。
+
+{source_name}テキスト:
+{text}
+
+{target_name}翻訳:"""
+
+                # 调用 Ollama API
+                url = f"{self.ollama_url}/api/generate"
+                data = {
+                    "model": self.ollama_model,
+                    "prompt": prompt,
+                    "stream": False,
+                    "options": {
+                        "temperature": 0.3,
+                        "num_predict": 500
+                    }
+                }
+
+                async with httpx.AsyncClient(timeout=60.0) as client:  # 增加超时时间
+                    response = await client.post(url, json=data)
+                    response.raise_for_status()
+
+                    result = response.json()
+                    translation = result.get("response", "").strip()
+
+                    # 如果翻译为空，返回原文
+                    if not translation:
+                        logger.warning(f"Ollama returned empty translation for: {text[:50]}")
+                        return text
+
+                    logger.info(f"Successfully translated: {text[:30]}... -> {translation[:30]}...")
+                    return translation
+
+            except Exception as e:
+                logger.error(f"Ollama translation error: {e}")
+                return text
+
     async def translate_zenn_article(
         self,
         title: str,
@@ -302,14 +376,14 @@ def get_translation_service() -> TranslationService:
     global _translation_service
 
     if _translation_service is None:
-        # 根据环境变量选择翻译提供商
-        provider_name = os.getenv("TRANSLATION_PROVIDER", "openai").lower()
+        # 根据环境变量选择翻译提供商，默认使用 Ollama
+        provider_name = os.getenv("TRANSLATION_PROVIDER", "ollama").lower()
 
         try:
             provider = TranslationProvider(provider_name)
         except ValueError:
-            logger.warning(f"Unknown translation provider: {provider_name}, using OpenAI")
-            provider = TranslationProvider.OPENAI
+            logger.warning(f"Unknown translation provider: {provider_name}, using Ollama")
+            provider = TranslationProvider.OLLAMA
 
         _translation_service = TranslationService(provider=provider)
         logger.info(f"Translation service initialized with provider: {provider.value}")

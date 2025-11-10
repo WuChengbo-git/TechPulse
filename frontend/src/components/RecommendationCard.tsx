@@ -1,10 +1,58 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card, Tag, Space, Typography, Badge, Button } from 'antd'
-import { StarOutlined, LinkOutlined, GithubOutlined, FileTextOutlined, RobotOutlined, HeartOutlined, EyeOutlined } from '@ant-design/icons'
+import { LinkOutlined, GithubOutlined, FileTextOutlined, RobotOutlined, HeartOutlined, EyeOutlined } from '@ant-design/icons'
 import { useLanguage } from '../contexts/LanguageContext'
 import QualityBadge from './QualityBadge'
+import { translateTags } from '../utils/translateTags'
 
 const { Text, Paragraph } = Typography
+
+// 推荐理由翻译字典
+const reasonTranslations: Record<string, Record<string, string>> = {
+  '为你推荐': {
+    'en-US': 'Recommended for you',
+    'ja-JP': 'おすすめ'
+  },
+  '最新发布': {
+    'en-US': 'Latest release',
+    'ja-JP': '最新リリース'
+  },
+  '高质量内容': {
+    'en-US': 'High quality',
+    'ja-JP': '高品質コンテンツ'
+  },
+  '基于你的兴趣': {
+    'en-US': 'Based on your interests',
+    'ja-JP': 'あなたの興味に基づく'
+  }
+}
+
+// 翻译推荐理由
+const translateReason = (reason: string, language: string): string => {
+  if (language === 'zh-CN') return reason
+
+  // 尝试匹配固定的理由模式
+  for (const [key, translations] of Object.entries(reasonTranslations)) {
+    if (reason.includes(key)) {
+      const baseTranslation = translations[language] || reason
+      // 处理特殊格式（如评分）
+      if (reason.includes('⭐')) {
+        const scoreMatch = reason.match(/⭐\s*(\d+\.\d+)/)
+        if (scoreMatch) {
+          return `${baseTranslation} (⭐ ${scoreMatch[1]})`
+        }
+      }
+      // 处理兴趣标签列表
+      if (key === '基于你的兴趣' && reason.includes('：')) {
+        const tags = reason.split('：')[1]
+        return `${baseTranslation}: ${tags}`
+      }
+      return baseTranslation
+    }
+  }
+
+  return reason
+}
 
 interface RecommendationCardData {
   card: {
@@ -61,7 +109,27 @@ export const RecommendationCard: React.FC<RecommendationCardProps> = ({
   onCardClick,
   onFavorite
 }) => {
-  const { t } = useLanguage()
+  const { language } = useLanguage()
+  const [translatedMatchedTags, setTranslatedMatchedTags] = useState<string[]>(data.matched_tags || [])
+
+  // 翻译标签
+  useEffect(() => {
+    const translateMatchedTags = async () => {
+      if (data.matched_tags && data.matched_tags.length > 0 && language !== 'zh-CN') {
+        try {
+          const translated = await translateTags(data.matched_tags, language as 'en-US' | 'ja-JP' | 'zh-CN')
+          setTranslatedMatchedTags(translated)
+        } catch (error) {
+          console.error('Failed to translate matched tags:', error)
+          setTranslatedMatchedTags(data.matched_tags)
+        }
+      } else {
+        setTranslatedMatchedTags(data.matched_tags || [])
+      }
+    }
+
+    translateMatchedTags()
+  }, [data.matched_tags, language])
 
   return (
     <Card
@@ -97,14 +165,14 @@ export const RecommendationCard: React.FC<RecommendationCardProps> = ({
       {/* 推荐理由 */}
       <div style={{ marginBottom: 8 }}>
         <Tag color="blue" style={{ fontSize: 11, marginBottom: 0 }}>
-          💡 {data.reason}
+          💡 {translateReason(data.reason, language)}
         </Tag>
       </div>
 
       {/* 匹配的标签 */}
-      {data.matched_tags && data.matched_tags.length > 0 && (
+      {translatedMatchedTags && translatedMatchedTags.length > 0 && (
         <Space size={[4, 4]} wrap style={{ marginBottom: 8 }}>
-          {data.matched_tags.map((tag, index) => (
+          {translatedMatchedTags.map((tag, index) => (
             <Tag key={index} color="orange" style={{ fontSize: 11, margin: 0 }}>
               {tag}
             </Tag>

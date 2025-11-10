@@ -7,14 +7,16 @@ from sqlalchemy import func, desc
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime, timedelta
+import logging
 
 from ..core.database import get_db
 from ..models.card import TechCard
 from ..models.behavior import UserBehavior, ActionType, UserRecommendation
 from ..models.user_preference import UserPreference
-from ..services.translation_service import translate_zenn_content
+from ..services.translation_service import translate_zenn_content, get_translation_service
 
 router = APIRouter(tags=["recommendations"])
+logger = logging.getLogger(__name__)
 
 
 @router.get("/recommend/")
@@ -133,6 +135,55 @@ async def get_simple_recommendations(
                     "created_at": card.created_at.isoformat() if card.created_at else None,
                     "metadata": metadata
                 }
+
+                # 翻译支持（字段过滤分支）
+                if translate_to:
+                    try:
+                        translation_service = get_translation_service()
+
+                        # 如果目标语言是中文且来源是日文（Zenn）
+                        if translate_to == "zh-CN" and card.source.value == 'zenn':
+                            translated = await translate_zenn_content(card.title, card.summary)
+                            result["translated_title"] = translated["title"]
+                            result["translated_summary"] = translated["summary"]
+
+                        # 如果目标语言是日文且来源内容是中文
+                        elif translate_to == "ja-JP" or translate_to == "ja":
+                            # 大部分内容是中文的，需要翻译成日文
+                            if card.source.value != 'zenn':  # Zenn 本身就是日文，不需要翻译
+                                translated_title = await translation_service.translate(
+                                    card.title,
+                                    source_lang="zh-CN",
+                                    target_lang="ja"
+                                )
+                                translated_summary = await translation_service.translate(
+                                    card.summary or "",
+                                    source_lang="zh-CN",
+                                    target_lang="ja"
+                                )
+                                result["translated_title"] = translated_title
+                                result["translated_summary"] = translated_summary
+
+                        # 如果目标语言是英文且来源内容是中文
+                        elif translate_to == "en-US" or translate_to == "en":
+                            if card.source.value != 'github' and card.source.value != 'arxiv':  # GitHub 和 arXiv 通常是英文
+                                translated_title = await translation_service.translate(
+                                    card.title,
+                                    source_lang="zh-CN",
+                                    target_lang="en"
+                                )
+                                translated_summary = await translation_service.translate(
+                                    card.summary or "",
+                                    source_lang="zh-CN",
+                                    target_lang="en"
+                                )
+                                result["translated_title"] = translated_title
+                                result["translated_summary"] = translated_summary
+
+                    except Exception as e:
+                        logger.error(f"Translation error for card {card.id}: {e}")
+                        # 翻译失败时不添加翻译字段
+
                 results.append(result)
 
             return results
@@ -214,12 +265,50 @@ async def get_simple_recommendations(
             "metadata": metadata
         }
 
-        # 翻译支持（主要用于 Zenn 日文内容）
-        if translate_to and translate_to == "zh-CN" and card.source.value == 'zenn':
+        # 翻译支持
+        if translate_to:
             try:
-                translated = await translate_zenn_content(card.title, card.summary)
-                result["translated_title"] = translated["title"]
-                result["translated_summary"] = translated["summary"]
+                translation_service = get_translation_service()
+
+                # 如果目标语言是中文且来源是日文（Zenn）
+                if translate_to == "zh-CN" and card.source.value == 'zenn':
+                    translated = await translate_zenn_content(card.title, card.summary)
+                    result["translated_title"] = translated["title"]
+                    result["translated_summary"] = translated["summary"]
+
+                # 如果目标语言是日文且来源内容是中文
+                elif translate_to == "ja-JP" or translate_to == "ja":
+                    # 大部分内容是中文的，需要翻译成日文
+                    if card.source.value != 'zenn':  # Zenn 本身就是日文，不需要翻译
+                        translated_title = await translation_service.translate(
+                            card.title,
+                            source_lang="zh-CN",
+                            target_lang="ja"
+                        )
+                        translated_summary = await translation_service.translate(
+                            card.summary or "",
+                            source_lang="zh-CN",
+                            target_lang="ja"
+                        )
+                        result["translated_title"] = translated_title
+                        result["translated_summary"] = translated_summary
+
+                # 如果目标语言是英文且来源内容是中文
+                elif translate_to == "en-US" or translate_to == "en":
+                    if card.source.value != 'github' and card.source.value != 'arxiv':  # GitHub 和 arXiv 通常是英文
+                        translated_title = await translation_service.translate(
+                            card.title,
+                            source_lang="zh-CN",
+                            target_lang="en"
+                        )
+                        translated_summary = await translation_service.translate(
+                            card.summary or "",
+                            source_lang="zh-CN",
+                            target_lang="en"
+                        )
+                        result["translated_title"] = translated_title
+                        result["translated_summary"] = translated_summary
+
             except Exception as e:
                 logger.error(f"Translation error for card {card.id}: {e}")
                 # 翻译失败时不添加翻译字段

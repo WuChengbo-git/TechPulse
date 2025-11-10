@@ -16,17 +16,11 @@ import ExplorePage from './pages/ExplorePage'
 import DetailPage from './pages/DetailPage'
 import CollectionsPage from './pages/CollectionsPage'
 
-// Legacy pages (will be phased out)
-import Dashboard from './pages/Dashboard'
-import Overview from './pages/Overview'
-import GitHubPage from './pages/GitHubPage'
-import ArxivPage from './pages/ArxivPage'
-import HuggingFacePage from './pages/HuggingFacePage'
-import ZennPage from './pages/ZennPage'
+// Legacy pages (backed up to src/pages/legacy_backup/)
+// Uncomment if needed: Dashboard, Overview, GitHubPage, ArxivPage, HuggingFacePage, ZennPage, Analytics
 
 // Other pages
 import Chat from './pages/Chat'
-import Analytics from './pages/Analytics'
 import TrendsPage from './pages/TrendsPage'
 import ApiConfigPage from './pages/ApiConfigPage'
 import SettingsPage from './pages/SettingsPage'
@@ -64,15 +58,7 @@ function AppContent() {
       '/explore': 'explore',
       '/collections': 'collections',
       '/trending': 'trending',
-      '/trends': 'trends',
       '/chat': 'chat',
-      // Legacy paths (kept for backward compatibility)
-      '/dashboard': 'dashboard',
-      '/github': 'github',
-      '/arxiv': 'arxiv',
-      '/huggingface': 'huggingface',
-      '/zenn': 'zenn',
-      '/analytics': 'analytics',
       // System management
       '/settings': 'settings',
       '/api-config': 'api-config',
@@ -93,15 +79,7 @@ function AppContent() {
       'explore': '/explore',
       'collections': '/collections',
       'trending': '/trending',
-      'trends': '/trends',
       'chat': '/chat',
-      // Legacy pages (kept for backward compatibility)
-      'dashboard': '/dashboard',
-      'github': '/github',
-      'arxiv': '/arxiv',
-      'huggingface': '/huggingface',
-      'zenn': '/zenn',
-      'analytics': '/analytics',
       // System management
       'settings': '/settings',
       'api-config': '/api-config',
@@ -248,19 +226,10 @@ function AppContent() {
       explore: [t('nav.home'), t('explore.title') || '数据探索'],
       collections: [t('nav.home'), t('collections.title') || '我的收藏'],
       // Trending & Analysis
-      trending: [t('nav.home'), t('nav.trending')],
-      trends: [t('nav.analytics'), t('nav.trendAnalysis')],
+      trending: [t('nav.analytics'), t('nav.trendAnalysis')],
       chat: [t('nav.analytics'), t('nav.aiAssistant')],
-      // Legacy data source pages
-      dashboard: [t('nav.home'), t('nav.dashboard')],
-      github: [t('nav.dataSources'), t('nav.github')],
-      arxiv: [t('nav.dataSources'), t('nav.arxiv')],
-      huggingface: [t('nav.dataSources'), t('nav.huggingface')],
-      zenn: [t('nav.dataSources'), t('nav.zenn')],
-      analytics: [t('nav.analytics'), t('nav.dataAnalysis')],
       // System management
       settings: [t('nav.systemManagement'), t('nav.systemSettings')],
-      notion: [t('nav.systemManagement'), t('nav.notionIntegration')],
       'api-config': [t('nav.systemManagement'), t('nav.apiConfig')],
       'llm-providers': [t('nav.systemManagement'), 'LLM模型管理'],
       tasks: [t('nav.systemManagement'), t('nav.taskManagement')],
@@ -431,17 +400,18 @@ function AppContent() {
                 <Route path="/collections" element={<CollectionsPage />} />
 
                 {/* Trending & Analysis */}
-                <Route path="/trending" element={<Dashboard />} />
-                <Route path="/trends" element={<TrendsPage />} />
+                <Route path="/trending" element={<TrendsPage />} />
                 <Route path="/chat" element={<Chat />} />
 
-                {/* Legacy data source pages (kept for backward compatibility) */}
+                {/* Legacy data source pages (backed up to src/pages/legacy_backup/) */}
+                {/* Uncomment if needed in the future:
                 <Route path="/dashboard" element={<Overview />} />
                 <Route path="/github" element={<GitHubPage />} />
                 <Route path="/arxiv" element={<ArxivPage />} />
                 <Route path="/huggingface" element={<HuggingFacePage />} />
                 <Route path="/zenn" element={<ZennPage />} />
                 <Route path="/analytics" element={<Analytics />} />
+                */}
 
                 {/* System management */}
                 <Route path="/api-config" element={<ApiConfigPage />} />

@@ -445,10 +445,12 @@ const DiscoverPage: React.FC = () => {
                 </Space>
 
                 {/* 翻译提示 */}
-                {card.translated_title && card.source.toLowerCase().includes('zenn') && (
+                {card.translated_title && (
                   <div style={{ marginTop: '12px' }}>
                     <Text type="secondary" style={{ fontSize: '12px' }}>
-                      🌐 {t('discover.translatedFromJapanese') || 'AI翻译自日语原文'}
+                      🌐 {card.source.toLowerCase().includes('zenn')
+                        ? (t('discover.translatedFromJapanese') || 'AI翻译自日语原文')
+                        : (t('discover.translatedFromChinese') || 'AI翻译自中文原文')}
                     </Text>
                   </div>
                 )}

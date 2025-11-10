@@ -34,6 +34,7 @@ import {
 import { useLanguage } from '../contexts/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import QuickViewModal from '../components/QuickViewModal';
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -78,6 +79,10 @@ const CollectionsPage: React.FC = () => {
   const [currentCard, setCurrentCard] = useState<TechCard | null>(null);
   const [newTag, setNewTag] = useState('');
   const [editingTags, setEditingTags] = useState<string[]>([]);
+
+  // 快速查看
+  const [quickViewVisible, setQuickViewVisible] = useState(false);
+  const [selectedCard, setSelectedCard] = useState<TechCard | null>(null);
 
   // 获取收藏列表
   const fetchCollections = async () => {
@@ -215,8 +220,8 @@ const CollectionsPage: React.FC = () => {
 
   // 快速查看
   const handleQuickView = (card: TechCard) => {
-    message.info('快速查看功能开发中...');
-    // TODO: 打开 QuickViewModal
+    setSelectedCard(card);
+    setQuickViewVisible(true);
   };
 
   // 深度阅读
@@ -527,6 +532,23 @@ const CollectionsPage: React.FC = () => {
           </Space>
         )}
       </Modal>
+
+      {/* 快速查看模态框 */}
+      <QuickViewModal
+        visible={quickViewVisible}
+        cardId={selectedCard?.id || null}
+        onClose={() => {
+          setQuickViewVisible(false);
+          setSelectedCard(null);
+        }}
+        onDeepRead={(cardId) => {
+          navigate(`/detail/${cardId}`);
+        }}
+        isFavorite={true}
+        onToggleFavorite={(cardId) => {
+          handleUnfavorite(cardId);
+        }}
+      />
     </div>
   );
 };
