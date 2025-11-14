@@ -3,14 +3,43 @@ from typing import List, Dict
 from sqlalchemy.orm import Session
 from datetime import datetime
 from ..models.card import TechCard, SourceType
-from ..models.config import DataSourceHealth, HealthStatus
+from ..models.config import DataSourceHealth, HealthStatus, DataSource
 from ..core.database import SessionLocal
 from .scrapers import GitHubScraper, ArxivScraper, HuggingFaceScraper, ZennScraper
 from .ai.azure_openai import azure_openai_service
 from ..core.config import settings
 import logging
+import re
 
 logger = logging.getLogger(__name__)
+
+
+def generate_short_summary(summary: str) -> str:
+    """从完整摘要生成简短摘要（1-2句话，用于卡片列表）"""
+    if not summary:
+        return ""
+
+    # 移除多余空格和换行
+    summary = summary.strip()
+    summary = re.sub(r'\s+', ' ', summary)
+
+    # 尝试找到第一句话（以句号、问号、感叹号结束）
+    # 支持中文和英文标点
+    sentence_end = re.search(r'[。！？\.!\?]', summary)
+    if sentence_end:
+        first_sentence = summary[:sentence_end.end()].strip()
+        # 如果第一句话太短，尝试取两句话
+        if len(first_sentence) < 50 and sentence_end.end() < len(summary):
+            second_end = re.search(r'[。！？\.!\?]', summary[sentence_end.end():])
+            if second_end:
+                return summary[:sentence_end.end() + second_end.end()].strip()
+        return first_sentence
+
+    # 如果没有找到句号，取前120个字符
+    if len(summary) > 120:
+        return summary[:120] + "..."
+
+    return summary
 
 
 class DataCollector:
@@ -80,9 +109,28 @@ class DataCollector:
         db = SessionLocal()
 
         try:
+            # 获取GitHub数据源配置
+            github_config = db.query(DataSource).filter(
+                DataSource.name == "github"
+            ).first()
+
+            # 获取最小星数要求（默认100）
+            min_stars = github_config.min_stars if github_config else 100
+
+            # 检查数据源是否启用
+            if github_config and not github_config.is_enabled:
+                logger.info("GitHub data source is disabled, skipping collection")
+                return 0
+
+            logger.info(f"Collecting GitHub repos with min_stars >= {min_stars}")
+
             # 使用新的每日trending算法获取最新项目
-            daily_trending = await self.github_scraper.get_daily_trending_repos(language="python", limit=25)
-            ai_repos = await self.github_scraper.get_ai_python_repos(since="daily")
+            daily_trending = await self.github_scraper.get_daily_trending_repos(
+                language="python", limit=25, min_stars=min_stars
+            )
+            ai_repos = await self.github_scraper.get_ai_python_repos(
+                since="daily", min_stars=min_stars
+            )
 
             # 合并并去重
             all_repos = daily_trending + ai_repos
@@ -92,8 +140,11 @@ class DataCollector:
             unique_repos.sort(key=lambda x: (x.get("trending_score", 0), x.get("updated_at", "")), reverse=True)
             unique_repos = unique_repos[:25]  # 增加到25个项目
 
+            # 再次应用星数筛选（双重保险）
+            unique_repos = [repo for repo in unique_repos if repo.get("stars", 0) >= min_stars]
+
             saved_count = 0
-            
+
             for repo in unique_repos:
                 existing = db.query(TechCard).filter(
                     TechCard.original_url == repo["url"]
@@ -129,11 +180,13 @@ class DataCollector:
                         except Exception as e:
                             logger.error(f"AI processing failed for {repo['title']}: {e}")
                     
+                    full_summary = summary or repo.get("description", "")
                     card = TechCard(
                         title=repo["title"],
                         source=SourceType.GITHUB,
                         original_url=repo["url"],
-                        summary=summary or repo.get("description", ""),
+                        short_summary=generate_short_summary(full_summary),
+                        summary=full_summary,
                         chinese_tags=chinese_tags if chinese_tags else repo.get("topics", []),
                         trial_suggestion=trial_suggestion,
                         stars=repo.get("stars", 0),
@@ -213,12 +266,14 @@ class DataCollector:
                     
                     # 构建基础摘要
                     base_summary = paper["summary"][:400] + "..." if len(paper["summary"]) > 400 else paper["summary"]
-                    
+                    full_summary = summary or base_summary
+
                     card = TechCard(
                         title=paper["title"],
                         source=SourceType.ARXIV,
                         original_url=paper["url"],
-                        summary=summary or base_summary,
+                        short_summary=generate_short_summary(full_summary),
+                        summary=full_summary,
                         chinese_tags=chinese_tags if chinese_tags else paper.get("categories", []),
                         trial_suggestion=trial_suggestion,
                         raw_data=paper
@@ -241,18 +296,43 @@ class DataCollector:
         收集 HuggingFace 数据
         """
         try:
-            # 收集热门模型和每日trending模型
+            db = SessionLocal()
+
+            # 获取HuggingFace数据源配置
+            hf_config = db.query(DataSource).filter(
+                DataSource.name == "huggingface"
+            ).first()
+
+            # 获取最小likes要求（默认20）
+            min_likes = hf_config.min_likes if hf_config else 20
+
+            # 检查数据源是否启用
+            if hf_config and not hf_config.is_enabled:
+                logger.info("HuggingFace data source is disabled, skipping")
+                db.close()
+                return 0
+
+            logger.info(f"Collecting HuggingFace models with min_likes >= {min_likes}")
+
+            # 收集热门模型和每日trending模型（传入min_likes参数）
             trending_models = await self.hf_scraper.get_trending_models(limit=15)
-            daily_models = await self.hf_scraper.get_daily_trending_models(limit=15)
+            daily_models = await self.hf_scraper.get_daily_trending_models(
+                limit=15, min_likes=min_likes
+            )
             datasets = await self.hf_scraper.get_trending_datasets(limit=10)
-            
+
             # 合并并去重
             all_items = trending_models + daily_models + datasets
             unique_items = {item["url"]: item for item in all_items}.values()
-            
-            db = SessionLocal()
+
+            # 再次应用likes筛选（双重保险）
+            unique_items = [
+                item for item in unique_items
+                if item.get("likes", 0) >= min_likes
+            ]
+
             saved_count = 0
-            
+
             for item in unique_items:
                 existing = db.query(TechCard).filter(
                     TechCard.original_url == item["url"]
@@ -293,12 +373,14 @@ class DataCollector:
                     base_summary = f"Downloads: {item.get('downloads', 0)}, Likes: {item.get('likes', 0)}"
                     if item.get('pipeline_tag'):
                         base_summary += f", Task: {item['pipeline_tag']}"
-                    
+                    full_summary = summary or base_summary
+
                     card = TechCard(
                         title=item["title"],
                         source=SourceType.HUGGINGFACE,
                         original_url=item["url"],
-                        summary=summary or base_summary,
+                        short_summary=generate_short_summary(full_summary),
+                        summary=full_summary,
                         chinese_tags=chinese_tags if chinese_tags else item.get("tags", []),
                         trial_suggestion=trial_suggestion,
                         raw_data=item
@@ -321,15 +403,42 @@ class DataCollector:
         收集 Zenn 数据 - 改进版，获取最近30天的活跃文章
         """
         try:
-            # 使用新的最近文章方法获取一个月内的文章
-            recent_articles = await self.zenn_scraper.get_recent_articles(days=30)
-            tech_articles = await self.zenn_scraper.get_tech_articles(limit=10)
-            
+            db = SessionLocal()
+
+            # 获取Zenn数据源配置
+            zenn_config = db.query(DataSource).filter(
+                DataSource.name == "zenn"
+            ).first()
+
+            # 获取最小いいね要求（默认20）
+            min_likes = zenn_config.min_likes if zenn_config else 20
+
+            # 检查数据源是否启用
+            if zenn_config and not zenn_config.is_enabled:
+                logger.info("Zenn data source is disabled, skipping collection")
+                db.close()
+                return 0
+
+            logger.info(f"Collecting Zenn articles with min_likes >= {min_likes}")
+
+            # 使用新的最近文章方法获取一个月内的文章（传入min_likes参数）
+            recent_articles = await self.zenn_scraper.get_trending_articles(
+                limit=30, min_likes=min_likes
+            )
+            tech_articles = await self.zenn_scraper.get_tech_articles(
+                limit=10, min_likes=min_likes
+            )
+
             # 合并并去重
             all_articles = recent_articles + tech_articles
             unique_articles = {article["url"]: article for article in all_articles}.values()
-            
-            db = SessionLocal()
+
+            # 再次应用likes筛选（双重保险）
+            unique_articles = [
+                article for article in unique_articles
+                if article.get("likes", 0) >= min_likes
+            ]
+
             saved_count = 0
 
             for article in unique_articles:
@@ -399,11 +508,13 @@ class DataCollector:
                         # 去重并限制标签数量
                         unique_tags = list(dict.fromkeys(tags))[:5]
 
+                        full_summary = summary or base_summary
                         card = TechCard(
                             title=article["title"],
                             source=SourceType.ZENN,
                             original_url=article["url"],
-                            summary=summary or base_summary,
+                            short_summary=generate_short_summary(full_summary),
+                            summary=full_summary,
                             chinese_tags=unique_tags,
                             trial_suggestion=trial_suggestion,
                             raw_data={

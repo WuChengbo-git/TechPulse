@@ -3,6 +3,7 @@ from typing import List, Dict, Optional
 from datetime import datetime, timedelta
 import logging
 from bs4 import BeautifulSoup
+from ..summarization_service import get_summarization_service
 
 logger = logging.getLogger(__name__)
 
@@ -13,10 +14,146 @@ class ZennScraper:
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
         }
+        self.summarization_service = get_summarization_service()
     
-    async def get_trending_articles(self, limit: int = 20) -> List[Dict]:
+    def _get_article_content(self, article_url: str) -> tuple[Optional[str], Optional[str]]:
         """
-        获取 Zenn 热门技术文章 - 使用官方API
+        从文章页面获取完整内容和摘要（保留Markdown格式）
+
+        Returns:
+            tuple: (summary, full_content) - 摘要（前300字符）和完整Markdown内容
+        """
+        try:
+            response = requests.get(article_url, headers=self.headers, timeout=10)
+            response.raise_for_status()
+
+            soup = BeautifulSoup(response.text, 'html.parser')
+
+            # 找到文章正文
+            content_div = soup.find('div', class_='znc') or soup.find('article')
+
+            if content_div:
+                # 将HTML转换为Markdown风格的文本
+                markdown_text = self._html_to_markdown(content_div)
+
+                # 生成摘要（前300字符）
+                summary = markdown_text[:300] + '...' if len(markdown_text) > 300 else markdown_text
+
+                return summary, markdown_text
+
+            return None, None
+        except Exception as e:
+            logger.warning(f"Error fetching article content from {article_url}: {e}")
+            return None, None
+
+    def _html_to_markdown(self, element) -> str:
+        """
+        将HTML元素转换为Markdown格式的文本
+        保留代码块、标题、列表等格式
+        """
+        markdown_lines = []
+
+        for child in element.children:
+            if child.name is None:  # 文本节点
+                text = str(child).strip()
+                if text:
+                    markdown_lines.append(text)
+            elif child.name == 'h1':
+                markdown_lines.append(f"\n# {child.get_text(strip=True)}\n")
+            elif child.name == 'h2':
+                markdown_lines.append(f"\n## {child.get_text(strip=True)}\n")
+            elif child.name == 'h3':
+                markdown_lines.append(f"\n### {child.get_text(strip=True)}\n")
+            elif child.name == 'h4':
+                markdown_lines.append(f"\n#### {child.get_text(strip=True)}\n")
+            elif child.name == 'pre':
+                # 代码块
+                code = child.get_text(strip=True)
+                lang = ''
+                # 尝试获取语言标识
+                code_tag = child.find('code')
+                if code_tag and code_tag.get('class'):
+                    classes = code_tag.get('class', [])
+                    for cls in classes:
+                        if cls.startswith('language-'):
+                            lang = cls.replace('language-', '')
+                            break
+                markdown_lines.append(f"\n```{lang}\n{code}\n```\n")
+            elif child.name == 'code' and child.parent.name != 'pre':
+                # 行内代码
+                markdown_lines.append(f"`{child.get_text(strip=True)}`")
+            elif child.name in ['ul', 'ol']:
+                # 列表
+                for li in child.find_all('li', recursive=False):
+                    prefix = '- ' if child.name == 'ul' else '1. '
+                    markdown_lines.append(f"{prefix}{li.get_text(strip=True)}")
+                markdown_lines.append("")
+            elif child.name == 'p':
+                markdown_lines.append(f"\n{child.get_text(strip=True)}\n")
+            elif child.name == 'a':
+                text = child.get_text(strip=True)
+                href = child.get('href', '')
+                markdown_lines.append(f"[{text}]({href})")
+            elif child.name == 'blockquote':
+                quote_text = child.get_text(strip=True)
+                markdown_lines.append(f"\n> {quote_text}\n")
+            else:
+                # 其他元素递归处理
+                if hasattr(child, 'children'):
+                    markdown_lines.append(self._html_to_markdown(child))
+                else:
+                    text = child.get_text(strip=True) if hasattr(child, 'get_text') else str(child).strip()
+                    if text:
+                        markdown_lines.append(text)
+
+        return '\n'.join(markdown_lines)
+
+    def _get_article_summary(self, article_url: str) -> Optional[str]:
+        """向后兼容的方法，只返回摘要"""
+        summary, _ = self._get_article_content(article_url)
+        return summary
+
+    async def _get_article_with_ai_summary(
+        self,
+        article_url: str
+    ) -> tuple[Optional[str], Optional[str], Optional[str]]:
+        """
+        获取文章并生成AI摘要
+
+        Returns:
+            tuple: (short_summary, summary, full_content)
+            - short_summary: 30字AI总结（列表展示）
+            - summary: 200字AI总结（快速阅览）
+            - full_content: 完整原文（深度阅读）
+        """
+        try:
+            # 获取完整文章内容
+            _, full_content = self._get_article_content(article_url)
+
+            if not full_content:
+                return None, None, None
+
+            # 使用AI生成不同长度的摘要（Zenn是日语网站，生成日语摘要）
+            summaries = await self.summarization_service.generate_multi_length_summaries(
+                full_content,
+                language="ja"  # Zenn文章生成日语摘要
+            )
+
+            return summaries["short"], summaries["medium"], summaries["full"]
+
+        except Exception as e:
+            logger.error(f"生成AI摘要失败: {e}")
+            # 降级方案：使用截断的文本
+            _, full_content = self._get_article_content(article_url)
+            if full_content:
+                short = full_content[:30] + "..." if len(full_content) > 30 else full_content
+                medium = full_content[:200] + "..." if len(full_content) > 200 else full_content
+                return short, medium, full_content
+            return None, None, None
+
+    async def get_trending_articles(self, limit: int = 20, min_likes: int = 20) -> List[Dict]:
+        """
+        获取 Zenn 热门技术文章 - 使用官方API并获取文章摘要
         """
         try:
             articles = []
@@ -29,15 +166,29 @@ class ZennScraper:
             data = response.json()
             article_list = data.get('articles', [])
 
-            for article in article_list[:limit]:
+            for article in article_list:
                 try:
+                    likes = article.get('liked_count', 0)
+
+                    # 应用最小いいね筛选
+                    if likes < min_likes:
+                        continue
+
+                    article_url = f"{self.base_url}{article.get('path', '')}"
+
+                    # 获取文章并生成AI摘要
+                    short_summary, medium_summary, full_content = await self._get_article_with_ai_summary(article_url)
+
                     # 提取文章信息
                     article_data = {
                         'title': article.get('title', 'No Title'),
-                        'url': f"{self.base_url}{article.get('path', '')}",
+                        'url': article_url,
+                        'short_summary': short_summary or f"{article.get('emoji', '📝')} {article.get('title', 'No Title')[:30]}",  # 30字AI总结
+                        'summary': medium_summary or short_summary,  # 200字AI总结
+                        'content': full_content,  # 完整原文
                         'author': article.get('user', {}).get('name', 'Unknown'),
                         'author_name': article.get('user', {}).get('username', ''),
-                        'likes': article.get('liked_count', 0),
+                        'likes': likes,
                         'comments': article.get('comments_count', 0),
                         'emoji': article.get('emoji', '📝'),
                         'published_at': article.get('published_at', ''),
@@ -46,6 +197,10 @@ class ZennScraper:
                     }
 
                     articles.append(article_data)
+
+                    # 如果已收集足够数量，停止
+                    if len(articles) >= limit:
+                        break
                 except Exception as e:
                     logger.warning(f"Error parsing article: {e}")
                     continue
@@ -56,7 +211,7 @@ class ZennScraper:
             logger.error(f"Error fetching Zenn articles: {e}")
             return []
 
-    async def get_tech_articles(self, limit: int = 20) -> List[Dict]:
+    async def get_tech_articles(self, limit: int = 20, min_likes: int = 20) -> List[Dict]:
         """
         获取技术相关文章 - 使用API并筛选点赞数高的文章
         """
@@ -74,10 +229,18 @@ class ZennScraper:
             for article in article_list:
                 try:
                     # 只保留技术相关文章（根据点赞数筛选）
-                    if article.get('liked_count', 0) >= 10:
+                    if article.get('liked_count', 0) >= min_likes:
+                        article_url = f"{self.base_url}{article.get('path', '')}"
+
+                        # 获取文章并生成AI摘要
+                        short_summary, medium_summary, full_content = await self._get_article_with_ai_summary(article_url)
+
                         article_data = {
                             'title': article.get('title', 'No Title'),
-                            'url': f"{self.base_url}{article.get('path', '')}",
+                            'url': article_url,
+                            'short_summary': short_summary or f"{article.get('emoji', '📝')} {article.get('title', 'No Title')[:30]}",  # 30字AI总结
+                            'summary': medium_summary or short_summary,  # 200字AI总结
+                            'content': full_content,  # 完整原文
                             'author': article.get('user', {}).get('name', 'Unknown'),
                             'author_name': article.get('user', {}).get('username', ''),
                             'likes': article.get('liked_count', 0),

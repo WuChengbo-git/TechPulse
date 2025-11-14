@@ -25,8 +25,8 @@ class TechCard(Base):
     title = Column(String(500), nullable=False, index=True)
     source = Column(Enum(SourceType), nullable=False, index=True)
     original_url = Column(String(1000), nullable=False)
-    summary = Column(Text)
-    content = Column(Text)  # 完整内容（Markdown格式）
+    summary = Column(Text)  # 中等详细度摘要（1段落，用于快速阅览）
+    content = Column(Text)  # 完整内容（Markdown格式，用于深度阅读）
     chinese_tags = Column(JSON)  # 中文标签
     ai_category = Column(JSON)   # AI分类标签：LLM、CV、NLP、Agent等
     tech_stack = Column(JSON)    # 技术栈：Python、PyTorch、FastAPI等
@@ -42,5 +42,6 @@ class TechCard(Base):
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
     
     notion_page_id = Column(String(100))
-    
+
     raw_data = Column(JSON)
+    short_summary = Column(Text)  # 简短介绍（1-2句话，用于卡片列表）

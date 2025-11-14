@@ -26,6 +26,7 @@ import {
 } from '@ant-design/icons';
 import { useLanguage } from '../contexts/LanguageContext';
 import axios from 'axios';
+import MarkdownRenderer from './MarkdownRenderer';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -34,8 +35,9 @@ interface TechCard {
   title: string;
   source: string;
   url: string;
-  summary: string;
-  content?: string;
+  short_summary?: string;  // 简短介绍（卡片列表用）
+  summary: string;  // 中等详细度摘要（快速阅览用）
+  content?: string;  // 完整内容（深度阅读用）
   tags: string[];
   created_at: string;
   metadata: {
@@ -88,7 +90,16 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({
         },
       });
 
-      setCard(response.data);
+      // 处理API返回的数据，确保url和tags字段存在
+      const cardData = response.data;
+      if (!cardData.url && cardData.original_url) {
+        cardData.url = cardData.original_url;
+      }
+      if (!cardData.tags && cardData.chinese_tags) {
+        cardData.tags = cardData.chinese_tags;
+      }
+
+      setCard(cardData);
     } catch (error: any) {
       console.error('Failed to fetch card detail:', error);
       message.error(t('quickView.loadFailed') || '加载详情失败');
@@ -133,7 +144,11 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({
   // 打开原文链接
   const handleOpenOriginal = () => {
     if (card?.url) {
-      window.open(card.url, '_blank');
+      console.log('Opening URL:', card.url);
+      window.open(card.url, '_blank', 'noopener,noreferrer');
+    } else {
+      console.error('No URL available for this card');
+      message.error(t('quickView.noUrl') || 'URLが見つかりません');
     }
   };
 
@@ -252,12 +267,12 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({
             </Card>
 
             {/* 标签 */}
-            {card.tags && card.tags.length > 0 && (
+            {(card.display_tags || card.tags) && (card.display_tags || card.tags).length > 0 && (
               <div style={{ marginBottom: '16px' }}>
                 <Text strong>{t('quickView.tags') || '标签'}:</Text>
                 <div style={{ marginTop: '8px' }}>
                   <Space size="small" wrap>
-                    {card.tags.map((tag, index) => (
+                    {(card.display_tags || card.tags).map((tag, index) => (
                       <Tag key={index} color="processing">
                         {tag}
                       </Tag>
@@ -275,28 +290,21 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({
               <Paragraph style={{ fontSize: '15px', lineHeight: '1.8' }}>
                 {card.translated_summary || card.summary}
               </Paragraph>
-              {card.translated_summary && card.source.toLowerCase().includes('zenn') && (
-                <Text type="secondary" style={{ fontSize: '12px' }}>
-                  🌐 {t('quickView.translatedFromJapanese') || 'AI翻译自日语原文'}
-                </Text>
-              )}
             </div>
 
             {/* 内容预览（如果有） */}
             {(card.translated_content || card.content) && (
               <div>
                 <Title level={5}>{t('quickView.preview') || '内容预览'}</Title>
-                <Paragraph
-                  ellipsis={{ rows: 6, expandable: true, symbol: t('quickView.readMore') || '展开更多' }}
-                  style={{ fontSize: '14px', lineHeight: '1.8', color: '#595959' }}
-                >
-                  {card.translated_content || card.content}
-                </Paragraph>
-                {card.translated_content && (
-                  <Text type="secondary" style={{ fontSize: '12px' }}>
-                    🌐 {t('quickView.translated') || 'AI翻译'}
-                  </Text>
-                )}
+                <div style={{
+                  maxHeight: '400px',
+                  overflowY: 'auto',
+                  padding: '12px',
+                  backgroundColor: '#fafafa',
+                  borderRadius: '6px'
+                }}>
+                  <MarkdownRenderer content={card.translated_content || card.content || ''} />
+                </div>
               </div>
             )}
 

@@ -7,6 +7,7 @@ from ..core.database import get_db
 from ..models.card import TechCard, SourceType, TrialStatus
 from ..models.schemas import TechCard as TechCardSchema, TechCardCreate, TechCardUpdate
 from ..services.translation_service import translate_zenn_content, get_translation_service
+from ..utils.tag_mapper import map_tags_to_display_names
 import logging
 
 logger = logging.getLogger(__name__)
@@ -137,13 +138,15 @@ async def get_cards(
         card_dict = {
             "id": card.id,
             "title": card.title,
-            "summary": card.summary,
+            "short_summary": card.short_summary,  # 简短介绍（卡片列表用）
+            "summary": card.summary,  # 中等详细度摘要（快速阅览用）
             "original_url": card.original_url,
             "source": card.source.value if hasattr(card.source, 'value') else str(card.source),
             "created_at": card.created_at.isoformat() if card.created_at else None,
             "updated_at": card.updated_at.isoformat() if card.updated_at else None,
             "quality_score": card.quality_score,
             "chinese_tags": card.chinese_tags,
+            "display_tags": map_tags_to_display_names(card.chinese_tags or [], max_tags=10),  # 友好显示名称
             "stars": card.stars if card.stars is not None else None,
             "forks": card.forks if card.forks is not None else None,
             "issues": card.issues if card.issues is not None else None,
@@ -314,13 +317,17 @@ async def get_card(
     card_dict = {
         "id": card.id,
         "title": card.title,
-        "summary": card.summary,
+        "short_summary": card.short_summary,  # 简短介绍（卡片列表用）
+        "summary": card.summary,  # 中等详细度摘要（快速阅览用）
+        "content": card.content,  # 完整内容（深度阅读用）
+        "url": card.original_url,  # 为了前端兼容性，同时提供url字段
         "original_url": card.original_url,
         "source": card.source.value if hasattr(card.source, 'value') else str(card.source),
         "created_at": card.created_at.isoformat() if card.created_at else None,
         "updated_at": card.updated_at.isoformat() if card.updated_at else None,
         "quality_score": card.quality_score,
         "chinese_tags": card.chinese_tags,
+        "display_tags": map_tags_to_display_names(card.chinese_tags or [], max_tags=10),  # 友好显示名称
         "stars": card.stars if card.stars is not None else None,
         "forks": card.forks if card.forks is not None else None,
         "issues": card.issues if card.issues is not None else None,

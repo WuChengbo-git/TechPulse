@@ -54,7 +54,7 @@ class HuggingFaceScraper:
             logger.error(f"Error fetching HuggingFace models: {e}")
             return []
     
-    async def get_daily_trending_models(self, limit: int = 20) -> List[Dict]:
+    async def get_daily_trending_models(self, limit: int = 20, min_likes: int = 20) -> List[Dict]:
         """
         获取最新AI模型 - 按下载量和最近更新时间
         """
@@ -63,16 +63,16 @@ class HuggingFaceScraper:
             ai_tasks = [
                 "text-generation",
                 "text-to-image",
-                "image-generation", 
+                "image-generation",
                 "automatic-speech-recognition",
                 "question-answering",
                 "translation",
                 "summarization",
                 "feature-extraction"
             ]
-            
+
             all_models = []
-            
+
             # 首先获取按下载量排序的热门模型
             for task in ai_tasks[:4]:  # 限制请求数量
                 params = {
@@ -81,19 +81,24 @@ class HuggingFaceScraper:
                     "limit": 8,
                     "filter": task
                 }
-                
+
                 response = requests.get(self.models_url, params=params, timeout=30)
                 if response.status_code == 200:
                     models = response.json()
-                    
+
                     for model in models:
+                        likes = model.get("likes", 0)
+                        # 应用最小likes筛选
+                        if likes < min_likes:
+                            continue
+
                         # 避免重复
                         if not any(m["title"] == model.get("modelId", "") for m in all_models):
                             model_data = {
                                 "title": model.get("modelId", ""),
                                 "author": model.get("author", ""),
                                 "downloads": model.get("downloads", 0),
-                                "likes": model.get("likes", 0),
+                                "likes": likes,
                                 "url": f"https://huggingface.co/{model.get('modelId', '')}",
                                 "tags": model.get("tags", []),
                                 "pipeline_tag": model.get("pipeline_tag"),
@@ -111,19 +116,24 @@ class HuggingFaceScraper:
                 "direction": -1,
                 "limit": 15
             }
-            
+
             response = requests.get(self.models_url, params=recent_params, timeout=30)
             if response.status_code == 200:
                 models = response.json()
-                
+
                 for model in models:
+                    likes = model.get("likes", 0)
+                    # 应用最小likes筛选
+                    if likes < min_likes:
+                        continue
+
                     # 避免重复
                     if not any(m["title"] == model.get("modelId", "") for m in all_models):
                         model_data = {
                             "title": model.get("modelId", ""),
                             "author": model.get("author", ""),
                             "downloads": model.get("downloads", 0),
-                            "likes": model.get("likes", 0),
+                            "likes": likes,
                             "url": f"https://huggingface.co/{model.get('modelId', '')}",
                             "tags": model.get("tags", []),
                             "pipeline_tag": model.get("pipeline_tag"),

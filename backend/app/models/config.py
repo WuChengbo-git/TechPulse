@@ -22,7 +22,11 @@ class DataSource(Base):
     name = Column(String(100), unique=True, nullable=False)
     is_enabled = Column(Boolean, default=True)
     last_sync = Column(DateTime(timezone=True))
-    config = Column(Text)
+    config = Column(Text)  # 保留用于额外配置的JSON字段
+    # 筛选条件字段
+    min_stars = Column(Integer, default=0)  # GitHub最少星数（默认100）
+    min_likes = Column(Integer, default=0)  # Hugging Face和Zenn最少点赞数（默认20）
+    min_citations = Column(Integer, default=0)  # arXiv最少引用数
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 

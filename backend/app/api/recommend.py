@@ -14,6 +14,7 @@ from ..models.card import TechCard
 from ..models.behavior import UserBehavior, ActionType, UserRecommendation
 from ..models.user_preference import UserPreference
 from ..services.translation_service import translate_zenn_content, get_translation_service
+from ..utils.tag_mapper import map_tags_to_display_names
 
 router = APIRouter(tags=["recommendations"])
 logger = logging.getLogger(__name__)
@@ -22,23 +23,32 @@ logger = logging.getLogger(__name__)
 @router.get("/recommend/")
 async def get_simple_recommendations(
     limit: int = Query(20, le=100),
+    skip: int = Query(0, ge=0),
     field: Optional[str] = None,
     sort_by: str = Query("recommended", regex="^(recommended|latest|hot|stars)$"),
     translate_to: Optional[str] = None,
+    lang: Optional[str] = Query(None, description="Language for tag display (zh/en/ja)"),
     db: Session = Depends(get_db)
 ):
     """
     简化的推荐端点（不需要用户ID，用于未登录或新用户）
 
-    返回高质量的最新内容
+    返回高质量的最新内容（今天和昨天）
 
     - limit: 返回数量
+    - skip: 跳过的数量（用于分页）
     - field: 领域筛选 (llm/cv/nlp/ml/dl/rl/tools/robotics/data)
     - sort_by: 排序方式 (recommended/latest/hot/stars)
     - translate_to: 翻译目标语言
     """
+    # 计算时间范围：今天和昨天
+    now = datetime.now()
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    yesterday_start = today_start - timedelta(days=1)
+
     query = db.query(TechCard).filter(
-        TechCard.quality_score >= 3.0
+        TechCard.quality_score >= 3.0,
+        TechCard.created_at >= yesterday_start  # 只显示昨天和今天的数据
     )
 
     # 领域筛选（通过标签匹配）
@@ -73,8 +83,8 @@ async def get_simple_recommendations(
                             filtered_cards.append(card)
                             break
 
-            # 直接返回筛选后的结果
-            cards = filtered_cards[:limit]
+            # 应用分页：跳过skip个，取limit个
+            cards = filtered_cards[skip:skip + limit]
             results = []
             for card in cards:
                 # 从 card 和 raw_data 中提取元数据
@@ -125,13 +135,23 @@ async def get_simple_recommendations(
                         "likes": None,
                     }
 
+                # 确定标签显示语言
+                tag_lang = 'zh'  # 默认中文
+                if lang:
+                    if lang.startswith('ja'):
+                        tag_lang = 'ja'
+                    elif lang.startswith('en'):
+                        tag_lang = 'en'
+
                 result = {
                     "id": card.id,
                     "title": card.title,
                     "source": card.source.value if hasattr(card.source, 'value') else str(card.source),
                     "url": card.original_url,
-                    "summary": card.summary or "",
+                    "short_summary": card.short_summary or "",  # 简短介绍（卡片列表用）
+                    "summary": card.summary or "",  # 中等详细度摘要（快速阅览用）
                     "tags": card.chinese_tags or [],
+                    "display_tags": map_tags_to_display_names(card.chinese_tags or [], max_tags=10, language=tag_lang),  # 友好显示名称
                     "created_at": card.created_at.isoformat() if card.created_at else None,
                     "metadata": metadata
                 }
@@ -201,7 +221,8 @@ async def get_simple_recommendations(
         # 暂时用质量分数代替
         query = query.order_by(TechCard.quality_score.desc())
 
-    cards = query.limit(limit).all()
+    # 应用分页
+    cards = query.offset(skip).limit(limit).all()
 
     # 转换为前端期望的格式
     results = []
@@ -254,13 +275,23 @@ async def get_simple_recommendations(
                 "likes": None,
             }
 
+        # 确定标签显示语言
+        tag_lang = 'zh'  # 默认中文
+        if lang:
+            if lang.startswith('ja'):
+                tag_lang = 'ja'
+            elif lang.startswith('en'):
+                tag_lang = 'en'
+
         result = {
             "id": card.id,
             "title": card.title,
             "source": card.source.value if hasattr(card.source, 'value') else str(card.source),
             "url": card.original_url,
-            "summary": card.summary or "",
+            "short_summary": card.short_summary or "",  # 简短介绍（卡片列表用）
+            "summary": card.summary or "",  # 中等详细度摘要（快速阅览用）
             "tags": card.chinese_tags or [],
+            "display_tags": map_tags_to_display_names(card.chinese_tags or [], max_tags=10, language=tag_lang),  # 友好显示名称
             "created_at": card.created_at.isoformat() if card.created_at else None,
             "metadata": metadata
         }

@@ -55,37 +55,37 @@ class GitHubScraper:
             logger.error(f"Error fetching GitHub trending: {e}")
             return []
     
-    async def get_daily_trending_repos(self, language: Optional[str] = None, limit: int = 30) -> List[Dict]:
+    async def get_daily_trending_repos(self, language: Optional[str] = None, limit: int = 30, min_stars: int = 100) -> List[Dict]:
         """
         获取每日真正trending的项目 - 结合新建和活跃项目
         """
         try:
             from datetime import datetime, timedelta
-            
+
             today = datetime.now().strftime("%Y-%m-%d")
             yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
-            
+
             all_repos = []
-            
-            # 策略1: 获取今天新建的项目
+
+            # 策略1: 获取今天新建的项目（应用星数筛选）
             new_repos = await self._search_repos({
-                "q": f"created:{today}" + (f" language:{language}" if language else ""),
-                "sort": "stars", 
+                "q": f"created:{today} stars:>={min_stars}" + (f" language:{language}" if language else ""),
+                "sort": "stars",
                 "order": "desc",
                 "per_page": 15
             })
-            
-            # 策略2: 获取昨天活跃且星数增长的项目  
+
+            # 策略2: 获取昨天活跃且星数增长的项目（应用星数筛选）
             active_repos = await self._search_repos({
-                "q": f"pushed:>{yesterday} stars:>10" + (f" language:{language}" if language else ""),
+                "q": f"pushed:>{yesterday} stars:>={min_stars}" + (f" language:{language}" if language else ""),
                 "sort": "updated",
-                "order": "desc", 
+                "order": "desc",
                 "per_page": 15
             })
-            
-            # 策略3: 获取最近2天创建的新兴项目
+
+            # 策略3: 获取最近2天创建的新兴项目（应用星数筛选）
             recent_repos = await self._search_repos({
-                "q": f"created:>{yesterday} stars:>3" + (f" language:{language}" if language else ""),
+                "q": f"created:>{yesterday} stars:>={min_stars}" + (f" language:{language}" if language else ""),
                 "sort": "stars",
                 "order": "desc",
                 "per_page": 15
@@ -160,20 +160,20 @@ class GitHubScraper:
             logger.error(f"Error in _search_repos: {e}")
             return []
 
-    async def get_ai_python_repos(self, since: str = "daily") -> List[Dict]:
+    async def get_ai_python_repos(self, since: str = "daily", min_stars: int = 100) -> List[Dict]:
         """
         获取 AI 相关的 Python 项目
         """
         try:
             from datetime import datetime, timedelta
-            
+
             if since == "daily":
                 date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
             elif since == "weekly":
                 date = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
             else:
                 date = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
-            
+
             ai_keywords = [
                 "machine learning", "deep learning", "neural network", "artificial intelligence",
                 "tensorflow", "pytorch", "keras", "scikit-learn", "pandas", "numpy",
@@ -181,13 +181,13 @@ class GitHubScraper:
                 "llm", "large language model", "gpt", "bert", "stable diffusion",
                 "generative ai", "chatbot", "recommendation system", "data science"
             ]
-            
+
             all_repos = []
-            
-            # 搜索不同的AI关键词组合，降低星数要求以获取更多新项目
+
+            # 搜索不同的AI关键词组合，应用星数筛选
             for keyword in ai_keywords[:5]:  # 限制搜索次数避免API限制
                 params = {
-                    "q": f'"{keyword}" language:python (created:>{date} OR pushed:>{date}) stars:>1',
+                    "q": f'"{keyword}" language:python (created:>{date} OR pushed:>{date}) stars:>={min_stars}',
                     "sort": "updated",
                     "order": "desc",
                     "per_page": 10

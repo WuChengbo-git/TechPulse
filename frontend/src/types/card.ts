@@ -5,6 +5,7 @@ export interface TechCard {
   original_url: string
   summary?: string
   chinese_tags?: string[]
+  display_tags?: string[]  // 友好显示的标签名称
   ai_category?: string[]
   tech_stack?: string[]
   license?: string

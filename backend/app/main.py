@@ -6,7 +6,7 @@ from .core.version import APP_VERSION
 from .api import (
     cards, sources, ai, notion, chat, auth, translate, user_settings,
     preferences, ai_config, health, behavior, search, recommend,
-    system_config, llm_providers, favorites, metadata, trends
+    system_config, llm_providers, favorites, metadata, trends, scheduler
 )
 from .api import settings as settings_api
 from .services.scheduler import task_scheduler
@@ -51,6 +51,7 @@ app.include_router(metadata.router, prefix="/api/v1")  # 元数据管理路由
 app.include_router(trends.router, prefix="/api/v1")  # 趋势分析路由
 app.include_router(system_config.router)  # 系统配置路由
 app.include_router(llm_providers.router)  # LLM提供商管理路由
+app.include_router(scheduler.router, prefix="/api/v1")  # 调度器管理路由
 
 
 @app.on_event("startup")

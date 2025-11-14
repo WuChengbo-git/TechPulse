@@ -12,6 +12,7 @@ import logging
 from ..core.database import get_db
 from ..models.card import TechCard
 from ..models.behavior import SearchHistory
+from ..utils.tag_mapper import map_tags_to_display_names
 
 router = APIRouter(tags=["search"])
 logger = logging.getLogger(__name__)
@@ -206,6 +207,7 @@ async def smart_search(
                     "original_url": card.original_url,
                     "summary": card.summary,
                     "chinese_tags": card.chinese_tags,
+                    "display_tags": map_tags_to_display_names(card.chinese_tags or [], max_tags=10),  # 友好显示名称
                     "quality_score": card.quality_score,
                     "created_at": card.created_at.isoformat()
                 },

@@ -2,25 +2,15 @@ import React from 'react'
 import { Layout, Menu, Typography } from 'antd'
 import type { MenuProps } from 'antd'
 import {
-  DashboardOutlined,
-  GithubOutlined,
-  FileTextOutlined,
-  RobotOutlined,
-  EditOutlined,
-  SearchOutlined,
+  FireOutlined,
+  CompassOutlined,
+  StarOutlined,
   LineChartOutlined,
+  MessageOutlined,
   SettingOutlined,
   ApiOutlined,
-  CloudOutlined,
-  UnorderedListOutlined,
-  MonitorOutlined,
-  FireOutlined,
-  BarChartOutlined,
-  MessageOutlined,
-  DashboardOutlined as AnalyticsOutlined,
-  StarOutlined,
-  CompassOutlined,
-  GlobalOutlined
+  DatabaseOutlined,
+  MonitorOutlined
 } from '@ant-design/icons'
 import { useLanguage } from '../contexts/LanguageContext'
 
@@ -76,13 +66,12 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, selectedKey, onMenuSelect 
     {
       key: 'system',
       icon: <SettingOutlined />,
-      label: t('sidebar.systemManagement'),
+      label: t('sidebar.systemManagement') || 'システム管理',
       children: [
-        { key: 'settings', icon: <SettingOutlined />, label: t('nav.systemSettings') },
-        { key: 'llm-providers', icon: <CloudOutlined />, label: 'LLM模型管理' },
-        { key: 'api-config', icon: <ApiOutlined />, label: t('nav.apiConfig') },
-        { key: 'tasks', icon: <UnorderedListOutlined />, label: t('nav.taskManagement') },
-        { key: 'status', icon: <MonitorOutlined />, label: t('nav.systemStatus') }
+        { key: 'settings', icon: <SettingOutlined />, label: t('nav.systemSettings') || 'システム設定' },
+        { key: 'ai-datasource', icon: <ApiOutlined />, label: t('nav.aiDataSource') || 'AI & データソース設定' },
+        { key: 'data-collection', icon: <DatabaseOutlined />, label: t('nav.dataCollection') || 'データ収集状態' },
+        { key: 'status', icon: <MonitorOutlined />, label: t('nav.systemStatus') || 'システム状態' }
       ]
     }
   ]
@@ -94,6 +83,12 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, selectedKey, onMenuSelect 
       theme="light"
       width={220}
       style={{
+        overflow: 'auto',
+        height: '100vh',
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        bottom: 0,
         boxShadow: '2px 0 8px 0 rgba(29, 35, 41, 0.05)',
         borderRight: '1px solid #f0f0f0'
       }}

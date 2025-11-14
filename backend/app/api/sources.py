@@ -1,5 +1,7 @@
-from fastapi import APIRouter, BackgroundTasks, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
+from typing import Optional
 from ..core.database import get_db
 from ..services.data_collector import DataCollector
 from ..models.config import DataSource
@@ -8,6 +10,14 @@ import logging
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/sources", tags=["sources"])
+
+
+class DataSourceConfigUpdate(BaseModel):
+    """数据源配置更新模型"""
+    is_enabled: Optional[bool] = None
+    min_stars: Optional[int] = None
+    min_likes: Optional[int] = None
+    min_citations: Optional[int] = None
 
 
 @router.post("/collect")
@@ -132,8 +142,118 @@ async def toggle_data_source(source_id: int, db: Session = Depends(get_db)):
     source = db.query(DataSource).filter(DataSource.id == source_id).first()
     if not source:
         return {"error": "Data source not found"}
-    
+
     source.is_enabled = not source.is_enabled
     db.commit()
-    
-    return {"message": f"Data source {source.name} {'enabled' if source.is_enabled else 'disabled'}"}
+
+    status = 'enabled' if source.is_enabled else 'disabled'
+    return {"message": f"Data source {source.name} {status}"}
+
+
+@router.put("/{source_id}/config")
+async def update_data_source_config(
+    source_id: int,
+    config: DataSourceConfigUpdate,
+    db: Session = Depends(get_db)
+):
+    """
+    更新数据源配置（包括筛选条件）
+    """
+    source = db.query(DataSource).filter(DataSource.id == source_id).first()
+    if not source:
+        raise HTTPException(status_code=404, detail="Data source not found")
+
+    # 更新配置字段
+    if config.is_enabled is not None:
+        source.is_enabled = config.is_enabled
+
+    if config.min_stars is not None:
+        source.min_stars = config.min_stars
+
+    if config.min_likes is not None:
+        source.min_likes = config.min_likes
+
+    if config.min_citations is not None:
+        source.min_citations = config.min_citations
+
+    db.commit()
+    db.refresh(source)
+
+    return {
+        "message": "Data source configuration updated successfully",
+        "source": {
+            "id": source.id,
+            "name": source.name,
+            "is_enabled": source.is_enabled,
+            "min_stars": source.min_stars,
+            "min_likes": source.min_likes,
+            "min_citations": source.min_citations
+        }
+    }
+
+
+@router.get("/{source_id}")
+async def get_data_source(source_id: int, db: Session = Depends(get_db)):
+    """
+    获取单个数据源详细配置
+    """
+    source = db.query(DataSource).filter(DataSource.id == source_id).first()
+    if not source:
+        raise HTTPException(status_code=404, detail="Data source not found")
+
+    return {
+        "id": source.id,
+        "name": source.name,
+        "is_enabled": source.is_enabled,
+        "min_stars": source.min_stars,
+        "min_likes": source.min_likes,
+        "min_citations": source.min_citations,
+        "last_sync": source.last_sync,
+        "created_at": source.created_at,
+        "updated_at": source.updated_at
+    }
+
+
+@router.put("/batch/config")
+async def update_all_sources_config(
+    configs: dict,
+    db: Session = Depends(get_db)
+):
+    """
+    批量更新所有数据源配置
+    接受格式: {"github": {"min_stars": 100}, "zenn": {"min_likes": 20}, ...}
+    """
+    try:
+        updated_sources = []
+
+        for source_name, config in configs.items():
+            source = db.query(DataSource).filter(
+                DataSource.name == source_name
+            ).first()
+
+            if source:
+                # 更新对应的筛选条件
+                if "min_stars" in config:
+                    source.min_stars = config["min_stars"]
+                if "min_likes" in config:
+                    source.min_likes = config["min_likes"]
+                if "min_citations" in config:
+                    source.min_citations = config["min_citations"]
+                if "is_enabled" in config:
+                    source.is_enabled = config["is_enabled"]
+
+                updated_sources.append(source.name)
+
+        db.commit()
+
+        return {
+            "message": "Data source configurations updated successfully",
+            "updated_sources": updated_sources
+        }
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to update configurations: {str(e)}"
+        )

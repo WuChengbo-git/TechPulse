@@ -26,15 +26,15 @@ const AddToFavoriteModal: React.FC<AddToFavoriteModalProps> = ({
   // 预设标签
   const suggestedTags = [
     'LLM',
-    '计算机视觉',
+    t('favorite.suggestedTag.cv') || '计算机视觉',
     'NLP',
-    '机器学习',
-    '深度学习',
-    '工具库',
-    '数据科学',
-    '强化学习',
-    '待学习',
-    '重要',
+    t('favorite.suggestedTag.ml') || '机器学习',
+    t('favorite.suggestedTag.dl') || '深度学习',
+    t('favorite.suggestedTag.tools') || '工具库',
+    t('favorite.suggestedTag.dataSci') || '数据科学',
+    t('favorite.suggestedTag.rl') || '强化学习',
+    t('favorite.suggestedTag.toLearn') || '待学习',
+    t('favorite.suggestedTag.important') || '重要',
   ];
 
   const handleAddTag = () => {

@@ -534,10 +534,10 @@ const ExplorePage: React.FC = () => {
                 </Paragraph>
 
                 {/* 标签 */}
-                {card.tags && card.tags.length > 0 && (
+                {(card.display_tags || card.tags) && (card.display_tags || card.tags).length > 0 && (
                   <div style={{ marginBottom: '12px' }}>
                     <Space size="small" wrap>
-                      {card.tags.slice(0, 8).map((tag, index) => (
+                      {(card.display_tags || card.tags).slice(0, 8).map((tag, index) => (
                         <Tag key={index}>{tag}</Tag>
                       ))}
                     </Space>
@@ -553,15 +553,6 @@ const ExplorePage: React.FC = () => {
                     {t('explore.deepRead') || '深度阅读'}
                   </Button>
                 </Space>
-
-                {/* 翻译提示 */}
-                {card.translated_title && card.source.toLowerCase().includes('zenn') && (
-                  <div style={{ marginTop: '12px' }}>
-                    <Text type="secondary" style={{ fontSize: '12px' }}>
-                      🌐 {t('explore.translatedFromJapanese') || 'AI翻译自日语原文'}
-                    </Text>
-                  </div>
-                )}
               </Card>
             ))}
           </Space>

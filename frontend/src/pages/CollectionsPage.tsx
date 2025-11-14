@@ -422,10 +422,10 @@ const CollectionsPage: React.FC = () => {
                 )}
 
                 {/* 技术标签 */}
-                {card.tags && card.tags.length > 0 && (
+                {(card.display_tags || card.tags) && (card.display_tags || card.tags).length > 0 && (
                   <div style={{ marginBottom: '12px' }}>
                     <Space size="small" wrap>
-                      {card.tags.slice(0, 5).map((tag, index) => (
+                      {(card.display_tags || card.tags).slice(0, 5).map((tag, index) => (
                         <Tag key={index}>{tag}</Tag>
                       ))}
                     </Space>
@@ -513,7 +513,17 @@ const CollectionsPage: React.FC = () => {
               <Text type="secondary">{t('collections.suggestedTags') || '常用标签'}:</Text>
               <div style={{ marginTop: '8px' }}>
                 <Space size="small" wrap>
-                  {['待学习', '重要', '工作相关', 'LLM', 'CV', 'NLP', '工具', '论文', '代码'].map((tag) => (
+                  {[
+                    t('collections.suggestedTag.toLearn') || '待学习',
+                    t('collections.suggestedTag.important') || '重要',
+                    t('collections.suggestedTag.workRelated') || '工作相关',
+                    'LLM',
+                    'CV',
+                    'NLP',
+                    t('collections.suggestedTag.tools') || '工具',
+                    t('collections.suggestedTag.paper') || '论文',
+                    t('collections.suggestedTag.code') || '代码'
+                  ].map((tag) => (
                     <Tag
                       key={tag}
                       style={{ cursor: 'pointer' }}

@@ -13,9 +13,27 @@ export const api: AxiosInstance = axios.create({
   },
 });
 
-// 请求拦截器：自动添加 token
+// 请求拦截器：自动添加 token 并验证登录请求
 api.interceptors.request.use(
   (config) => {
+    // 如果是登录请求，验证请求体
+    if (config.url?.includes('/auth/login') && config.method === 'post') {
+      const data = config.data ? (typeof config.data === 'string' ? JSON.parse(config.data) : config.data) : {};
+
+      // 如果用户名或密码为空或只有空格，拒绝请求
+      if (!data.username || !data.password ||
+          data.username.trim() === '' || data.password.trim() === '') {
+        console.log('阻止空的登录请求');
+
+        // 清除无效的自动登录凭据
+        localStorage.removeItem('techpulse_auto_login');
+        localStorage.removeItem('techpulse_saved_password');
+
+        // 返回一个被拒绝的Promise，阻止请求发送
+        return Promise.reject(new Error('Invalid login credentials'));
+      }
+    }
+
     const token =
       localStorage.getItem('techpulse_token') ||
       sessionStorage.getItem('techpulse_token');

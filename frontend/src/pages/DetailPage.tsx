@@ -44,8 +44,9 @@ interface TechCard {
   title: string;
   source: string;
   url: string;
-  summary: string;
-  content: string;
+  short_summary?: string;  // 简短介绍（卡片列表用）
+  summary: string;  // 中等详细度摘要（快速阅览用）
+  content: string;  // 完整内容（深度阅读用）
   tags: string[];
   created_at: string;
   updated_at?: string;
@@ -197,14 +198,6 @@ const DetailPage: React.FC = () => {
               <MarkdownRenderer content={card.translated_content || card.content} />
             ) : (
               <Text type="secondary">{t('detail.noContent') || '暂无详细内容'}</Text>
-            )}
-            {(card.translated_summary || card.translated_content) && (
-              <div style={{ marginTop: '16px' }}>
-                <Text type="secondary" style={{ fontSize: '12px' }}>
-                  🌐 {t('detail.aiTranslated') || 'AI 翻译'}
-                  {card.source.toLowerCase().includes('zenn') && ` (${t('detail.fromJapanese') || '来自日语原文'})`}
-                </Text>
-              </div>
             )}
           </Card>
         </div>
@@ -436,10 +429,10 @@ const DetailPage: React.FC = () => {
         </div>
 
         {/* 标签 */}
-        {card.tags && card.tags.length > 0 && (
+        {(card.display_tags || card.tags) && (card.display_tags || card.tags).length > 0 && (
           <div style={{ marginBottom: '16px' }}>
             <Space size="small" wrap>
-              {card.tags.map((tag, index) => (
+              {(card.display_tags || card.tags).map((tag, index) => (
                 <Tag key={index} color="default">
                   {tag}
                 </Tag>

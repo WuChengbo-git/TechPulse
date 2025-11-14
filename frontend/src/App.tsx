@@ -22,11 +22,10 @@ import CollectionsPage from './pages/CollectionsPage'
 // Other pages
 import Chat from './pages/Chat'
 import TrendsPage from './pages/TrendsPage'
-import ApiConfigPage from './pages/ApiConfigPage'
 import SettingsPage from './pages/SettingsPage'
-import TaskManagementPage from './pages/TaskManagementPage'
 import SystemStatusPage from './pages/SystemStatusPage'
-import LLMProvidersPage from './pages/LLMProvidersPage'
+import AIDataSourceConfigPage from './pages/AIDataSourceConfigPage'
+import DataCollectionPage from './pages/DataCollectionPage'
 import Login from './pages/Login'
 import './App.css'
 import './styles/responsive.css'
@@ -61,9 +60,8 @@ function AppContent() {
       '/chat': 'chat',
       // System management
       '/settings': 'settings',
-      '/api-config': 'api-config',
-      '/llm-providers': 'llm-providers',
-      '/tasks': 'tasks',
+      '/ai-datasource': 'ai-datasource',
+      '/data-collection': 'data-collection',
       '/status': 'status'
     }
     return pathMap[pathname] || 'discover'
@@ -82,9 +80,8 @@ function AppContent() {
       'chat': '/chat',
       // System management
       'settings': '/settings',
-      'api-config': '/api-config',
-      'llm-providers': '/llm-providers',
-      'tasks': '/tasks',
+      'ai-datasource': '/ai-datasource',
+      'data-collection': '/data-collection',
       'status': '/status'
     }
     navigate(keyToPath[key] || '/discover')
@@ -230,9 +227,8 @@ function AppContent() {
       chat: [t('nav.analytics'), t('nav.aiAssistant')],
       // System management
       settings: [t('nav.systemManagement'), t('nav.systemSettings')],
-      'api-config': [t('nav.systemManagement'), t('nav.apiConfig')],
-      'llm-providers': [t('nav.systemManagement'), 'LLM模型管理'],
-      tasks: [t('nav.systemManagement'), t('nav.taskManagement')],
+      'ai-datasource': [t('nav.systemManagement'), t('nav.aiDataSource') || 'AI & データソース設定'],
+      'data-collection': [t('nav.systemManagement'), t('nav.dataCollection') || 'データ収集状態'],
       status: [t('nav.systemManagement'), t('nav.systemStatus')]
     }
 
@@ -256,8 +252,8 @@ function AppContent() {
             selectedKey={selectedKey}
             onMenuSelect={handleMenuSelect}
           />
-          
-          <Layout>
+
+          <Layout style={{ marginLeft: collapsed ? 80 : 220, transition: 'margin-left 0.2s' }}>
             <Header style={{ 
               padding: '0 24px', 
               background: '#fff', 
@@ -414,10 +410,9 @@ function AppContent() {
                 */}
 
                 {/* System management */}
-                <Route path="/api-config" element={<ApiConfigPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
-                <Route path="/llm-providers" element={<LLMProvidersPage />} />
-                <Route path="/tasks" element={<TaskManagementPage />} />
+                <Route path="/ai-datasource" element={<AIDataSourceConfigPage />} />
+                <Route path="/data-collection" element={<DataCollectionPage />} />
                 <Route path="/status" element={<SystemStatusPage />} />
 
                 {/* Catch all - redirect to discover */}

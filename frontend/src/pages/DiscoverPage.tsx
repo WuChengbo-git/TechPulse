@@ -34,8 +34,10 @@ interface TechCard {
   title: string;
   source: string;
   url: string;
-  summary: string;
+  short_summary?: string;  // 简短介绍（卡片列表用）
+  summary: string;  // 中等详细度摘要（快速阅览用）
   tags: string[];
+  display_tags?: string[];  // 友好显示的标签名称
   created_at: string;
   metadata: {
     stars?: number;
@@ -50,6 +52,7 @@ interface TechCard {
   };
   translated_title?: string;
   translated_summary?: string;
+  translated_short_summary?: string;
 }
 
 const DiscoverPage: React.FC = () => {
@@ -58,7 +61,7 @@ const DiscoverPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [selectedField, setSelectedField] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<string>('recommended');
+  const [sortBy, setSortBy] = useState<string>('latest');
   const [itemsPerPage, setItemsPerPage] = useState<number>(20);
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
   const [hasMore, setHasMore] = useState<boolean>(true);
@@ -81,6 +84,7 @@ const DiscoverPage: React.FC = () => {
           field: selectedField === 'all' ? undefined : selectedField,
           sort_by: sortBy,
           translate_to: language, // 根据用户语言翻译
+          lang: language, // 添加语言参数用于标签显示
         },
       });
 
@@ -132,6 +136,7 @@ const DiscoverPage: React.FC = () => {
           field: selectedField === 'all' ? undefined : selectedField,
           sort_by: sortBy,
           translate_to: language,
+          lang: language, // 添加语言参数用于标签显示
         },
       });
 
@@ -415,19 +420,21 @@ const DiscoverPage: React.FC = () => {
                   )}
                 </Space>
 
-                {/* 摘要 */}
+                {/* 简短介绍 */}
                 <Paragraph
-                  ellipsis={{ rows: 3, expandable: false }}
+                  ellipsis={{ rows: 2, expandable: false }}
                   style={{ marginBottom: '12px' }}
                 >
-                  {card.translated_summary || card.summary}
+                  {card.source.toLowerCase().includes('zenn')
+                    ? (card.translated_summary || card.summary || t('discover.zennArticle') || 'Zenn 技術記事')
+                    : (card.translated_short_summary || card.short_summary || card.translated_summary || card.summary)}
                 </Paragraph>
 
                 {/* 标签 */}
-                {card.tags && card.tags.length > 0 && (
+                {(card.display_tags || card.tags) && (card.display_tags || card.tags).length > 0 && (
                   <div style={{ marginBottom: '12px' }}>
                     <Space size="small" wrap>
-                      {card.tags.slice(0, 5).map((tag, index) => (
+                      {(card.display_tags || card.tags).slice(0, 5).map((tag, index) => (
                         <Tag key={index}>{tag}</Tag>
                       ))}
                     </Space>
@@ -443,17 +450,6 @@ const DiscoverPage: React.FC = () => {
                     {t('discover.deepRead') || '深度阅读'}
                   </Button>
                 </Space>
-
-                {/* 翻译提示 */}
-                {card.translated_title && (
-                  <div style={{ marginTop: '12px' }}>
-                    <Text type="secondary" style={{ fontSize: '12px' }}>
-                      🌐 {card.source.toLowerCase().includes('zenn')
-                        ? (t('discover.translatedFromJapanese') || 'AI翻译自日语原文')
-                        : (t('discover.translatedFromChinese') || 'AI翻译自中文原文')}
-                    </Text>
-                  </div>
-                )}
               </Card>
             ))}
           </Space>
@@ -478,6 +474,7 @@ const DiscoverPage: React.FC = () => {
       <QuickViewModal
         visible={quickViewVisible}
         cardId={selectedCard?.id || null}
+        isFavorite={selectedCard ? favorites.has(selectedCard.id) : false}
         onClose={() => {
           setQuickViewVisible(false);
           setSelectedCard(null);
@@ -486,6 +483,12 @@ const DiscoverPage: React.FC = () => {
           if (selectedCard) {
             setQuickViewVisible(false);
             handleDeepRead(selectedCard);
+          }
+        }}
+        onToggleFavorite={(cardId) => {
+          const card = cards.find(c => c.id === cardId);
+          if (card) {
+            toggleFavorite(card);
           }
         }}
       />

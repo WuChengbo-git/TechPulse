@@ -387,7 +387,7 @@ const TrendsPage: React.FC = () => {
         capability: 89,
         popularity: 75,
         recent: true,
-        provider: '阿里云',
+        provider: 'Alibaba Cloud',
         description: t('trends.llmDescQwen25')
       },
       {

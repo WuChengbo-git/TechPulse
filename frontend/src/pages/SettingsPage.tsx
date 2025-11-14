@@ -4,7 +4,7 @@ import {
   message, Typography, Alert, Tag
 } from 'antd';
 import {
-  DatabaseOutlined, UserOutlined, HeartOutlined,
+  DatabaseOutlined, HeartOutlined,
   SettingOutlined, CheckCircleOutlined,
   ExclamationCircleOutlined
 } from '@ant-design/icons';
@@ -23,9 +23,6 @@ const SettingsPage: React.FC = () => {
 
   // 个性化设置状态
   const [personalizationForm] = Form.useForm();
-
-  // 用户偏好状态
-  const [preferencesForm] = Form.useForm();
 
   // 测试连接状态
   const [testStatus, setTestStatus] = useState<{[key: string]: 'success' | 'error' | 'testing' | null}>({
@@ -47,7 +44,7 @@ const SettingsPage: React.FC = () => {
   };
 
   // 保存配置
-  const handleSave = async (formType: string) => {
+  const handleSave = async () => {
     setLoading(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -79,8 +76,8 @@ const SettingsPage: React.FC = () => {
       </Paragraph>
 
       <Alert
-        message={t('settings.aiModelsMovedTitle')}
-        description={t('settings.aiModelsMovedDescription')}
+        message="システム設定について"
+        description="このページではシステム全体に影響する設定を管理します。個人的な表示設定は右上の個人センターメニューから設定できます。"
         type="info"
         showIcon
         style={{ marginBottom: 24 }}
@@ -115,7 +112,7 @@ const SettingsPage: React.FC = () => {
               </Form.Item>
 
               <Space>
-                <Button type="primary" onClick={() => handleSave('notion')} loading={loading}>
+                <Button type="primary" onClick={handleSave} loading={loading}>
                   {t('common.save')}
                 </Button>
                 <Button onClick={testNotionConnection} loading={testStatus.notion === 'testing'}>
@@ -130,13 +127,11 @@ const SettingsPage: React.FC = () => {
             <Space wrap>
               <Tag color="default">{t('settings.obsidianPlanned')}</Tag>
               <Tag color="default">{t('settings.logseqPlanned')}</Tag>
-              <Tag color="default">{t('settings.yuquePlanned')}</Tag>
-              <Tag color="default">{t('settings.feishuPlanned')}</Tag>
             </Space>
           </Card>
         </Tabs.TabPane>
 
-        {/* 个性化推荐 */}
+        {/* AI個性化 */}
         <Tabs.TabPane
           tab={
             <span>
@@ -147,6 +142,14 @@ const SettingsPage: React.FC = () => {
           key="personalization"
         >
           <Card title={t('settings.recommendationSettings')}>
+            <Alert
+              message="AI個性化について"
+              description="ここではAIによる推薦システムの動作を設定します。興味のあるトピックを設定することで、より適切なコンテンツが推薦されます。"
+              type="info"
+              showIcon
+              style={{ marginBottom: 16 }}
+            />
+
             <Form form={personalizationForm} layout="vertical">
               <Form.Item name="enableRecommendations" valuePropName="checked">
                 <Space>
@@ -162,38 +165,22 @@ const SettingsPage: React.FC = () => {
                   <Option value="mobile">Mobile Development</Option>
                   <Option value="devops">DevOps</Option>
                   <Option value="data">Data Science</Option>
+                  <Option value="cloud">Cloud Computing</Option>
+                  <Option value="blockchain">Blockchain</Option>
+                  <Option value="iot">IoT</Option>
+                  <Option value="security">Security</Option>
+                  <Option value="database">Database</Option>
                 </Select>
               </Form.Item>
 
-              <Button type="primary" onClick={() => handleSave('personalization')} loading={loading}>
-                {t('common.save')}
-              </Button>
-            </Form>
-          </Card>
-        </Tabs.TabPane>
-
-        {/* 用户偏好 */}
-        <Tabs.TabPane
-          tab={
-            <span>
-              <UserOutlined />
-              {t('settings.preferencesTab')}
-            </span>
-          }
-          key="preferences"
-        >
-          <Card title={t('settings.displaySettings')}>
-            <Form form={preferencesForm} layout="vertical">
-              <Form.Item label={t('settings.itemsPerPage')} name="itemsPerPage">
-                <Select defaultValue={20}>
-                  <Option value={10}>10 {t('settings.items')}</Option>
-                  <Option value={20}>20 {t('settings.items')}</Option>
-                  <Option value={50}>50 {t('settings.items')}</Option>
-                  <Option value={100}>100 {t('settings.items')}</Option>
-                </Select>
+              <Form.Item name="enableAutoEnhancement" valuePropName="checked">
+                <Space>
+                  <Switch defaultChecked />
+                  <Text>新規データの自動AI増強を有効化</Text>
+                </Space>
               </Form.Item>
 
-              <Button type="primary" onClick={() => handleSave('preferences')} loading={loading}>
+              <Button type="primary" onClick={handleSave} loading={loading}>
                 {t('common.save')}
               </Button>
             </Form>
